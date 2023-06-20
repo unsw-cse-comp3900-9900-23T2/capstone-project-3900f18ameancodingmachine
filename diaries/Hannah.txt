@@ -1,0 +1,13 @@
+Week One
+  I met my team and chose our project topic which is the Eatery Management System. We chose a scrum master and discussed our prefered roles, I chose to work on front-end as that
+  is where I feel most comfortable. We also discussed the tools we could/will use for our project development.
+
+Week Two
+  We got started defining our user stories and setting up our proposal document. I wrote the 'existing systems and drawbacks' section of our proposal. This involved signing up for
+  the two similar websites and mock using them as both customers and restaurants (where possible).
+
+Week Three
+  We worked on our proposal, refining our user stories and deciding on novel functionality. I made the story boards for our user stories, and in the process found a number of missing
+  or redundant user stories to add/remove. I then wrote up the descriptions of the story boards and split the overview storyboard into sections based on the functionality categories.
+
+Week Four
