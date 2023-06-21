@@ -1,9 +1,9 @@
 -- eatery management schema
 
 -- Note:
--- for start and end offer in voucher table, need to discuss the type that is needed
--- discuss ratings, specifically for the range
--- discuss about whether we use a code in the voucher
+-- type of start and end offer in the voucher table
+-- range for ratings
+-- use a code in the voucher
 
 create table LoginInfo {
     id          integer,
@@ -17,14 +17,14 @@ create table UserAccount {
     first       text not null,
     last        text not null,
     login       integer not null references LoginInfo(id),
-    address     integer references Address(id),-- foreign key for address table
+    address     integer references Address(id),
     primary key (id)
 };
 
 create table EateryAccount {
     id          integer,
     name        text not null,
-    address     integer,-- foreign key for address table
+    address     integer references Address(id),
     phone       integer not null,
     email       text,
     login       integer not null references LoginInfo(id),
@@ -75,7 +75,8 @@ create table Posts {
 
 create table Cuisines {
     id          integer,
-    name        text
+    name        text,
+    primary key (id)
 };
 
 create table CuisineOffer {
@@ -91,7 +92,33 @@ create table Voucher {
     startOffer      datetime, -- 2022-04-22 10:34:23:55
     endOffer        datetime, 
     description     text,
-    code            text, -- may not needed
+    code            text, -- in consideration
     primary key (id)
 };
+
+create table DietaryRestrictions {
+    id              integer,
+    restriction     text not null,
+    primary key (id)
+};
+
+create table userDietary {
+    userId      integer references UserAccount(id),
+    dietId      integer references DietaryRestrictions(id),
+    primary key (userId, dietId)
+};
+
+create table provideDietary {
+    restaurantId    integer references EateryAccount(id),
+    dietId          integer references DietaryRestrictions(id),
+    primary key (restaurantId, dietId)
+}
+
+create table BusinessHour {
+    id      integer,
+    day     text,
+    open    text,
+    close   text,
+    primary key (id)
+}
 
