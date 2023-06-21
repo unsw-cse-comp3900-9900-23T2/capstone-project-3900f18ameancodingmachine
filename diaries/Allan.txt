@@ -1,0 +1,11 @@
+Week 1
+- start forming groups
+- figure out what project we are making
+
+Week 2
+- start making proposal
+- assigned to design the ER diagram for eatery management
+
+Week 3
+- keep doing the proposal
+- help a bit in system architecture explaining why we use mysql as the database
