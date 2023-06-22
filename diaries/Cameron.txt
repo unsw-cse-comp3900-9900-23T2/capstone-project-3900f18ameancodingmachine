@@ -37,3 +37,6 @@ Friday 16-06
 Week 4
 Wednesday 21-06
 - Had meeting dicussing how we will proceed. We will first implement account making.
+
+Thursday 22-06
+- Made very basic login and home page setups to later be implemented
