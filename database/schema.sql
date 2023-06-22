@@ -5,23 +5,23 @@
 -- range for ratings
 -- use a code in the voucher
 
-create table LoginInfo {
+create table LoginInfo (
     id          integer,
     login       text not null,
     password    text not null,
     primary key (id)
-};
+);
 
-create table UserAccount {
+create table UserAccount (
     id          integer,
     first       text not null,
     last        text not null,
     login       integer not null references LoginInfo(id),
     address     integer references Address(id),
     primary key (id)
-};
+);
 
-create table EateryAccount {
+create table EateryAccount (
     id          integer,
     name        text not null,
     address     integer references Address(id),
@@ -29,63 +29,64 @@ create table EateryAccount {
     email       text,
     login       integer not null references LoginInfo(id),
     url         text,
-    hours       integer, --foreign key for BusinessHour table
+    hours       integer, 
     primary key (id) 
-};
+);
 
-create table Address {
+create table Address (
     id          integer,
     street      text not null,
     suburb      text not null,
-    region      char(3) not null, -- NSW, QLD, VIC, etc
-    postcode    integer(4) not null, --2020, 1920, etc
+    region      char(3) not null, 
+    postcode    integer(4) not null, 
     primary key (id)
-};
+);
 
-create table RestaurantOwners {
+create table RestaurantOwners (
     id          integer,
     first       text not null,
     last        text not null,
-    ownerOf     id references EateryAccount(id),
+    ownerOf     integer references EateryAccount(id),
     primary key (id)
-};
+);
 
-create table SubscribedTo {
+create table SubscribedTo (
     userId          integer references UserAccount(id),
     restaurantId    integer references EateryAccount(id),
     primary key (userId, restaurantId) 
-};
+);
 
-create table Reviews {
+create table Reviews (
     id              integer,
     userId          integer references UserAccount(id),
     restaurantId    integer references EateryAccount(id),
-    rating          integer, --may need to set range
+    -- may need to set range later on
+    rating          integer, 
     comment         text,
     primary key (id)
-};
+);
 
-create table Posts {
+create table Posts (
     id          integer,
-    postedBy    integer references RestaurantOwners(id)
-    title       text
+    postedBy    integer references RestaurantOwners(id),
+    title       text,
     content     text,
     primary key (id)
-};
+);
 
-create table Cuisines {
+create table Cuisines (
     id          integer,
     name        text,
     primary key (id)
-};
+);
 
-create table CuisineOffer {
+create table CuisineOffer (
     restaurantId    integer references EateryAccount(id),
     cuisineId       integer references Cuisines(id),
     primary key (restaurantId, cuisineId)
-};
+);
 
-create table Voucher {
+create table Voucher (
     id              integer,
     offeredBy       integer references EateryAccount(id),
     discount        decimal(3,2), -- 25.25%, 32.50%, etc
@@ -94,31 +95,31 @@ create table Voucher {
     description     text,
     code            text, -- in consideration
     primary key (id)
-};
+);
 
-create table DietaryRestrictions {
+create table DietaryRestrictions (
     id              integer,
     restriction     text not null,
     primary key (id)
-};
+);
 
-create table userDietary {
+create table userDietary (
     userId      integer references UserAccount(id),
     dietId      integer references DietaryRestrictions(id),
     primary key (userId, dietId)
-};
+);
 
-create table provideDietary {
+create table provideDietary (
     restaurantId    integer references EateryAccount(id),
     dietId          integer references DietaryRestrictions(id),
     primary key (restaurantId, dietId)
-}
+);
 
-create table BusinessHour {
+create table BusinessHour (
     id      integer,
     day     text,
     open    text,
     close   text,
     primary key (id)
-}
+);
 
