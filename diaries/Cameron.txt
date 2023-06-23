@@ -1,0 +1,42 @@
+Week 1
+Friday 02-06
+- Group was formed called “3900F18AMeanCodingMachine”.
+- Group members were given roles, mine is front-end. More details will be worked out later.
+- Group has decided on Project 3 Eatery Management System.
+
+Week 2
+Thursday 08-06
+- Discussing User stories
+- Two types of accounts users / restaurants
+- So restaurants are able to advertise / communicate with customers on the platform
+- Planning on getting a majority of user stories so we have something to present tomorrow
+
+Friday 09-06
+- A user should be able to view all available coupons in one-location, with the option to search thru them for keywords, sort them based on expiry or alphabetically
+- A user should be able to ‘follow’ a restaurant so they are able to view any news that they post
+- A user can search for a food type or restaurant, when searching by food type it should be sorted by rating and or price
+- A user can leave star ratings and a written review from any restaurant they purchase from
+- A user can easily view the restaurants rating, and be able to click to see highly rated written reviews
+- A user can rate reviews as ‘helpful’ to help filter out spam reviews
+- A restaurant is able to use a special sign up to indicate that they are a restaurant, they must include their location and menu
+- A non-logged in user should be able to login or signup from the same location
+
+- Backlog completed
+- Try to come up with two novel ideas for eatery up
+- 1st is already the social media aspect
+- 2nd is the ability to integrate with online booking system to eat in-person
+
+Week 3
+Thursday 15-06
+- Synced up the differences between Jira and the google doc in terms of user stories
+- Recorded user stories
+
+Friday 16-06
+- Final touches before handing in our plan
+
+Week 4
+Wednesday 21-06
+- Had meeting dicussing how we will proceed. We will first implement account making.
+
+Thursday 22-06
+- Made very basic login and home page setups to later be implemented

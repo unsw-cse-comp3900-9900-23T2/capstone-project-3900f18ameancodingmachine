@@ -1,0 +1,13 @@
+Week 1
+  - Met the team and discussed the project.
+  - After considering each of the provided project ideas, I narrowed my decision down to the "eatery management system" project.
+  - Revised notes from previous Comp Sci courses about SQL, JavaScript, and the Express framework.
+  - Decided I was going to focus on the backend part of the project.
+Week 2
+  - Met up with team and began on the project proposal document. I wrote the background section of the document and multiple User Stories on Jira, including the sprint structure.
+  - Learn more about the Express framework, routing and authentication (cookies, tokens, etc)
+Week 3
+  - Finished multiple objective paragraphs and the system architecture diagram (as well as the accompanying explanations).
+  - Finalised and helped submit the report.
+Week 4
+--
