@@ -1,3 +1,13 @@
 .formSubmission{
     padding: 20px;
 }
+
+.formField {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .formField label {
+    margin-right: 10px;
+  }
