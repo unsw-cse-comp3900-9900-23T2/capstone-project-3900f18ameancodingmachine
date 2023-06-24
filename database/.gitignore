@@ -1,0 +1,2 @@
+# remove any files related to API configuration
+.env
