@@ -11,7 +11,11 @@ const config = {
 
 const pool = mysql.createPool(config)
 
-export { pool };
+const poolPromise = pool.promise();
+
+
+
+export { pool, poolPromise };
 
 
 // testing connection
