@@ -1,7 +1,7 @@
 import { pool, poolPromise } from "./db_connection.js";
 
 async function insertLogin(username, password) {
-    const query_1 = `insert into LoginInfo(login, password) values ("${username}", "${password}");`;
+    const query_1 = `insert into LoginInfo(login, password) values (?, ?);`;
     await poolPromise.execute(query_1, [username, password]);
 };
 
