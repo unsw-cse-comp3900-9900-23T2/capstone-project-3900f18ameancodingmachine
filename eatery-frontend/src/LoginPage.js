@@ -1,21 +1,39 @@
 import React from 'react';
 import './LoginPage.css'
 import { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
+/*
+ *  Checks credentials with backend, if successful set the recieved sessionID and returns true
+ *  Otherwise return false
+ */
+function checkCredentials(email, pass){
+  /*
+   *  If the credentials are successful set appropriate cookies for homepage
+   */
+  alert(`LoginPage.js: checkCredentials\nThe email you entered was: ${email}\nThe password you entered was: ${pass}`);
+  return false;
+}
 
 function LoginForm(){
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const navigate = useNavigate();
+  const [logInFail, setLogInFail] = useState(false);
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
     /*
-     *  Modify this function to use a hook to access the backend
-     *  Once the backend is up set up checking that 
+     *  Send email and password to backend to check if they are valid
+     *  If so, proceed to homepage as a logged in user
+     *  Else print underneath "Incorrect Email or Password" 
      */
-    alert(`The email you entered was: ${email}\nThe password you entered was: ${pass}`);
-    history.push('/');
+    if (checkCredentials(email, pass)){
+      navigate("/");
+    };
+    setLogInFail(true);
+    
   }
 
  return (
@@ -33,6 +51,9 @@ function LoginForm(){
       </label>
     </div>
     <input onClick={handleSubmit} type="submit" value="Submit" />
+    <div>
+      {logInFail && <span className="logInError">Incorrect Email or Password</span> }
+    </div>
     </form>
 
   )

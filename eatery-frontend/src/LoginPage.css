@@ -8,6 +8,10 @@
     margin-bottom: 10px;
   }
 
-  .formField label {
-    margin-right: 10px;
-  }
+.formField label {
+  margin-right: 10px;
+}
+
+.logInError {
+  color: red;
+}
