@@ -6,14 +6,14 @@
 -- use a code in the voucher
 
 create table LoginInfo (
-    id          integer,
+    id          integer auto_increment,
     login       text not null,
     password    text not null,
     primary key (id)
 );
 
 create table UserAccount (
-    id          integer,
+    id          integer auto_increment,
     first       text not null,
     last        text not null,
     login       integer not null references LoginInfo(id),
@@ -22,7 +22,7 @@ create table UserAccount (
 );
 
 create table EateryAccount (
-    id          integer,
+    id          integer auto_increment,
     name        text not null,
     address     integer references Address(id),
     phone       integer not null,
@@ -34,7 +34,7 @@ create table EateryAccount (
 );
 
 create table Address (
-    id          integer,
+    id          integer auto_increment,
     street      text not null,
     suburb      text not null,
     region      char(3) not null, 
@@ -43,7 +43,7 @@ create table Address (
 );
 
 create table RestaurantOwners (
-    id          integer,
+    id          integer auto_increment,
     first       text not null,
     last        text not null,
     ownerOf     integer references EateryAccount(id),
@@ -57,7 +57,7 @@ create table SubscribedTo (
 );
 
 create table Reviews (
-    id              integer,
+    id              integer auto_increment,
     userId          integer references UserAccount(id),
     restaurantId    integer references EateryAccount(id),
     -- may need to set range later on
@@ -67,7 +67,7 @@ create table Reviews (
 );
 
 create table Posts (
-    id          integer,
+    id          integer auto_increment,
     postedBy    integer references RestaurantOwners(id),
     title       text,
     content     text,
@@ -75,7 +75,7 @@ create table Posts (
 );
 
 create table Cuisines (
-    id          integer,
+    id          integer auto_increment,
     name        text,
     primary key (id)
 );
@@ -87,7 +87,7 @@ create table CuisineOffer (
 );
 
 create table Voucher (
-    id              integer,
+    id              integer auto_increment,
     offeredBy       integer references EateryAccount(id),
     discount        decimal(3,2), -- 25.25%, 32.50%, etc
     startOffer      datetime, -- 2022-04-22 10:34:23:55
@@ -98,7 +98,7 @@ create table Voucher (
 );
 
 create table DietaryRestrictions (
-    id              integer,
+    id              integer auto_increment,
     restriction     text not null,
     primary key (id)
 );
@@ -116,10 +116,11 @@ create table provideDietary (
 );
 
 create table BusinessHour (
-    id      integer,
-    day     text,
-    open    text,
-    close   text,
+    id              integer auto_increment,
+    restaurantId    integer references EateryAccount(id),
+    day             text,
+    open            text,
+    close           text,
     primary key (id)
 );
 
