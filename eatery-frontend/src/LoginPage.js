@@ -38,22 +38,22 @@ function LoginForm(){
 
  return (
     <form className='formSubmission'>
-    <div className='formField'>
-      <label>
-        Email:
-        <input type="text" value={email} onChange={(e) => setEmail(e.target.value)}/>
-      </label>
-    </div>
-    <div className='formField'>
-      <label>
-        Password:
-        <input type="text" value={pass} onChange={(e) => setPass(e.target.value)}/>
-      </label>
-    </div>
-    <input onClick={handleSubmit} type="submit" value="Submit" />
-    <div>
-      {logInFail && <span className="logInError">Incorrect Email or Password</span> }
-    </div>
+      <div className='formField'>
+        <label>
+          Email:
+          <input type="text" value={email} onChange={(e) => setEmail(e.target.value)}/>
+        </label>
+      </div>
+      <div className='formField'>
+        <label>
+          Password:
+          <input type="text" value={pass} onChange={(e) => setPass(e.target.value)}/>
+        </label>
+      </div>
+      <input onClick={handleSubmit} type="submit" value="Log In" />
+      <div>
+        {logInFail && <span className="logInError">Incorrect Email or Password</span> }
+      </div>
     </form>
 
   )
@@ -70,12 +70,14 @@ function ForgotPassword(){
 function LoginPage(){  
   return (
     <div>
-      <h1>Login Page</h1>
-      <Link to="/">Go to Home</Link>
-
-      <LoginForm/>
-      <ForgotPassword/>
-   
+      <div className='header'>
+        <Link className="homeButton" to="/">Go to Home</Link> 
+      </div>
+      <div className='middlePageLogin'>
+        <h1>Login Page</h1>
+        <LoginForm/>
+        <ForgotPassword/>
+      </div>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 .formSubmission{
-    padding: 20px;
+    padding: 0px;
 }
 
 .formField {
     display: flex;
-    align-items: center;
+    align-items: left;
     margin-bottom: 10px;
   }
 
@@ -15,3 +15,15 @@
 .logInError {
   color: red;
 }
+
+.middlePageLogin{
+  padding-top: 10%;
+  margin-left:auto;
+  margin-right:auto;
+  width: 300px;
+}
+
+.homeButton{
+  float: right;
+}
+
