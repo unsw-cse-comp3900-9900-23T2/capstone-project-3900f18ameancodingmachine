@@ -29,7 +29,6 @@ create table EateryAccount (
     email       text,
     login       integer not null references LoginInfo(id),
     url         text,
-    hours       integer, 
     primary key (id) 
 );
 
