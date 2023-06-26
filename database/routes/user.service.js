@@ -5,7 +5,7 @@ export function createLogin(data, callBack) {
     pool.execute(
         `insert into LoginInfo (login, password) values (?, ?)`,
         [
-            data.user,
+            data.login,
             data.password
         ],
         (error, results, fields) => {
@@ -39,8 +39,8 @@ export function createUse(data, callBack) {
         [
             data.first,
             data.last,
-            data.login,
-            data.address
+            data.loginId,
+            data.addressId
         ],
         (error, results, fields) => {
             if (error) return callBack(error);

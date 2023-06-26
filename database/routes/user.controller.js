@@ -1,10 +1,13 @@
 import { createAddress, createLogin, createUse, getUsers, getUserByUserId, getLoginByUsername } from "./user.service.js";
 import crypto from "crypto";
-import { sign  } from "jsonwebtoken";
+import pkg from "jsonwebtoken";
 import 'dotenv/config';
 
-//wrapper functions
+const { sign } = pkg;
 
+//Controller functions
+
+//create account in LoginInfo table
 export function createAccountInfo(req, res) {
     const body = req.body
     body.password = getHashOf(body.password);
@@ -23,6 +26,7 @@ export function createAccountInfo(req, res) {
     })
 }
 
+//create address in Address table
 export function createAddressInfo(req, res) {
     const body = req.body
     createAddress(body, (err, results) => {
@@ -40,6 +44,7 @@ export function createAddressInfo(req, res) {
     })
 }
 
+//create User in UserAccount table
 export function createUser(req, res) {
     const body = req.body
     createUse(body, (err, results) => {
@@ -57,6 +62,7 @@ export function createUser(req, res) {
     })
 }
 
+//get user by userId
 export function getUserById(req, res) {
     const id = req.params.id;
     getUserByUserId(id, (err, results) => {
@@ -80,6 +86,7 @@ export function getUserById(req, res) {
     })
 }
 
+//get all existing users
 export function getAllUsers(req, res) {
     getUsers((err, results) => {
         if (err) {
@@ -96,6 +103,7 @@ export function getAllUsers(req, res) {
     });
 }
 
+//user obtains token here
 export function login(req, res) {
     const body = req.body;
     getLoginByUsername(body.login, (err, results) => {
@@ -108,7 +116,7 @@ export function login(req, res) {
                 data: "Invalid username or password"
             });
         }
-        //check if password matches
+        //check if hashed password matches
         const result = getHashOf(body.password) === results.password;
         if(result) {
             results.password = undefined;
@@ -129,6 +137,7 @@ export function login(req, res) {
     });
 }
 
+//Used to hash the password for security
 function getHashOf(text) {
     return crypto.createHash('sha256').update(text).digest('hex');
 }
