@@ -84,3 +84,56 @@ export function getLoginByUsername(username, callBack) {
         }
     )
 }
+
+export function createEateryAccount(data, callBack) {
+    pool.execute(
+        `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?)`,
+        [data.name, data.address, data.phone, data.email, data.login, data.url],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results);
+        }
+    )
+}
+
+// returns multiple row if more than one cuisine
+export function getEateryByRestaurantId(id, callBack) {
+    const query = `select name, address, phone, email, login, url 
+                    from EateryAccount ea
+                    join cuisine()
+                    where id = ?`;
+    pool.execute(
+        query,
+        [id],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results);
+        }
+    )
+}
+
+export function insertNewCuisineName(name, callBack) {
+    const query = `insert into Cuisine(name) values (?)`;
+    pool.execute(
+        query,
+        [name],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results);
+        }
+    )
+}
+
+export function insertCuisineFromRestaurant(data, callBack) {
+    // assume that cuisine name exist in cuisine offer
+    const query = `insert into CuisineOffer(restaurantId, cuisineId)
+                    value(?, (select id from Cusines where name=?))`;
+    pool.execute(
+        query,
+        [data.restaurantId, data.cusineName],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results);
+        }
+    )
+}
