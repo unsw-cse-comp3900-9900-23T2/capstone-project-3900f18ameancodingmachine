@@ -1,5 +1,5 @@
 // temporary file to delete data from tables
-import { pool } from "./db_connection.js"
+import { pool } from "./db-config/db_connection.js"
 
 function deleteAllUserAccount() {
     pool.getConnection(function(err, conn) {
@@ -23,4 +23,4 @@ function deleteAllUserAccount() {
     });
 }
 
-deleteAllUserAccount;
+deleteAllUserAccount();
