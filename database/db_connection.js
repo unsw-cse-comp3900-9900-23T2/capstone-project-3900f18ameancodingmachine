@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import mysql from 'mysql2';
 
-// initialize pool
+// project config
 const config = {
   host     : process.env.DB_HOST,
   user     : process.env.DB_USER,
@@ -9,13 +9,22 @@ const config = {
   database : process.env.DB_DATABASE
 };
 
-const pool = mysql.createPool(config)
+// for local mysql testing
+// make sure to donwload mysql first
+const local_config = {
+  host: process.env.LOCAL_HOST,
+  user: process.env.LOCAL_USER,
+  password: process.env.LOCAL_PASSWORD,
+  database: process.env.LOCAL_DATABASE
+};
+
+const pool = mysql.createPool(config);
+const localpool = mysql.createPool(local_config);
 
 const poolPromise = pool.promise();
+const poolPromiseLocal = localpool.promise();
 
-
-
-export { pool, poolPromise };
+export { pool, poolPromise, poolPromiseLocal };
 
 
 // testing connection

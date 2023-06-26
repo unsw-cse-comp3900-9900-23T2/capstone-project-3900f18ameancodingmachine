@@ -4,10 +4,13 @@
 -- type of start and end offer in the voucher table
 -- range for ratings
 -- use a code in the voucher
+drop database if exists eatery_test;
+create database eatery_test;
+use eatery_test;
 
 create table LoginInfo (
     id          integer auto_increment,
-    login       text not null, --referring to username
+    login       text not null,
     password    text not null,
     primary key (id)
 );
@@ -23,11 +26,11 @@ create table UserAccount (
 
 create table EateryAccount (
     id          integer auto_increment,
-    name        text not null,
+    name        text,
     address     integer references Address(id),
     phone       integer not null,
     email       text,
-    login       integer not null references LoginInfo(id),
+    login       integer references LoginInfo(id),
     url         text,
     hours       integer, 
     primary key (id) 

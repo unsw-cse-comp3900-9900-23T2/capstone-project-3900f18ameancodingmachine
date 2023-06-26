@@ -1,10 +1,12 @@
 // this file is to test queries
-import { getLoginId, insertLogin, insertUserAccount } from "./db_function.js";
+import { insertLogin, insertUserAccount } from "./db_function.js";
 
-const new_username = 'allansugi';
+const new_username = 'firstuser';
 const new_password = 'pass';
+const first = 'first';
+const last = 'last';
+const address = 1;
+
 await insertLogin(new_username, new_password);
-const loginId  = await getLoginId(new_username);
-console.log(loginId)
-await insertUserAccount('Allan', 'Sugianto', loginId);
+await insertUserAccount(first, last, new_username, address);
 console.log("success");
