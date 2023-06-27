@@ -187,6 +187,19 @@ export function createReviews(data, callBack) {
     );
 }
 
+export function createSubscribedTo(data, callBack) {
+    pool.execute(
+        `insert into SubscribedTo (restaurantId) values (?)`,
+        [
+            data.restaurantId
+        ],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results);
+        }
+    );
+}
+
 export function insertHourFromRestaurant(data, callback) {
     const query = `insert into BusinessHour (restaurantId, day, open, close) values (?, ?, ?, ?)`;
     const values = [data.restaurantId, data.day, data.open, data.close]
