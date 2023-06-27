@@ -112,23 +112,6 @@ export function getEateryByRestaurantId(id, callBack) {
     )
 }
 
-export async function insertNewCuisineName2(body) {
-    try {
-        const name = body.name;
-        const query = `insert into Cuisine(name) values (?)`;
-        const [result] = await poolPromise.execute(query,[name]);
-        return res.status(200).json({
-            success: 1,
-            results: result
-        });
-    } catch (err) {
-        return res.status(500).json({
-            success: 0,
-            results: 'Database Connection Error'
-        });
-    }
-}
-
 export function insertNewCuisineName(data, callBack) {
     const query = `insert into Cuisines(name) values (?)`;
     pool.execute(
