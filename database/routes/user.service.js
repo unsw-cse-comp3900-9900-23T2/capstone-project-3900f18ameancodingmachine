@@ -171,6 +171,18 @@ export function createPosts(data, callBack) {
     );
 }
 
+export function getPostByPostId(id, callBack) {
+    //gets user by id
+    pool.execute(
+        `select id, postedBy, title, content from Posts where id = ?`,
+        [id],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results[0]);
+        }
+    );
+}
+
 export function createReviews(data, callBack) {
     pool.execute(
         `insert into Reviews (userId, restaurantId, rating, comment) values (?, ?, ?, ?)`,
