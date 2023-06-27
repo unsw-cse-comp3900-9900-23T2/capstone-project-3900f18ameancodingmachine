@@ -25,35 +25,35 @@ export default function RegistrationPage() {
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
             First Name
           </Typography>
-          <TextField id="register-first-name" label="First Name" value={firstName} onChange={(event) => {
+          <TextField required id="register-first-name" label="First Name" value={firstName} onChange={(event) => {
               setFirstName(event.target.value);
             }}
           />
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
             Last Name
           </Typography>
-          <TextField id="register-last-name" label="Last Name" value={lastName} onChange={(event) => {
+          <TextField required id="register-last-name" label="Last Name" value={lastName} onChange={(event) => {
               setLastName(event.target.value);
             }}
           />
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
             Email Address
           </Typography>
-          <TextField id="register-email" label="email" value={email} onChange={(event) => {
+          <TextField required id="register-email" label="email" value={email} onChange={(event) => {
               setEmail(event.target.value);
             }}
           />
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
             Password
           </Typography>
-          <TextField id="register-password" label="Password" value={password} onChange={(event) => {
+          <TextField required type="password" id="register-password" label="Password" value={password} onChange={(event) => {
               setPassword(event.target.value);
             }}
           />
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
             Confirm Password
           </Typography>
-          <TextField id="register-confirm-password" label="Confirm Password" value={confirmPassword} onChange={(event) => {
+          <TextField required type="password" id="register-confirm-password" label="Confirm Password" value={confirmPassword} onChange={(event) => {
               setConfirmPassword(event.target.value);
             }}
           />
