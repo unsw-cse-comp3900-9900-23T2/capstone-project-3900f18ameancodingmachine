@@ -159,3 +159,34 @@ export function insertCuisineFromRestaurant(data, callBack) {
         }
     )
 }
+
+export function createPosts(data, callBack) {
+    pool.execute(
+        `insert into Posts (postedBy, title, content) values (?, ?, ?)`,
+        [
+            data.postedBy,
+            data.title,
+            data.content
+        ],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results);
+        }
+    );
+}
+
+export function createReviews(data, callBack) {
+    pool.execute(
+        `insert into Reviews (userId, restaurantId, rating, comment) values (?, ?, ?, ?)`,
+        [
+            data.userId,
+            data.restaurantId,
+            data.rating,
+            data.comment
+        ],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results);
+        }
+    );
+}
