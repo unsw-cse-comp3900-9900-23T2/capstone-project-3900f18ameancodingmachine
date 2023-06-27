@@ -2,11 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 // import HomePage from './HomePage';
 // import LoginPage from './LoginPage';
-import RegistrationPage from './account/RegistrationPage';
+import Banner from './banner/Banner';
+import RegistrationPage from './user/RegistrationPage';
 
 function App() {
   return (
     <Router>
+      <Banner/>
       <Routes>
         {/* <Route path="/" element={<HomePage />} /> */}
         {/* <Route path="/login" element={<LoginPage />} /> */}
