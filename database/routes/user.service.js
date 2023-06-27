@@ -172,7 +172,7 @@ export function createPosts(data, callBack) {
 }
 
 export function getPostByPostId(id, callBack) {
-    //gets user by id
+    //gets post by id
     pool.execute(
         `select id, postedBy, title, content from Posts where id = ?`,
         [id],
