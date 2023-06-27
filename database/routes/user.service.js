@@ -1,4 +1,4 @@
-import { pool } from "../db-config/db_connection.js";
+import { pool, poolPromise } from "../db-config/db_connection.js";
 
 export function createLogin(data, callBack) {
     //insert login details
@@ -87,7 +87,7 @@ export function getLoginByUsername(username, callBack) {
 
 export function createEateryAccount(data, callBack) {
     pool.execute(
-        `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?)`,
+        `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?, ?, ?)`,
         [data.name, data.address, data.phone, data.email, data.login, data.url],
         (error, results, fields) => {
             if (error) return callBack(error);
@@ -112,16 +112,38 @@ export function getEateryByRestaurantId(id, callBack) {
     )
 }
 
-export function insertNewCuisineName(name, callBack) {
-    const query = `insert into Cuisine(name) values (?)`;
+export async function insertNewCuisineName2(body) {
+    try {
+        const name = body.name;
+        const query = `insert into Cuisine(name) values (?)`;
+        const [result] = await poolPromise.execute(query,[name]);
+        return res.status(200).json({
+            success: 1,
+            results: result
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            results: 'Database Connection Error'
+        });
+    }
+}
+
+export function insertNewCuisineName(body, callBack) {
+    const name = body.name;
+    const query = `insert into Cuisines(name) values (?)`;
     pool.execute(
         query,
         [name],
         (error, results, fields) => {
-            if (error) return callBack(error);
-            return callBack(null, results);
+            if (error) return error.code;
+            return results;
         }
     )
+}
+
+function dberrorHandler() {
+    return res
 }
 
 export function insertCuisineFromRestaurant(data, callBack) {

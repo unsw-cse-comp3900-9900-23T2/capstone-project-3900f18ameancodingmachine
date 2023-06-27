@@ -1,4 +1,5 @@
-import { createAddress, createLogin, createUse, getUsers, getUserByUserId, getLoginByUsername } from "./user.service.js";
+import { createAddress, createLogin, createUse, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertNewCuisineName2 } from "./user.service.js";
+import { poolPromise } from "../db-config/db_connection.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
 import 'dotenv/config';
@@ -135,6 +136,67 @@ export function login(req, res) {
             });
         }
     });
+}
+
+export function createEatery(req,res) {
+    const body = req.body;
+    createEateryAccount(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database conenction error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })
+    })
+}
+
+// async function
+export async function createEatery2(req, res) {
+    try {
+        const body = req.body;
+        const name = body.name;
+        const query = `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?, ?, ?)`;
+        const values = [body.name, body.address, body.phone, body.email, body.login, body.url];
+        const [result] = await poolPromise.execute(query,values);
+        return res.status(200).json({
+            success: 1,
+            results: result
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            results: 'Database Connection Error'
+        })
+    }
+}
+
+export async function createCuisine2(req, res) {
+    try {
+        const body = req.body;
+        const name = body.name;
+        const query = `insert into Cuisine(name) values (?)`;
+        const [result] = await poolPromise.execute(query,[name]);
+        return res.status(200).json({
+            success: 1,
+            results: result
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            results: 'Database Connection Error'
+        });
+    }
+}
+
+// ignore this for now
+export function createCuisine1(req,res) {
+    const body = req.body;
+    return insertNewCuisineName2(body);
 }
 
 //Used to hash the password for security
