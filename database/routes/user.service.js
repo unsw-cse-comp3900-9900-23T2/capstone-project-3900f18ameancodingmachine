@@ -129,23 +129,19 @@ export async function insertNewCuisineName2(body) {
     }
 }
 
-export function insertNewCuisineName(body, callBack) {
-    const name = body.name;
+export function insertNewCuisineName(data, callBack) {
     const query = `insert into Cuisines(name) values (?)`;
     pool.execute(
         query,
-        [name],
+        [data.name],
         (error, results, fields) => {
-            if (error) return error.code;
-            return results;
+            if (error) return callBack(error);
+            return callBack(null, results);
         }
     )
 }
 
-function dberrorHandler() {
-    return res
-}
-
+// given restaurantId and name of the cuisine
 export function insertCuisineFromRestaurant(data, callBack) {
     // assume that cuisine name exist in cuisine offer
     const query = `insert into CuisineOffer(restaurantId, cuisineId)
@@ -156,6 +152,19 @@ export function insertCuisineFromRestaurant(data, callBack) {
         (error, results, fields) => {
             if (error) return callBack(error);
             return callBack(null, results);
+        }
+    )
+}
+
+export function insertHourFromRestaurant(data, callback) {
+    const query = `insert into BusinessHour (restaurantId, day, open, close) values (?, ?, ?, ?)`;
+    const values = [data.restaurantId, data.day, data.open, data.close]
+    pool.execute(
+        query,
+        values,
+        (error, results, fields) => {
+            if (error) return callback(error);
+            return callback(null, results);
         }
     )
 }

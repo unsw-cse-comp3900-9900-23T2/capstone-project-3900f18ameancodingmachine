@@ -1,4 +1,4 @@
-import { createAddress, createLogin, createUse, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertNewCuisineName2 } from "./user.service.js";
+import { createAddress, createLogin, createUse, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertNewCuisineName2, insertCuisineFromRestaurant, insertHourFromRestaurant } from "./user.service.js";
 import { poolPromise } from "../db-config/db_connection.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -155,7 +155,6 @@ export function createEatery(req,res) {
     })
 }
 
-// async function
 export async function createEatery2(req, res) {
     try {
         const body = req.body;
@@ -175,6 +174,23 @@ export async function createEatery2(req, res) {
     }
 }
 
+export function createCuisine(req,res) {
+    const body = req.body;
+    insertNewCuisineName(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })
+    })
+}
+
 export async function createCuisine2(req, res) {
     try {
         const body = req.body;
@@ -186,6 +202,7 @@ export async function createCuisine2(req, res) {
             results: result
         });
     } catch (err) {
+        console.log(err);
         return res.status(500).json({
             success: 0,
             results: 'Database Connection Error'
@@ -193,10 +210,76 @@ export async function createCuisine2(req, res) {
     }
 }
 
-// ignore this for now
-export function createCuisine1(req,res) {
+export function createRestaurantCusine(req, res) {
     const body = req.body;
-    return insertNewCuisineName2(body);
+    insertCuisineFromRestaurant(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })
+    });
+}
+
+export async function createRestaurantCusine2(req, res) {
+    try {
+        const body = req.body;
+        const restaurant = body.restaurantId;
+        const cuisine = body.cuisineId;
+        const values = [restaurant, cuisine]
+        const query = `insert into CuisineOffer(restaurantId, cuisineId) values (?, ?)`
+        const [results] = await poolPromise.execute(query, values);
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })  
+    } catch(err) {
+        console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+export function insertBusinessHour(req, res) {
+    insertHourFromRestaurant(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        });
+    });
+}
+
+export async function insertBusinessHour2(req,res) {
+    try {
+        const data = req.body;
+        const values = [data.restaurantId, data.day, data.open, data.close]
+        const query = `insert into BusinessHour (restaurantId, day, open, close) values (?, ?, ?, ?)`;
+        const [results] = await poolPromise.execute(query, values);
+        return res.status(200).json({
+            success: 1,
+            data: results
+        });  
+    } catch(err) {
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
 //Used to hash the password for security
