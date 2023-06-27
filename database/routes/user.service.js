@@ -154,6 +154,18 @@ export function createPosts(data, callBack) {
     );
 }
 
+export function getPostByPostId(id, callBack) {
+    //gets post by id
+    pool.execute(
+        `select id, postedBy, title, content from Posts where id = ?`,
+        [id],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results[0]);
+        }
+    );
+}
+
 export function createReviews(data, callBack) {
     pool.execute(
         `insert into Reviews (userId, restaurantId, rating, comment) values (?, ?, ?, ?)`,
@@ -162,6 +174,19 @@ export function createReviews(data, callBack) {
             data.restaurantId,
             data.rating,
             data.comment
+        ],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results);
+        }
+    );
+}
+
+export function createSubscribedTo(data, callBack) {
+    pool.execute(
+        `insert into SubscribedTo (restaurantId) values (?)`,
+        [
+            data.restaurantId
         ],
         (error, results, fields) => {
             if (error) return callBack(error);
