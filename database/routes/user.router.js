@@ -1,4 +1,4 @@
-import { createAccountInfo, createAddressInfo, createUser, createEatery, getAllUsers, getUserById, login, createCuisine2 } from "./user.controller.js";
+import { createAccountInfo, createAddressInfo, createUser, createEatery, getAllUsers, getUserById, login, createCuisine, createB, createBusinessHour } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
 
@@ -18,7 +18,8 @@ router.get("/:id", getUserById)
 router.post("/login", login);
 
 router.post("/eatery", createEatery);
-router.post("/cuisine", createCuisine2);
+router.post("/cuisine", createCuisine);
+router.post("/hour", createBusinessHour);
 export { router };
 
 

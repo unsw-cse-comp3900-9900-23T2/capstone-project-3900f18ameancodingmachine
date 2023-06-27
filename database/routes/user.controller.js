@@ -7,6 +7,7 @@ import 'dotenv/config';
 const { sign } = pkg;
 
 //Controller functions
+//async functions are written function2
 
 //create account in LoginInfo table
 export function createAccountInfo(req, res) {
@@ -248,7 +249,8 @@ export async function createRestaurantCusine2(req, res) {
     }
 }
 
-export function insertBusinessHour(req, res) {
+export function createBusinessHour(req, res) {
+    const body = req.body;
     insertHourFromRestaurant(body, (err, results) => {
         if (err) {
             console.log(err);
@@ -264,7 +266,7 @@ export function insertBusinessHour(req, res) {
     });
 }
 
-export async function insertBusinessHour2(req,res) {
+export async function createBusinessHour2(req,res) {
     try {
         const data = req.body;
         const values = [data.restaurantId, data.day, data.open, data.close]
