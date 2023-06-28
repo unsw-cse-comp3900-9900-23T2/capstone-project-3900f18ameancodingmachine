@@ -1,7 +1,16 @@
-import React from 'react';
 import './LoginPage.css'
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
+import * as React from 'react';
+
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 /*
  *  Checks credentials with backend, if successful set the recieved sessionID and returns true
@@ -16,10 +25,10 @@ function checkCredentials(email, pass){
 }
 
 function LoginForm(){
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
   const navigate = useNavigate();
   const [logInFail, setLogInFail] = useState(false);
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -29,7 +38,7 @@ function LoginForm(){
      *  If so, proceed to homepage as a logged in user
      *  Else print underneath "Incorrect Email or Password" 
      */
-    if (checkCredentials(email, pass)){
+    if (checkCredentials(email, password)){
       navigate("/");
     };
     setLogInFail(true);
@@ -37,48 +46,45 @@ function LoginForm(){
   }
 
  return (
-    <form className='formSubmission'>
-      <div className='formField'>
-        <label>
-          Email:
-          <input type="text" value={email} onChange={(e) => setEmail(e.target.value)}/>
-        </label>
-      </div>
-      <div className='formField'>
-        <label>
-          Password:
-          <input type="text" value={pass} onChange={(e) => setPass(e.target.value)}/>
-        </label>
-      </div>
-      <input onClick={handleSubmit} type="submit" value="Log In" />
-      <div>
-        {logInFail && <span className="logInError">Incorrect Email or Password</span> }
-      </div>
-    </form>
+  <Container maxWidth="md">
+    <Card sx={{ minWidth: 275 }}>
+      <CardContent>
+        <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+          Log In
+        </Typography>
+        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          Email Address
+        </Typography>
+        <TextField required id="register-email" label="email" value={email} onChange={(event) => {
+            setEmail(event.target.value);
+          }}
+        />
+        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          Password
+        </Typography>
+        <TextField required type="password" id="register-password" label="Password" value={password} onChange={(event) => {
+            setPassword(event.target.value);
+          }}
+        />
+        {logInFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>Incorrect Email or Password</Typography> }
+      </CardContent>
+      <CardActions onClick={handleSubmit}>
+        <Button size="small">Log In</Button>
+      </CardActions>
+      
+      <CardActions>
+        <Button size="small">Forgot Password? TODO: Modify to link to Forgot Password Page</Button>
+      </CardActions>
 
-  )
-}
+    </Card>
+  </Container>
 
-function ForgotPassword(){
-  return(
-    <button>
-        Forgot Password
-    </button>
   )
 }
 
 function LoginPage(){  
   return (
-    <div>
-      <div className='header'>
-        <Link className="homeButton" to="/">Go to Home</Link> 
-      </div>
-      <div className='middlePageLogin'>
-        <h1>Login Page</h1>
-        <LoginForm/>
-        <ForgotPassword/>
-      </div>
-    </div>
+    <LoginForm/>
   );
 }
 
