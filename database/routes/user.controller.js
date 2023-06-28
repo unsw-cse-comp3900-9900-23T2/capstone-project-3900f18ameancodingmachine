@@ -1,4 +1,4 @@
-import { createAddress, createLogin, createUse, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertCuisineFromRestaurant, insertHourFromRestaurant } from "./user.service.js";
+import { createAddress, createLogin, createUse, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertCuisineFromRestaurant, insertHourFromRestaurant, getCuisineFromCuisineIdt, getCuisineFromCuisineId } from "./user.service.js";
 import { poolPromise } from "../db-config/db_connection.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -85,7 +85,7 @@ export function getUserById(req, res) {
             success: 1,
             data: results
         })
-    })
+    });
 }
 
 //get all existing users
@@ -173,6 +173,29 @@ export function createCuisine(req,res) {
     })
 }
 
+export function getCuisineById(req, res) {
+    const id = req.params.id
+    getCuisineFromCuisineId(id, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        if (!results) {
+            return res.status(404).json({
+                success: 0,
+                message: "Cuisine not found"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        });
+    });
+}
+
 export function createRestaurantCusine(req, res) {
     const body = req.body;
     insertCuisineFromRestaurant(body, (err, results) => {
@@ -189,8 +212,6 @@ export function createRestaurantCusine(req, res) {
         })
     });
 }
-
-
 
 export function createBusinessHour(req, res) {
     const body = req.body;
