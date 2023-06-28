@@ -212,6 +212,19 @@ export function createSubscribedTo(data, callBack) {
     );
 }
 
+export function getSubscribedToByUserId(id, callBack) {
+    pool.execute(
+        `select userId, restaurantId from SubscribedTo st
+        join UserAccount()
+        where id = ?`,
+        [id],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results[0]);
+        }
+    );
+}
+
 export function insertHourFromRestaurant(data, callback) {
     const query = `insert into BusinessHour (restaurantId, day, open, close) values (?, ?, ?, ?)`;
     const values = [data.restaurantId, data.day, data.open, data.close]
