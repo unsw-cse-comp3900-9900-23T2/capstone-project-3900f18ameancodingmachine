@@ -1,4 +1,5 @@
-import { createAddress, createLogin, createUse, getUsers, getUserByUserId, getLoginByUsername } from "./user.service.js";
+import { createAddress, createLogin, createUse, createPosts, createReviews, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertCuisineFromRestaurant, insertHourFromRestaurant, getCuisineFromCuisineIdt, getCuisineFromCuisineId } from "./user.service.js";
+import { poolPromise } from "../db-config/db_connection.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
 import 'dotenv/config';
@@ -6,6 +7,7 @@ import 'dotenv/config';
 const { sign } = pkg;
 
 //Controller functions
+//async functions are written function2
 
 //create account in LoginInfo table
 export function createAccountInfo(req, res) {
@@ -62,6 +64,41 @@ export function createUser(req, res) {
     })
 }
 
+export function createReviews(req, res) {
+    const body = req.body
+    createReviews(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })
+    })
+}
+
+export function createPosts(req, res) {
+    const body = req.body
+    body.password = getHashOf(body.password);
+    createPosts(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })
+    })
+}
+
 //get user by userId
 export function getUserById(req, res) {
     const id = req.params.id;
@@ -83,7 +120,7 @@ export function getUserById(req, res) {
             success: 1,
             data: results
         })
-    })
+    });
 }
 
 //get all existing users
@@ -136,6 +173,99 @@ export function login(req, res) {
         }
     });
 }
+
+export function createEatery(req,res) {
+    const body = req.body;
+    createEateryAccount(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database conenction error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })
+    })
+}
+
+export function createCuisine(req,res) {
+    const body = req.body;
+    insertNewCuisineName(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })
+    })
+}
+
+export function getCuisineById(req, res) {
+    const id = req.params.id
+    getCuisineFromCuisineId(id, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        if (!results) {
+            return res.status(404).json({
+                success: 0,
+                message: "Cuisine not found"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        });
+    });
+}
+
+export function createRestaurantCusine(req, res) {
+    const body = req.body;
+    insertCuisineFromRestaurant(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })
+    });
+}
+
+export function createBusinessHour(req, res) {
+    const body = req.body;
+    insertHourFromRestaurant(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        });
+    });
+}
+
+
 
 //Used to hash the password for security
 function getHashOf(text) {
