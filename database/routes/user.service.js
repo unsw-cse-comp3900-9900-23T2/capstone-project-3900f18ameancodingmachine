@@ -298,7 +298,7 @@ export async function createCuisine(data) {
 }
 
 // create new eatery account
-export async function createEatery(data) {
+export async function createEateryAccount(data) {
     try {
         const name = data.name;
         const query = `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?, ?, ?)`;
