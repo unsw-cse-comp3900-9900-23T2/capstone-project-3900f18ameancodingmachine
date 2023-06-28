@@ -1,4 +1,4 @@
-import { createAddress, createLogin, createUse, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertCuisineFromRestaurant, insertHourFromRestaurant, getCuisineFromCuisineIdt, getCuisineFromCuisineId } from "./user.service.js";
+import { createAddress, createLogin, createUse, createPosts, createReviews, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertCuisineFromRestaurant, insertHourFromRestaurant, getCuisineFromCuisineIdt, getCuisineFromCuisineId } from "./user.service.js";
 import { poolPromise } from "../db-config/db_connection.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -50,6 +50,41 @@ export function createAddressInfo(req, res) {
 export function createUser(req, res) {
     const body = req.body
     createUse(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })
+    })
+}
+
+export function createReviews(req, res) {
+    const body = req.body
+    createReviews(body, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        })
+    })
+}
+
+export function createPosts(req, res) {
+    const body = req.body
+    body.password = getHashOf(body.password);
+    createPosts(body, (err, results) => {
         if (err) {
             console.log(err);
             return res.status(500).json({
