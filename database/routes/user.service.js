@@ -112,6 +112,23 @@ export function getEateryByRestaurantId(id, callBack) {
     )
 }
 
+export async function insertNewCuisineName2(body) {
+    try {
+        const name = body.name;
+        const query = `insert into Cuisine(name) values (?)`;
+        const [result] = await poolPromise.execute(query,[name]);
+        return res.status(200).json({
+            success: 1,
+            results: result
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            results: 'Database Connection Error'
+        });
+    }
+}
+
 export function insertNewCuisineName(data, callBack) {
     const query = `insert into Cuisines(name) values (?)`;
     pool.execute(
@@ -182,7 +199,22 @@ export function createReviews(data, callBack) {
     );
 }
 
-export function createSubscribedTo(data, callBack) {
+export function getAllReviewsByRestaurantId(id, callBack) {
+    pool.execute(
+        `select e.id, u.first, u.last
+        from UserAccount u
+        join Reviews r
+        on u.userId = r.userId
+        where id = ?`,
+        [id],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results[0]);
+        }
+    );
+}
+
+export function createSubscription(data, callBack) {
     pool.execute(
         `insert into SubscribedTo (restaurantId) values (?)`,
         [
@@ -195,10 +227,15 @@ export function createSubscribedTo(data, callBack) {
     );
 }
 
-export function getSubscribedToByUserId(id, callBack) {
+export function getUserNameBySubscription(id, callBack) {
+    // checks which restaurants the user subscribed
     pool.execute(
-        `select userId, restaurantId from SubscribedTo st
-        join UserAccount()
+        `select u.userId, u.first, u.last, e.name
+        from UserAccount u
+        join SubscribedTo st
+        on u.userId = st.userId
+        join EateryAccount e
+        on e.id = st.restaurantId
         where id = ?`,
         [id],
         (error, results, fields) => {
