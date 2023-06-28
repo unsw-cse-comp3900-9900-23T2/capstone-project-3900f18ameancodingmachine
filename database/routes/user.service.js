@@ -100,7 +100,20 @@ export function createEateryAccount(data, callBack) {
 export function getEateryByRestaurantId(id, callBack) {
     const query = `select name, address, phone, email, login, url 
                     from EateryAccount ea
-                    join cuisine()
+                    where id = ?`;
+    pool.execute(
+        query,
+        [id],
+        (error, results, fields) => {
+            if (error) return callBack(error);
+            return callBack(null, results);
+        }
+    )
+}
+
+export function getCuisineFromCuisineId(id, callBack) {
+    const query = `select name 
+                    from Cuisines
                     where id = ?`;
     pool.execute(
         query,
