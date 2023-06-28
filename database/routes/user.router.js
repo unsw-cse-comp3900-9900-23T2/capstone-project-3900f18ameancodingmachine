@@ -1,4 +1,16 @@
-import { createAccountInfo, createAddressInfo, createUser, createEatery, getAllUsers, getUserById, login, createCuisine, createBusinessHour, createRestaurantCusine, createPosts, createReviews } from "./user.controller.js";
+import { createAccountInfo, 
+    createAddressInfo, 
+    createUser, 
+    createEatery, 
+    getAllUsers, 
+    getUserById, 
+    login, 
+    createCuisine, 
+    createBusinessHour, 
+    createRestaurantCusine, 
+    createEateryPosts, 
+    createUserReviews 
+} from "./user.controller.js";
 import { createBusinessHour2, createCuisine2, createEatery2, createRestaurantCusine2 } from "./user.service2.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
@@ -22,8 +34,8 @@ router.post("/eatery", createEatery);
 router.post("/cuisine", createCuisine);
 router.post("/cuisine-offer", createRestaurantCusine);
 router.post("/hour", createBusinessHour);
-router.post("/posts", createPosts)
-router.post("/reviews", createReviews)
+router.post("/posts", createEateryPosts)
+router.post("/reviews", createUserReviews)
 
 
 // these routes below are using await/async function

@@ -1,4 +1,17 @@
-import { createAddress, createLogin, createUse, createPosts, createReviews, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertCuisineFromRestaurant, insertHourFromRestaurant, getCuisineFromCuisineIdt, getCuisineFromCuisineId } from "./user.service.js";
+import { createAddress, 
+    createLogin, 
+    createUse, 
+    createPosts, 
+    createReviews, 
+    getUsers,
+    getUserByUserId, 
+    getLoginByUsername, 
+    createEateryAccount, 
+    insertNewCuisineName, 
+    insertCuisineFromRestaurant, 
+    insertHourFromRestaurant, 
+    getCuisineFromCuisineId, 
+} from "./user.service.js";
 import { poolPromise } from "../db-config/db_connection.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -64,7 +77,7 @@ export function createUser(req, res) {
     })
 }
 
-export function createReviews(req, res) {
+export function createUserReviews(req, res) {
     const body = req.body
     createReviews(body, (err, results) => {
         if (err) {
@@ -81,7 +94,7 @@ export function createReviews(req, res) {
     })
 }
 
-export function createPosts(req, res) {
+export function createEateryPosts(req, res) {
     const body = req.body
     body.password = getHashOf(body.password);
     createPosts(body, (err, results) => {
@@ -155,15 +168,18 @@ export function login(req, res) {
         }
         //check if hashed password matches
         const result = getHashOf(body.password) === results.password;
-        if(result) {
+        if (result) {
             results.password = undefined;
-            const jsonwebtoken = sign({result: results}, process.env.SECRET, {
-                expiresIn: "1h"
+            const jsonwebtoken = sign({result: results}, process.env.SECRET, {expiresIn: "1h"});
+            //provide user with a cookie containing A token
+            res.cookie('token', jsonwebtoken,{
+                secure: process.env.NODE_ENV !== "development",
+                httpOnly: true,
             });
-            return res.json({
+            //confirm success
+            return res.status(200).json({
                 success: 1,
-                message: "Login Success!",
-                token: jsonwebtoken
+                data: "Login successful"
             });
         } else {
             return res.json({
@@ -264,8 +280,6 @@ export function createBusinessHour(req, res) {
         });
     });
 }
-
-
 
 //Used to hash the password for security
 function getHashOf(text) {
