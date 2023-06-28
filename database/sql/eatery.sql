@@ -13,7 +13,7 @@ create view restaurantInfo as
 select  ea.name, ea.phone, ea.email, ea.url, a.street, a.suburb, a.region, a.postcode
 from    EateryAccount ea
 join    Address a on (ea.address = a.id)
-join    restaurantOwners ro on (ro.ownerOf = ea.id)
+join    RestaurantOwners ro on (ro.ownerOf = ea.id)
 ;
 
 -- restaurant login info
@@ -25,7 +25,7 @@ join    LoginInfo l on (ea.login = l.id)
 
 -- restaurant cusines that they offer
 create view restaurantCuisines as
-select  ea.name, c.name
+select  ea.name as "eatery", c.name "cuisine"
 from    EateryAccount ea
 join    CuisineOffer co on (co.restaurantId = ea.id)
 join    Cuisines c on (co.cuisineId = c.id)
@@ -43,7 +43,7 @@ create view restaurantPosts as
 select  ro.first, ro.last, ea.name, p.title, p.content
 from    EateryAccount ea
 join    Posts p on (ea.id = p.postedBy)
-join    restaurantOwners ro on (ro.ownerOf = ea.id)
+join    RestaurantOwners ro on (ro.ownerOf = ea.id)
 ;
 
 -- vouchers offered by restaurant
