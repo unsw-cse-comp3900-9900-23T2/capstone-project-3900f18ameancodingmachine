@@ -14,6 +14,7 @@ import { createAccountInfo,
 import { createBusinessHour2, createCuisine2, createEatery2, createRestaurantCusine2 } from "./user.service2.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
+import { verify } from "jsonwebtoken";
 
 const router = express.Router();
 

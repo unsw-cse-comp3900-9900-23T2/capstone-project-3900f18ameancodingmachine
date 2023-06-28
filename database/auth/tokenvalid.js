@@ -6,16 +6,14 @@ const { verify } = pkg;
 //ensure that token provided is valid
 export function checkToken(req, res, next) {
     //get authorization field from the header
-    let token = req.get("authorization");
+    let token = req.cookies.token;
     //check if token present
     if (token) {
-        //skip 'Bearer' and get the actual token
-        token = token.slice(7);
         verify(token, process.env.SECRET, (err, decoded) => {
             if (err) {
                 res.json({
                     success: 0,
-                    message: "Invalid token"
+                    message: "Access denied: Invalid token"
                 });
             } else {
                 next();
