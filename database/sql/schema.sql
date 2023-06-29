@@ -29,7 +29,6 @@ create table EateryAccount (
     email       text,
     login       integer not null references LoginInfo(id),
     url         text,
-    hours       integer, 
     primary key (id) 
 );
 
@@ -93,7 +92,7 @@ create table Voucher (
     startOffer      datetime, -- 2022-04-22 10:34:23:55
     endOffer        datetime, 
     description     text,
-    code            text, -- in consideration
+    code            text, 
     primary key (id)
 );
 

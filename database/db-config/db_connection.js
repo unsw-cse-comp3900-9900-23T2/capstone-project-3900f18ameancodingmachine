@@ -13,8 +13,6 @@ const pool = mysql.createPool(config)
 
 const poolPromise = pool.promise();
 
-
-
 export { pool, poolPromise };
 
 
