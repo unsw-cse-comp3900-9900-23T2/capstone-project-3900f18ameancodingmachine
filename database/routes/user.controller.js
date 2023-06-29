@@ -1,4 +1,4 @@
-import { createAddress, createLogin, createUse, createNewPost, createReviews, createSubscribedTo, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertCuisineFromRestaurant, insertHourFromRestaurant, getCuisineFromCuisineIdt, getCuisineFromCuisineId } from "./user.service.js";
+import { createAddress, createLogin, createUse, createNewPost, createReviews, createSubscribedTo, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertCuisineFromRestaurant, insertHourFromRestaurant, getCuisineFromCuisineIdt, getCuisineFromCuisineId, getPostByPostId, getReviewByReviewId } from "./user.service.js";
 import { poolPromise } from "../db-config/db_connection.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -240,6 +240,52 @@ export function getCuisineById(req, res) {
             return res.status(404).json({
                 success: 0,
                 message: "Cuisine not found"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        });
+    });
+}
+
+export function getPostById(req, res) {
+    const id = req.params.id
+    getPostByPostId(id, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        if (!results) {
+            return res.status(404).json({
+                success: 0,
+                message: "Post not found"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        });
+    });
+}
+
+export function getReviewById(req, res) {
+    const id = req.params.id
+    getReviewByReviewId(id, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
+        }
+        if (!results) {
+            return res.status(404).json({
+                success: 0,
+                message: "Review not found"
             });
         }
         return res.status(200).json({

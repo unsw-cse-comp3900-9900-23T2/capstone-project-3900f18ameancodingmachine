@@ -209,7 +209,24 @@ export async function createReviews(data) {
             message: "Database connection error"
         });
     }
-    
+}
+
+export async function getReviewByReviewId(id) {
+    //gets post by id
+    try {
+        const query = `select id, userId, restaurantId, rating, comment from Reviews where id = ?`;
+        const value = [id]
+        const [results] = await poolPromise.execute(query, value);
+        return res.status(200).json({
+            success: 1,
+            data: results[0]
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
 export async function createSubscribedTo(data) {
