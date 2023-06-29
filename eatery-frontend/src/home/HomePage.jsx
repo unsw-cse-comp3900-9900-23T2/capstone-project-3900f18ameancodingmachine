@@ -1,21 +1,18 @@
 import * as React from 'react';
 
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
+import UserHomePage from './UserHomePage';
+import RestaurantHomePage from './RestaurantHomePage';
 
 export default function HomePage() {
+  // Null if not logged in, True if Restaurant manager, False if User
+  const [isRestaurant, setIsRestaurant] = React.useState(null); // TODO get from backend
   
   return (
-    <Container maxWidth="md">
-      <Card sx={{ minWidth: 275 }}>
-        <CardContent>
-          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
-            Home
-          </Typography>
-        </CardContent>
-      </Card>
+    // Defaults to User Home Page if not logged in
+    <Container maxWidth="lg">
+      {isRestaurant  && <RestaurantHomePage/>}
+      {!isRestaurant && <UserHomePage/>}
     </Container>
   );
 }

@@ -5,8 +5,9 @@ import HomePage from './home/HomePage';
 import LoginPage from './user/LoginPage';
 import ForgotPassPage from './user/ForgotPassPage';
 import RegistrationPage from './user/RegistrationPage';
+import RestaurantRegistrationPage from './restaurant/RestaurantRegistrationPage';
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Banner/>
@@ -15,9 +16,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/loginRecovery" element={<ForgotPassPage/>} />
         <Route path="/register" element={<RegistrationPage />} />
+        <Route path="/create-restaurant" element={<RestaurantRegistrationPage />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;
