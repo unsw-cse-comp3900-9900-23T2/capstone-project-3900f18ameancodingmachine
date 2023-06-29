@@ -4,8 +4,9 @@ import Banner from './banner/Banner';
 import HomePage from './home/HomePage';
 import LoginPage from './user/LoginPage';
 import RegistrationPage from './user/RegistrationPage';
+import RestaurantRegistrationPage from './restaurant/RestaurantRegistrationPage';
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Banner/>
@@ -13,9 +14,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
+        <Route path="/create-restaurant" element={<RestaurantRegistrationPage />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;
