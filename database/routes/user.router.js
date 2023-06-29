@@ -9,7 +9,8 @@ import { createAccountInfo,
     createBusinessHour, 
     createRestaurantCusine, 
     createEateryPosts, 
-    createUserReviews 
+    createUserReviews, 
+    logout
 } from "./user.controller.js";
 import { createBusinessHour2, createCuisine2, createEatery2, createRestaurantCusine2 } from "./user.service2.js";
 import express from 'express';
@@ -30,6 +31,7 @@ router.post("/user", createUser);
 router.get("/userall", getAllUsers);
 router.get("/:id", getUserById)
 router.post("/login", login);
+router.put("/logout", logout);
 
 router.post("/eatery", createEatery);
 router.post("/cuisine", createCuisine);
