@@ -157,8 +157,6 @@ export async function login(req, res) {
             return res.json(results);
         }
         //check if hashed password matches
-        console.log(body.password);
-        console.log(results.password);
         const result = getHashOf(body.password) === results.password;
         if (result) {
             results.password = undefined;
