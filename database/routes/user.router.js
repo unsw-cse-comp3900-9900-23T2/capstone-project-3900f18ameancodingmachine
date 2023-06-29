@@ -12,7 +12,9 @@ import { createAccountInfo,
     createRestaurantCusine, 
     createEateryPosts, 
     createUserReviews, 
-    logout
+    logout,
+    getCuisineById,
+    getEateryById
 } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
@@ -34,15 +36,17 @@ router.get("/:id", getUserById) // get success
 router.post("/login", login); //login success
 router.put("/logout", logout); //logout success
 
-router.post("/eatery", createEatery);
-router.post("/cuisine", createCuisine);
-router.post("/cuisine-offer", createRestaurantCusine);
-router.post("/hour", createBusinessHour);
-router.post("/posts", createEateryPosts)
-router.post("/reviews", createUserReviews)
+router.post("/eatery", createEatery); // success
+router.post("/cuisine", createCuisine); // success
+router.post("/cuisine-offer", createRestaurantCusine); //success
+router.post("/hour", createBusinessHour); // ok
+router.post("/posts", createEateryPosts) // ok
+router.post("/reviews", createUserReviews) // ok
 
-router.get("/:post", getPostById)
-router.get("/:review", getReviewById)
+router.get("/post/:id", getPostById) // ok
+router.get("/review/:id", getReviewById) // ok
+router.get("/cuisine/:id", getCuisineById) //ok
+router.get("/eatery/:id", getEateryById) // ok
 
 // these routes below are using await/async function
 // router.post("/eatery1", createEatery2);

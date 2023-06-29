@@ -242,7 +242,6 @@ export async function insertNewCuisineName(data) {
 
 // create new eatery account
 export async function createEateryAccount(data) {
-    const name = data.name;
     const query = `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?, ?, ?)`;
     const values = [data.name, data.address, data.phone, data.email, data.login, data.url];
     const [result] = await poolPromise.execute(query,values);

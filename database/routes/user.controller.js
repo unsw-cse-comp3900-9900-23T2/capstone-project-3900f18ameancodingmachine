@@ -15,7 +15,8 @@ import {
     insertHourFromRestaurant, 
     getCuisineFromCuisineId,
     getPostByPostId, 
-    getReviewByReviewId 
+    getReviewByReviewId, 
+    getEateryByRestaurantId
 } from "./user.service.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -91,7 +92,6 @@ export async function createUserReviews(req, res) {
 export async function createEateryPosts(req, res) {
     try {
         const body = req.body
-        body.password = getHashOf(body.password);
         const result = await createNewPost(body);
         return res.status(200).json(result); 
     } catch (err) {
@@ -106,7 +106,6 @@ export async function createEateryPosts(req, res) {
 export async function createSubscribedTo(req, res) {
     try {
         const body = req.body;
-        body.password = getHashOf(body.password);
         const result = await insertSubscribedTo(body);
         return res.status(200).json(result);
     } catch (error) {
@@ -256,7 +255,9 @@ export async function getCuisineById(req, res) {
 
 export async function getPostById(req, res) {
     try {
+        
         const id = req.params.id;
+        console.log(id)
         const result = await getPostByPostId(id);
 
         if (result.success == 0) {
@@ -313,6 +314,25 @@ export async function createBusinessHour(req, res) {
         return res.status(200).json(result);
     } catch (err) {
         console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+export async function getEateryById(req, res) {
+    try {
+        const id = req.params.id;
+        const result = await getEateryByRestaurantId(id);
+        
+        if (result.success == 0) {
+            return res.status(404).json(result);
+        }
+        return res.status(200).json(result);
+
+    } catch (err) {
+        console.log(err)
         return res.status(500).json({
             success: 0,
             message: "Database connection error"
