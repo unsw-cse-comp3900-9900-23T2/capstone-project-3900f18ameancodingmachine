@@ -14,7 +14,6 @@ import { createAccountInfo,
     createUserReviews, 
     logout
 } from "./user.controller.js";
-import { createBusinessHour2, createCuisine2, createEatery2, createRestaurantCusine2 } from "./user.service2.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
 import { verify } from "jsonwebtoken";
@@ -26,12 +25,12 @@ const router = express.Router();
 // e.g. router.METHOD("/someRoute", checkToken, function)
 
 //these two routes return and insertId in the response, use this to create the user
-router.post("/account", createAccountInfo);
-router.post("/address", createAddressInfo);
+router.post("/account", createAccountInfo); // create success
+router.post("/address", createAddressInfo);  // create success
 
-router.post("/user", createUser);
-router.get("/userall", getAllUsers);
-router.get("/:id", getUserById)
+router.post("/user", createUser); //create success 
+router.get("/userall", getAllUsers); //get success
+router.get("/:id", getUserById) // get success
 router.post("/login", login);
 router.put("/logout", logout);
 
@@ -46,10 +45,10 @@ router.get("/:post", getPostById)
 router.get("/:review", getReviewById)
 
 // these routes below are using await/async function
-router.post("/eatery1", createEatery2);
-router.post("/cuisine1", createCuisine2);
-router.post("/cuisine-offer1", createRestaurantCusine2);
-router.post("/hour1", createBusinessHour2);
+// router.post("/eatery1", createEatery2);
+// router.post("/cuisine1", createCuisine2);
+// router.post("/cuisine-offer1", createRestaurantCusine2);
+// router.post("/hour1", createBusinessHour2);
 export { router };
 
 
