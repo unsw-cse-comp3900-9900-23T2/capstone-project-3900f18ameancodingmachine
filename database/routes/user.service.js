@@ -85,7 +85,7 @@ export async function getLoginByUsername(username) {
     }
     return {
         success: 1,
-        data: "Login successful"
+        password: results[0].password
     };
 }
 

@@ -157,10 +157,10 @@ export async function login(req, res) {
         if (results.success == 0) {
             return res.json(results);
         }
-
         //check if hashed password matches
+        console.log(body.password);
+        console.log(results.password);
         const result = getHashOf(body.password) === results.password;
-
         if (result) {
             results.password = undefined;
             const jsonwebtoken = sign({result: results}, process.env.SECRET, {expiresIn: "1h"});
@@ -170,7 +170,10 @@ export async function login(req, res) {
                 httpOnly: true,
             });
             //confirm success
-            return res.status(200).json(results);
+            return res.status(200).json({
+                success: 1,
+                data: "Login successful"
+            });
         } else {
             return res.json({
                 success: 0,
@@ -178,7 +181,7 @@ export async function login(req, res) {
             });
         }
 
-    } catch (error) {
+    } catch (err) {
         console.log(err);
         return res.status(500).json({
             success: 0,

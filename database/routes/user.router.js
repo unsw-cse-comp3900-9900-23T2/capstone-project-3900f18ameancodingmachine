@@ -31,8 +31,8 @@ router.post("/address", createAddressInfo);  // create success
 router.post("/user", createUser); //create success 
 router.get("/userall", getAllUsers); //get success
 router.get("/:id", getUserById) // get success
-router.post("/login", login);
-router.put("/logout", logout);
+router.post("/login", login); //login success
+router.put("/logout", logout); //logout success
 
 router.post("/eatery", createEatery);
 router.post("/cuisine", createCuisine);
