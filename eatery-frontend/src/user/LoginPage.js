@@ -77,7 +77,7 @@ function LoginForm(){
       </CardActions>
       
       <CardActions>
-        <Button size="small" onClick={passRecovery}>Forgot Password? TODO: Modify to link to Forgot Password Page</Button>
+        <Button size="small" onClick={passRecovery}>Forgot Password?</Button>
       </CardActions>
 
     </Card>

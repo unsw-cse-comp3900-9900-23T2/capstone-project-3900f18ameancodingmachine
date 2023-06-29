@@ -13,10 +13,19 @@ import Typography from '@mui/material/Typography';
 
 
 function EmailEntry(){
-  const navigate = useNavigate();
   const [email, setEmail] = React.useState('');
-    
   
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    /*
+     *  Send email with a link to reset password for associated
+     *  Email to that email address
+     *  For now simply send the email  
+     */
+    alert(`Sending recovery email to:  ${email}`);
+    
+  }
 
  return (
   <Container maxWidth="md">
@@ -35,7 +44,7 @@ function EmailEntry(){
       </CardContent>
       
       <CardActions>
-        <Button size="small">Recover Password</Button>
+        <Button size="small" onClick={handleSubmit}>Recover Password</Button>
       </CardActions>
 
     </Card>
