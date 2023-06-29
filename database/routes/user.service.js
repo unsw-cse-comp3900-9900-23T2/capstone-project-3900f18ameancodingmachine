@@ -229,8 +229,9 @@ export function getAllReviewsByRestaurantId(id, callBack) {
 
 export function createSubscription(data, callBack) {
     pool.execute(
-        `insert into SubscribedTo (restaurantId) values (?)`,
+        `insert into SubscribedTo (userId, restaurantId) values (?, ?)`,
         [
+            data.userId,
             data.restaurantId
         ],
         (error, results, fields) => {
