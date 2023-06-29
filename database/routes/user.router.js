@@ -1,7 +1,23 @@
-import { createAccountInfo, createAddressInfo, createUser, createEatery, getAllUsers, getUserById, login, createCuisine, createBusinessHour, createRestaurantCusine, createNewPost, createReviews, createSubscribedTo, getPostById, getReviewById } from "./user.controller.js";
+import { createAccountInfo, 
+    createAddressInfo, 
+    createUser, 
+    createEatery, 
+    getAllUsers, 
+    getUserById, 
+    login,
+    getPostById,
+    getReviewById, 
+    createCuisine, 
+    createBusinessHour, 
+    createRestaurantCusine, 
+    createEateryPosts, 
+    createUserReviews, 
+    logout
+} from "./user.controller.js";
 import { createBusinessHour2, createCuisine2, createEatery2, createRestaurantCusine2 } from "./user.service2.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
+import { verify } from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -17,14 +33,14 @@ router.post("/user", createUser);
 router.get("/userall", getAllUsers);
 router.get("/:id", getUserById)
 router.post("/login", login);
+router.put("/logout", logout);
 
 router.post("/eatery", createEatery);
 router.post("/cuisine", createCuisine);
 router.post("/cuisine-offer", createRestaurantCusine);
 router.post("/hour", createBusinessHour);
-router.post("/posts", createNewPost)
-router.post("/reviews", createReviews)
-router.post("/subscribe", createSubscribedTo)
+router.post("/posts", createEateryPosts)
+router.post("/reviews", createUserReviews)
 
 router.get("/:post", getPostById)
 router.get("/:review", getReviewById)

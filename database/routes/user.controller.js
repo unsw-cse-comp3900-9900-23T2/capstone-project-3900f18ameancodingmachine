@@ -1,10 +1,29 @@
-import { createAddress, createLogin, createUse, createNewPost, createReviews, createSubscribedTo, getUsers, getUserByUserId, getLoginByUsername, createEateryAccount, insertNewCuisineName, insertCuisineFromRestaurant, insertHourFromRestaurant, getCuisineFromCuisineIdt, getCuisineFromCuisineId, getPostByPostId, getReviewByReviewId } from "./user.service.js";
-import { poolPromise } from "../db-config/db_connection.js";
+
+import { createAddress, 
+    createLogin, 
+    createUse, 
+    createPosts, 
+    createReviews,
+    createSubscribedTo, 
+    getUsers,
+    getUserByUserId, 
+    getLoginByUsername, 
+    createEateryAccount, 
+    insertNewCuisineName, 
+    insertCuisineFromRestaurant, 
+    insertHourFromRestaurant, 
+    getCuisineFromCuisineId,
+    getPostByPostId, 
+    getReviewByReviewId 
+} from "./user.service.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
 import 'dotenv/config';
 
 const { sign } = pkg;
+
+//used to store invalidated tokens once a user logs-out
+export let tokenBlackList = [];
 
 //Controller functions
 //async functions are written function2
@@ -64,7 +83,7 @@ export function createUser(req, res) {
     })
 }
 
-export function createReviews(req, res) {
+export function createUserReviews(req, res) {
     const body = req.body
     createReviews(body, (err, results) => {
         if (err) {
@@ -81,7 +100,7 @@ export function createReviews(req, res) {
     })
 }
 
-export function createNewPost(req, res) {
+export function createEateryPosts(req, res) {
     const body = req.body
     body.password = getHashOf(body.password);
     createNewPost(body, (err, results) => {
@@ -164,6 +183,10 @@ export function login(req, res) {
     getLoginByUsername(body.login, (err, results) => {
         if (err) {
             console.log(err);
+            return res.status(500).json({
+                success: 0,
+                message: "Database connection error"
+            });
         }
         if (!results) {
             return res.json({
@@ -171,26 +194,49 @@ export function login(req, res) {
                 data: "Invalid username or password"
             });
         }
+
         //check if hashed password matches
         const result = getHashOf(body.password) === results.password;
-        if(result) {
+
+        if (result) {
             results.password = undefined;
-            const jsonwebtoken = sign({result: results}, process.env.SECRET, {
-                expiresIn: "1h"
+            const jsonwebtoken = sign({result: results}, process.env.SECRET, {expiresIn: "1h"});
+            //provide user with a cookie containing A token
+            res.cookie('token', jsonwebtoken,{
+                secure: process.env.NODE_ENV !== "development",
+                httpOnly: true,
             });
-            return res.json({
+            //confirm success
+            return res.status(200).json({
                 success: 1,
-                message: "Login Success!",
-                token: jsonwebtoken
+                data: "Login successful"
             });
         } else {
             return res.json({
                 success: 0,
-                data: "Invalid username or Pass"
+                data: "Invalid username or password"
             });
         }
     });
 }
+
+export function logout(req, res) {
+    const token = req.cookies.token;
+    if (token) {
+        tokenBlackList.push(token);
+        return res.json({
+            success: 1,
+            message: "You've been logged-out!"
+        });
+    } else {
+        return res.json({
+            success:0,
+            message: "Not logged-in!"
+        });
+    }
+}
+
+
 
 export function createEatery(req,res) {
     const body = req.body;
@@ -328,8 +374,6 @@ export function createBusinessHour(req, res) {
         });
     });
 }
-
-
 
 //Used to hash the password for security
 function getHashOf(text) {
