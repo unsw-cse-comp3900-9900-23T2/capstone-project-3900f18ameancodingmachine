@@ -28,7 +28,11 @@ export default function Banner() {
             <HomeOutlinedIcon />
           </IconButton>
 
-          {isLoggedIn && <Button color="inherit" component={NavLink} to="/login">Logout</Button>}
+          {isLoggedIn && <Button color="inherit" component={NavLink} to="/" onClick={() => {
+            // Log Out in backend
+              }}>
+              Logout
+            </Button>}
           {!isLoggedIn && <Button color="inherit" component={NavLink} to="/login">Login</Button>}
           {!isLoggedIn && <Button color="inherit" component={NavLink} to="/register">Register</Button>}
           {isRestaurant && <Button color="inherit" component={NavLink} to="/create-restaurant">New Restaurant</Button>}
