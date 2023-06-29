@@ -1,8 +1,11 @@
-import { createAddress, 
+
+import { 
+    createAddress, 
     createLogin, 
     createUse, 
-    createPosts, 
-    createReviews, 
+    createNewPost, 
+    createReviews,
+    insertSubscribedTo, 
     getUsers,
     getUserByUserId, 
     getLoginByUsername, 
@@ -10,9 +13,11 @@ import { createAddress,
     insertNewCuisineName, 
     insertCuisineFromRestaurant, 
     insertHourFromRestaurant, 
-    getCuisineFromCuisineId, 
+    getCuisineFromCuisineId,
+    getPostByPostId, 
+    getReviewByReviewId, 
+    getEateryByRestaurantId
 } from "./user.service.js";
-import { poolPromise } from "../db-config/db_connection.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
 import 'dotenv/config';
@@ -26,157 +31,135 @@ export let tokenBlackList = [];
 //async functions are written function2
 
 //create account in LoginInfo table
-export function createAccountInfo(req, res) {
-    const body = req.body
-    body.password = getHashOf(body.password);
-    createLogin(body, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
-        })
-    })
+export async function createAccountInfo(req, res) {
+    try {
+        const body = req.body;
+        body.password = getHashOf(body.password);
+        const result = await createLogin(body);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
 //create address in Address table
-export function createAddressInfo(req, res) {
-    const body = req.body
-    createAddress(body, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
-        })
-    })
+export async function createAddressInfo(req, res) {
+    try {
+        const body = req.body;
+        const result = await createAddress(body);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
 //create User in UserAccount table
-export function createUser(req, res) {
-    const body = req.body
-    createUse(body, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
-        })
-    })
+export async function createUser(req, res) {
+    try {
+        const body = req.body;
+        const result = await createUse(body);
+        return res.status(200).json(result);
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
-export function createUserReviews(req, res) {
-    const body = req.body
-    createReviews(body, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
-        })
-    })
+export async function createUserReviews(req, res) {
+    try {
+        const body = req.body;
+        const result = await createReviews(body);
+        return res.status(200).json(result);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
-export function createEateryPosts(req, res) {
-    const body = req.body
-    body.password = getHashOf(body.password);
-    createPosts(body, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
-        })
-    })
+export async function createEateryPosts(req, res) {
+    try {
+        const body = req.body
+        const result = await createNewPost(body);
+        return res.status(200).json(result); 
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+export async function createSubscribedTo(req, res) {
+    try {
+        const body = req.body;
+        const result = await insertSubscribedTo(body);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
 //get user by userId
-export function getUserById(req, res) {
-    const id = req.params.id;
-    getUserByUserId(id, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
+export async function getUserById(req, res) {
+    try {
+        const id = req.params.id;
+        const result = await getUserByUserId(id);
+        if (result.success == 0) { // user not found
+            return res.status(404).json(result);
         }
-        if (!results) {
-            return res.status(404).json({
-                success: 0,
-                message: "User not found"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
-        })
-    });
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
 //get all existing users
-export function getAllUsers(req, res) {
-    getUsers((err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
-        })
-    });
+export async function getAllUsers(req, res) {
+    try {
+        const results = await getUsers();
+        return res.status(200).json(results);
+    } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
 //user obtains token here
-export function login(req, res) {
-    const body = req.body;
-    getLoginByUsername(body.login, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
+export async function login(req, res) {
+    try {
+        const body = req.body;
+        const results = await getLoginByUsername(body.login);
+        
+        if (results.success == 0) {
+            return res.json(results);
         }
-        if (!results) {
-            return res.json({
-                success: 0,
-                data: "Invalid username or password"
-            });
-        }
-
         //check if hashed password matches
+        console.log(body.password);
+        console.log(results.password);
         const result = getHashOf(body.password) === results.password;
-
         if (result) {
             results.password = undefined;
             const jsonwebtoken = sign({result: results}, process.env.SECRET, {expiresIn: "1h"});
@@ -196,7 +179,14 @@ export function login(req, res) {
                 data: "Invalid username or password"
             });
         }
-    });
+
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
 export function logout(req, res) {
@@ -215,97 +205,139 @@ export function logout(req, res) {
     }
 }
 
-
-
-export function createEatery(req,res) {
-    const body = req.body;
-    createEateryAccount(body, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database conenction error"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
-        })
-    })
-}
-
-export function createCuisine(req,res) {
-    const body = req.body;
-    insertNewCuisineName(body, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
-        })
-    })
-}
-
-export function getCuisineById(req, res) {
-    const id = req.params.id
-    getCuisineFromCuisineId(id, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
-        }
-        if (!results) {
-            return res.status(404).json({
-                success: 0,
-                message: "Cuisine not found"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
+export async function createEatery(req,res) {
+    try {
+        const body = req.body;
+        const result = await createEateryAccount(body);
+        return res.status(200).json(result);
+    } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            message: "Database conenction error"
         });
-    });
+    }
 }
 
-export function createRestaurantCusine(req, res) {
-    const body = req.body;
-    insertCuisineFromRestaurant(body, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
+export async function createCuisine(req,res) {
+    try {
+        const body = req.body;
+        const result = await insertNewCuisineName(body);
+        if (result.success == 0) { //cuisine exist
+            return res.status(409).json(result);
         }
-        return res.status(200).json({
-            success: 1,
-            data: results
-        })
-    });
-}
+        return res.status(200).json(result);
 
-export function createBusinessHour(req, res) {
-    const body = req.body;
-    insertHourFromRestaurant(body, (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({
-                success: 0,
-                message: "Database connection error"
-            });
-        }
-        return res.status(200).json({
-            success: 1,
-            data: results
+    } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
         });
-    });
+    }
+}
+
+export async function getCuisineById(req, res) {
+    try {
+        const id = req.params.id
+        const result = await getCuisineFromCuisineId(id);
+
+        if (result.success == 0) {
+            return res.status(404).json(result); 
+        }
+        return res.status(200).json(result);
+
+    } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+export async function getPostById(req, res) {
+    try {
+        
+        const id = req.params.id;
+        console.log(id)
+        const result = await getPostByPostId(id);
+
+        if (result.success == 0) {
+            return res.status(404).json(result);
+        }
+        return res.status(200).json(result);
+
+    } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+export async function getReviewById(req, res) {
+    try {
+        const id = req.params.id;
+        const result = await getReviewByReviewId(id);
+        
+        if (result.success == 0) {
+            return res.status(404).json(result);
+        }
+        return res.status(200).json(result);
+
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+// insert the cuisines of what the restaurant offers
+export async function createRestaurantCusine(req, res) {
+    try {
+        const body = req.body;
+        const result = await insertCuisineFromRestaurant(body);
+        return res.status(200).json(result);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+export async function createBusinessHour(req, res) {
+    try {
+        const body = req.body;
+        const result = await insertHourFromRestaurant(body);
+        return res.status(200).json(result);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+export async function getEateryById(req, res) {
+    try {
+        const id = req.params.id;
+        const result = await getEateryByRestaurantId(id);
+        
+        if (result.success == 0) {
+            return res.status(404).json(result);
+        }
+        return res.status(200).json(result);
+
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
 }
 
 //Used to hash the password for security
