@@ -44,6 +44,10 @@ function LoginForm(){
     
   }
 
+  const passRecovery = () =>{ 
+    navigate("/loginRecovery");
+  }
+
  return (
   <Container maxWidth="md">
     <Card sx={{ minWidth: 275 }}>
@@ -72,7 +76,7 @@ function LoginForm(){
       </CardActions>
       
       <CardActions>
-        <Button size="small">Forgot Password? TODO: Modify to link to Forgot Password Page</Button>
+        <Button size="small" onClick={passRecovery}>Forgot Password?</Button>
       </CardActions>
 
     </Card>
