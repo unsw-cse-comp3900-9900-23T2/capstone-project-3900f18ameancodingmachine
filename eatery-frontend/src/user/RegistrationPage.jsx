@@ -8,6 +8,8 @@ import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
+import bugerIcon from './img/burgerIcon.jpeg';
+
 export default function RegistrationPage() {
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
@@ -18,7 +20,11 @@ export default function RegistrationPage() {
   return (
     <Container maxWidth="md">
       <Card sx={{ minWidth: 275 }}>
+          
         <CardContent>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <img src={bugerIcon} style={{position: 'absolute', top: '50%', right: '35%',  transform: 'translateY(-50%)',  width: '256px', height: '256px'}} />
+          </div>
           <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
             Create Account
           </Typography>
@@ -58,10 +64,14 @@ export default function RegistrationPage() {
             }}
           />
         </CardContent>
+        
         <CardActions>
           <Button size="small">REGISTER</Button>
         </CardActions>
+
+        
       </Card>
+      
     </Container>
   );
 }
