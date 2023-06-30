@@ -1,0 +1,3 @@
+Week 4
+- Started working on backends
+- Worked on post, reviews, and subscription routes
