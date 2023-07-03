@@ -10,21 +10,23 @@ export default function UserHomePage() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false); // TODO get from backend
 
   React.useEffect(() => {
-    async function checkCookies() {
+    async function checkLogin() {
       try {
-        // return token
+        // use check token as middleware to verify token
         const result = await axios.get('api/user/');
         let data = result.data;
         // const decrypted = jwt_decode(data.token)
         if (data.success !== 0) {
           setIsLoggedIn(true)
+          console.log("is logged in")
         }
       } catch (err) {
         // not do anything
+        console.log("Not logged in")
       }
       
     }
-    checkCookies()
+    checkLogin()
   })
 
   return (
