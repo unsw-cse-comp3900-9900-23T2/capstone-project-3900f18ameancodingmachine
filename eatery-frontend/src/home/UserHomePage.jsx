@@ -5,7 +5,6 @@ import CardContent from '@mui/material/CardContent';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
-import jwt_decode from 'jwt-decode';
 
 export default function UserHomePage() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false); // TODO get from backend
