@@ -7,7 +7,7 @@
 
 create table LoginInfo (
     id          integer auto_increment,
-    login       text not null, --referring to username
+    login       text not null,
     password    text not null,
     primary key (id)
 );

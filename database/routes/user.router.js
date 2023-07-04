@@ -14,11 +14,11 @@ import { createAccountInfo,
     createUserReviews, 
     logout,
     getCuisineById,
-    getEateryById
+    getEateryByLogin,
+    getDecryptedToken,
 } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
-import { verify } from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -46,7 +46,9 @@ router.post("/reviews", createUserReviews) // ok
 router.get("/post/:id", getPostById) // ok
 router.get("/review/:id", getReviewById) // ok
 router.get("/cuisine/:id", getCuisineById) //ok
-router.get("/eatery/:id", getEateryById) // ok
+router.get("/eatery/:id", getEateryByLogin) // ok
+
+router.get("/", checkToken, getDecryptedToken);
 
 // these routes below are using await/async function
 // router.post("/eatery1", createEatery2);
