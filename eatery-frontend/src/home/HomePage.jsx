@@ -18,9 +18,9 @@ export default function HomePage() {
         const decrypt = jwt_decode(data.token)
         if (data.success !== 0) {
           let loginId = decrypt.result.id;
-          // get EateryAccount, it no result then it will return an 404 error
+          // get EateryAccount, if no result then it will return an 404 error
           // else it will go to restaurant page
-          await axios.get(`api/user/eatery/${loginId}`)
+          await axios.get(`api/user/eatery/login/${loginId}`)
           setIsRestaurant(true)
         }
       } catch (err) {

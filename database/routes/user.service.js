@@ -78,7 +78,8 @@ export async function getUserByUserId(id) {
     };
 }
 
-//change to email when that is implemented 
+//change to email when that is implemented
+//update: adding loginid as a return
 export async function getLoginByUsername(username) {
     const query = `select * from LoginInfo where login = ?`;
     const values = [username]

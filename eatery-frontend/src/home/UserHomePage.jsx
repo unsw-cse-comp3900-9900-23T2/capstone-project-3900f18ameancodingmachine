@@ -12,16 +12,14 @@ export default function UserHomePage() {
   React.useEffect(() => {
     async function checkLogin() {
       try {
-        // use check token as middleware to verify token
-        const result = await axios.get('api/user/');
+        const result = await axios.get('api/user/'); // use checkToken as middleware to verify token
         let data = result.data;
-        // const decrypted = jwt_decode(data.token)
         if (data.success !== 0) {
           setIsLoggedIn(true)
           console.log("is logged in")
         }
       } catch (err) {
-        // not do anything
+        // error when checking token using checktoken
         console.log("Not logged in")
       }
       

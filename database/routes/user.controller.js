@@ -358,7 +358,8 @@ export async function getEateryByLogin(req, res) {
     }
 }
 
-export function getDecryptedToken(req, res) {
+// get user token
+export function getToken(req, res) {
     try {
         return res.status(200).json({
             success: 1, 
