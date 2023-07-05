@@ -35,7 +35,7 @@ export default function Banner() {
             </Button>}
           {!isLoggedIn && <Button color="inherit" component={NavLink} to="/login">Login</Button>}
           {!isLoggedIn && <Button color="inherit" component={NavLink} to="/register">Register</Button>}
-          {isRestaurant && <Button color="inherit" component={NavLink} to="/create-restaurant">New Restaurant</Button>}
+          {!isLoggedIn && <Button color="inherit" component={NavLink} to="/create-restaurant">New Restaurant</Button>}
         </Toolbar>
       </Container>
     </AppBar>
