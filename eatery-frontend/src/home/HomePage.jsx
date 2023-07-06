@@ -25,7 +25,7 @@ export default function HomePage() {
         }
       } catch (err) {
         if (err.response) { // not an eatery
-          console.log("Not an eatery")
+          console.log(err.response.data.message)
           setIsRestaurant(false)
         } else { // not loggedIn
           console.log("Not logged in")
