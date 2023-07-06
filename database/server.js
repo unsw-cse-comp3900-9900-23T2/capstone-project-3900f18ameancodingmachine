@@ -9,6 +9,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/user", userRouter);
 
-app.listen(process.env.SERVER_PORT, () => {
+const server = app.listen(process.env.SERVER_PORT, () => {
     console.log("Server is up and running on port ", process.env.SERVER_PORT)
 });
+
+export { app, server }

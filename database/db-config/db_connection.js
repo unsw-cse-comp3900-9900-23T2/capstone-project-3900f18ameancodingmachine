@@ -9,11 +9,21 @@ const config = {
   database : process.env.DB_DATABASE
 };
 
+const testConfig = {
+  host     : process.env.DB_HOST,
+  user     : process.env.DB_USER,
+  password : process.env.DB_PASSWORD,
+  database : process.env.DB_DATABASE_TEST
+}
+
 const pool = mysql.createPool(config)
+const poolTest = mysql.createPool(testConfig)
 
 const poolPromise = pool.promise();
+const poolTestPromise = poolTest.promise();
 
-export { pool, poolPromise };
+
+export { pool, poolPromise, poolTestPromise };
 
 
 // testing connection
