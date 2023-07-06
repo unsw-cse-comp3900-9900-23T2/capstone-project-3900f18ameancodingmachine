@@ -107,3 +107,21 @@ describe("/eatery", () => {
 
 })
 
+describe("/cuisine", () => {
+    const data = {
+        name: "new cuisine" //fake
+    }
+
+    afterEach(async () => {
+        const query = `delete from Cuisines where name = ?`
+        const res = await poolPromise.execute(query, ["new cuisine"])
+        console.log("cuisine deleted")
+    })
+
+    test("adding new cuisine should return statuscode 200 and success of 1", async () => {
+        const response = await request(app).post('/api/user/cuisine').send(data)
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+    })
+})
+
