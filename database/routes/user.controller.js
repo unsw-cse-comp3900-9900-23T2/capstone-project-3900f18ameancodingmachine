@@ -207,6 +207,9 @@ export async function createEatery(req,res) {
     try {
         const body = req.body;
         const result = await createEateryAccount(body);
+        if (result.success == 0) {
+            return res.status(400).json(result)
+        }
         return res.status(200).json(result);
     } catch (err) {
         return res.status(500).json({

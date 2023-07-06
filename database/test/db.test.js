@@ -100,9 +100,19 @@ describe("/eatery", () => {
     })
 
     test("eatery registration should return statuscode 200 and success of 1", async () => {
-        const response = await request(app).post('/api/user/eatery').send(data)
+        const response = await request(app).post('/api/user/eatery').send(data);
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
+    })
+
+    test("register the same eatery with the same info twice should not return success 1", async () => {
+        const response = await request(app).post('/api/user/eatery').send(data);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+
+        const response2 = await request(app).post('/api/user/eatery').send(data);
+        expect(response2.statusCode).toBe(400);
+        expect(response2.body.success).toBe(0);
     })
 
 })
