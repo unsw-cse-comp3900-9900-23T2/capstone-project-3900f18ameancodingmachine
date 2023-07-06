@@ -36,6 +36,11 @@ export async function createAccountInfo(req, res) {
         const body = req.body;
         body.password = getHashOf(body.password);
         const result = await createLogin(body);
+
+        if (result.success == 0) {
+            return res.status(400).json(result);
+        }
+        
         return res.status(200).json(result);
     } catch (error) {
         console.log(err);

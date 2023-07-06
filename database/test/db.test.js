@@ -2,10 +2,11 @@ import request from 'supertest';
 import { app, server } from '../server';
 import { poolPromise } from '../db-config/db_connection';
 
+// after all test done, it will stop pool connection
+// otherwise jest won't exit
 afterAll((done) => {
     server.close(() => {
         poolPromise.end()
-        console.log("done")
         done();
     });
 });
@@ -32,7 +33,6 @@ describe("/account", () => {
     afterEach(async () => {
         const query = "delete from LoginInfo where login = ?"
         const res = await poolPromise.execute(query, [login])
-        console.log("deleted")
     })
 
     test('successful registration should return status code 200 and success', async () => {
@@ -57,7 +57,7 @@ describe("/account", () => {
             login: login,
             password: password
         })
-        expect(anotherResponse.statusCode).toBe(200)
+        expect(anotherResponse.statusCode).toBe(400)
         expect(anotherResponse.body.success).toBe(0)
     })
 })
@@ -73,7 +73,6 @@ describe("/address", () => {
     afterEach(async () => {
         const query = `delete from Address where street = ? and suburb = ? and region = ? and postcode = ?`
         const res = await poolPromise.execute(query, ["unicorn street", "dirtland", "NSW", "2025"])
-        console.log("address deleted")
     })
 
     test("address should return status code 200", async () => {
@@ -96,7 +95,6 @@ describe("/eatery", () => {
     afterEach(async () => {
         const query = `delete from EateryAccount where name = ? and email = ? and url = ?`
         const res = await poolPromise.execute(query, ["another restaurant", "anotherrestaurant@gmail.com", "www.anotherrestaurant.com"])
-        console.log("eatery account deleted")
     })
 
     test("eatery registration should return statuscode 200 and success of 1", async () => {
@@ -125,7 +123,6 @@ describe("/cuisine", () => {
     afterEach(async () => {
         const query = `delete from Cuisines where name = ?`
         const res = await poolPromise.execute(query, ["new cuisine"])
-        console.log("cuisine deleted")
     })
 
     test("adding new cuisine should return statuscode 200 and success of 1", async () => {
