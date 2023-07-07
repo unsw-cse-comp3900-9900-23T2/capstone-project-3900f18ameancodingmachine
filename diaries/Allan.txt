@@ -20,5 +20,5 @@ week 5
 - encountered bug where if i send an axios request to the server, it will throw 413 error
 
 week 6
-- finally fix the bug by installing cors as well as running server and frontend in separate project
-- planning to do some unit test for database and routes
+- finally fix the bug by installing cors as well as running server and frontend in separate port
+- planning to do unit test for database and routes
