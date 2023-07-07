@@ -62,6 +62,43 @@ describe("/account", () => {
     })
 })
 
+describe("/login", () => {
+    const login = "uniquename@gmail.com"
+    const password = "test"
+
+    afterEach(async () => {
+        const query = "delete from LoginInfo"
+        const res = await poolPromise.execute(query)
+    })
+
+    test("register then login should return statuscode 200 and success 1", async () => {
+        // register the user first
+        let response = await request(app).post("/api/user/account").send({
+            login: login,
+            password: password
+        })
+
+        // then user login
+        response = await request(app).post("/api/user/login").send({
+            login: login,
+            password: password
+        })
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+    })
+
+    test("login without register should return statuscode 404 and success 0", async () => {
+        const response = await request(app).post("/api/user/login").send({
+            login: login,
+            password: password
+        })
+        console.log(response.body)
+        expect(response.statusCode).toBe(404)
+        expect(response.body.success).toBe(0)
+    })
+})
+
 describe("/address", () => {
     
     const data = {

@@ -160,7 +160,7 @@ export async function login(req, res) {
         const results = await getLoginByUsername(body.login);
         
         if (results.success == 0) {
-            return res.json(results);
+            return res.status(404).json(results);
         }
         //check if hashed password matches
         const result = getHashOf(body.password) === results.password;
@@ -178,7 +178,7 @@ export async function login(req, res) {
                 data: "Login successful"
             });
         } else {
-            return res.json({
+            return res.status(404).json({
                 success: 0,
                 data: "Invalid username or password"
             });
