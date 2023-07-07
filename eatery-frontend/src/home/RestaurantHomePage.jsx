@@ -14,11 +14,56 @@ import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
+/*
+ * Stub for editDescription button
+ */
+function editDescription() {
+  alert("editDescription: Pressed editDescription");
+  return false;
+}
+
+/*
+ * Stub for uploadMenu button
+ */
+function uploadMenu() {
+  alert("uploadMenu: Pressed uploadMenu");
+  return false;
+}
+
+/*
+ * Stub for uploadLayout button
+ */
+function uploadLayout() {
+  alert("uploadLayout: Pressed uploadLayout");
+  return false;
+}
+
+/*
+ * Stub for uploadHours button
+ */
+function uploadHours() {
+  alert("uploadHours: Pressed uploadHours");
+  return false;
+}
+
+/*
+ * Stub for createVoucher button
+ */
+function createVoucher(percentage, numVouchers, startDate, endDate, reoccuring) {
+  alert(`createVoucher: Pressed createVoucher \npercentage =${percentage}\nnumVouchers =${numVouchers}\nstartDate =${startDate}\nendDate =${endDate}\nreoccuring =${reoccuring}`);
+  return false;
+}
+
+
+
+
 export default function RestaurantHomePage() {
   const [percentage, setPercentage] = React.useState('');
   const [numVouchers, setNumVouchers] = React.useState('');
-  const [date, setDate] = React.useState('');
-  const [reoccuring, setReoccuring] = React.useState(false);
+  const [startDate, setStartDate] = React.useState('');
+  const [endDate, setEndDate] = React.useState('');
+  const [reoccuring, setReoccuring] = React.useState(true);
+  const [test, setTest] = React.useState('');
   return (
     <Container maxWidth="lg">
       <Card sx={{ minWidth: 275 }}>
@@ -28,7 +73,7 @@ export default function RestaurantHomePage() {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button variant="contained">Edit Description</Button>
+          <Button variant="contained" onClick={editDescription}>Edit Description</Button>
           <Button variant="contained">Upload Menu</Button>
           <Button variant="contained">Upload Layout</Button>
           <Button variant="contained">Upload Hours</Button>
@@ -51,8 +96,11 @@ export default function RestaurantHomePage() {
           }}
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker value={date} onChange={(event) => {
-              setDate(event.target.value);
+          <DatePicker label="Start Date" value={startDate} onChange={(event) => {
+              setStartDate(event);
+            }}/>
+          <DatePicker label="End Date" value={endDate} onChange={(event) => {
+              setEndDate(event);
             }}/>
         </LocalizationProvider>
         <FormGroup>
@@ -60,9 +108,10 @@ export default function RestaurantHomePage() {
             setReoccuring(event.target.value);
           }}/>
         </FormGroup>  
-        <CardActions>          
-          <Button variant="contained">Create Voucher</Button>
+        <CardActions >          
+          <Button variant="contained" onClick={() => {createVoucher(percentage, numVouchers, startDate, endDate, reoccuring)}}>Create Voucher</Button>
         </CardActions>
+        
         <CardActions>
           <Button size="large">View Created Vouchers</Button>
         </CardActions>
