@@ -113,7 +113,7 @@ export default function RestaurantHomePage() {
         </LocalizationProvider>
         <FormGroup>
           <FormControlLabel control={<Checkbox defaultChecked />} label="Reoccuring" value={reoccuring} onChange={(event) => {
-            setReoccuring(event.target.value);
+            const { name, checked } = event.target; setReoccuring(checked);
           }}/>
         </FormGroup>  
         <CardActions >          
