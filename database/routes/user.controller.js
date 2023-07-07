@@ -16,7 +16,8 @@ import {
     getCuisineFromCuisineId,
     getPostByPostId, 
     getReviewByReviewId, 
-    getEateryByRestaurantId
+    getEateryByRestaurantId,
+    getEateryByLoginId
 } from "./user.service.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -343,6 +344,40 @@ export async function getEateryById(req, res) {
             success: 0,
             message: "Database connection error"
         });
+    }
+}
+
+export async function getEateryByLogin(req, res) {
+    try {
+        const id = req.params.id;
+        const result = await getEateryByLoginId(id);
+        
+        if (result.success == 0) {
+            return res.status(404).json(result);
+        }
+        return res.status(200).json(result);
+
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+// get user token
+export function getToken(req, res) {
+    try {
+        return res.status(200).json({
+            success: 1, 
+            token: req.cookies.token
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: 0, 
+            message: "connection error"
+        })
     }
 }
 
