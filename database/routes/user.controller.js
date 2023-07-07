@@ -333,6 +333,7 @@ export async function createRestaurantCusine(req, res) {
 export async function createBusinessHour(req, res) {
     try {
         const body = req.body;
+        console.log(body)
         const result = await insertHourFromRestaurant(body);
         return res.status(200).json(result);
     } catch (err) {

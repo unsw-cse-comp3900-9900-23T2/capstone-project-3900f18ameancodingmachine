@@ -106,3 +106,41 @@ describe("/cuisine-offer", () => {
     })
 
 })
+
+describe("/hour", () => {
+    const data = {
+        name: "another restaurant",
+        address: 0, //fake
+        phone: "0493186858",
+        email: "anotherrestaurant@gmail.com",
+        login: 0, //fake
+        url: "www.anotherrestaurant.com",
+    }
+
+    afterEach(async () => {
+        let query = `delete from BusinessHour`;
+        let res = await poolPromise.execute(query)
+        query = `delete from EateryAccount`
+        res = await poolPromise.execute(query)
+    })
+
+    test("input business hour return statuscode 200 and success 1", async () => {
+        // create the new eatery
+        let response = await request(app).post('/api/user/eatery').send(data)
+        const restaurantId = response.body.results.insertId
+
+        //  insert business hour
+        const hourData = {
+            restaurantId: restaurantId,
+            day: "mon",
+            open: "09:00",
+            close: "17:00"
+        }
+
+        response = await request(app).post('/api/user/hour').send(hourData)
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+
+    })
+
+})
