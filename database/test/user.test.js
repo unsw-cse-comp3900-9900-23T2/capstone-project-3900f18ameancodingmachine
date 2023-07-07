@@ -93,7 +93,6 @@ describe("/login", () => {
             login: login,
             password: password
         })
-        console.log(response.body)
         expect(response.statusCode).toBe(404)
         expect(response.body.success).toBe(0)
     })
@@ -207,6 +206,97 @@ describe("/reviews", () => {
     })
     
 
+})
+
+describe('/subscribe', () => {
+    const userAccount = {
+        first: "first",
+        last: "last",
+        loginId: 0, //fake
+        addressId: 1 //fake
+    }
+
+    const addressData = {
+        street: "unicorn street",
+        suburb: "dirtland",
+        region: "NSW",
+        postcode: "2025"
+    }
+
+    const eateryAccount = {
+        name: "another restaurant",
+        address: 0, //fake
+        phone: "0493186858",
+        email: "anotherrestaurant@gmail.com",
+        login: 0, //fake 
+        url: "www.anotherrestaurant.com",
+    }
+
+    afterEach(async () => {
+        let query = `delete from SubscribedTo`
+        let res = await poolPromise.execute(query)
+        query = `delete from UserAccount`;
+        res = await poolPromise.execute(query);
+        query = `delete from EateryAccount`;
+        res = await poolPromise.execute(query);
+        query = `delete from Address`;
+        res = await poolPromise.execute(query);
+    })
+
+    test("user subscribe to registered restaurant", async () => {
+        let response = await request(app).post("/api/user/eatery").send(eateryAccount)
+        const eateryAccountId = response.body.results.insertId
+
+        response = await request(app).post("/api/user/user").send(userAccount)
+        const userAccountId = response.body.data.insertId
+
+        const subscribeData = {
+            userId: userAccountId,
+            restaurantId: eateryAccountId
+        }
+
+        response = await request(app).post("/api/user/subscribe").send(subscribeData)
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+    })
+
+    test("finding what eateries the user is subscribed to", async () => {
+
+        let response = await request(app).post("/api/user/address").send(addressData)
+        const eateryAddressId = response.body.data.insertId
+
+        const eateryAccount2 = {
+            name: "another restaurant",
+            address: eateryAddressId,
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            login: 0, //fake 
+            url: "www.anotherrestaurant.com",
+        }
+
+        response = await request(app).post("/api/user/eatery").send(eateryAccount2)
+        const eateryAccountId = response.body.results.insertId
+
+        response = await request(app).post("/api/user/user").send(userAccount)
+        const userAccountId = response.body.data.insertId
+
+        const subscribeData = {
+            userId: userAccountId,
+            restaurantId: eateryAccountId
+        }
+
+        response = await request(app).post("/api/user/subscribe").send(subscribeData)
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+
+        let [res] = await poolPromise.execute(`select * from userSubscription where userId = ?`, [userAccountId])
+        expect(res.length).toBe(1)
+
+        response = await request(app).get(`/api/user/subscribe/${userAccountId}`)
+        // console.log(response)
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+    })
 })
 
 

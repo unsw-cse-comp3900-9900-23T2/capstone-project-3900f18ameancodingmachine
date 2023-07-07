@@ -224,6 +224,16 @@ export async function insertSubscribedTo(data) {
     };  
 }
 
+export async function findSubscribedEateriesFromUserId(id) {
+    const query = `select * from userSubscription where userId = ?`
+    const value = [id]
+    const [results] = await poolPromise.execute(query, value);
+    return {
+        success: 1,
+        data: results
+    }
+}
+
 export async function insertHourFromRestaurant(data) {
     const values = [data.restaurantId, data.day, data.open, data.close]
     const query = `insert into BusinessHour (restaurantId, day, open, close) values (?, ?, ?, ?)`;

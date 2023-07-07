@@ -17,7 +17,8 @@ import {
     getPostByPostId, 
     getReviewByReviewId, 
     getEateryByRestaurantId,
-    getEateryByLoginId
+    getEateryByLoginId,
+    findSubscribedEateriesFromUserId
 } from "./user.service.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -116,6 +117,21 @@ export async function createSubscribedTo(req, res) {
         return res.status(200).json(result);
     } catch (error) {
         console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+// get eateries subscribed based on userId
+export async function showSubscribedEateries(req, res) {
+    try {
+        const id =  req.params.id;
+        const result = await findSubscribedEateriesFromUserId(id);
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: 0,
             message: "Database connection error"
