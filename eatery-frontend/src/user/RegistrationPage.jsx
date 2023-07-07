@@ -53,7 +53,7 @@ async function createUser(first, last, loginId, addressId) {
       addressId: addressId
     });
     if (data.success) {
-      console.log("User created");
+      console.log("User successfully created");
       return data.data.insertId;
     }
   } catch (error) {

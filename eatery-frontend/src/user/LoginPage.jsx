@@ -47,6 +47,7 @@ function LoginForm(){
      *  Else print underneath "Incorrect Email or Password" 
      */
     if (await checkCredentials(email, password)){
+      console.log("success")
       navigate("/");
     };
     setLogInFail(true);
