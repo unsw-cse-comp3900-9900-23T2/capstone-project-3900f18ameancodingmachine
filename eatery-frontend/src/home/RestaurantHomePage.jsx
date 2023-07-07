@@ -47,12 +47,12 @@ function uploadLayout() {
  */
 async function uploadHours() {
   // alert("uploadHours: Pressed uploadHours");
-  const day = prompt("choose day, (e.g mon,tue, wed, etc)")
+  const day = prompt("choose day, (e.g mon,tue, wed, etc) case insensitive").toLowerCase()
   const open = prompt("enter opening time (HH:MM)")
   const close = prompt("enter closing time (HH:MM)")
 
   // not correct day
-  if (!days.includes(day.toLowerCase())) {
+  if (!days.includes(day)) {
     alert("incorrect day")
     return;
   }
