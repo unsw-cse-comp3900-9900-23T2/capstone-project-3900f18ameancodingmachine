@@ -22,22 +22,22 @@ describe("/eatery", () => {
     }
 
     afterEach(async () => {
-        const query = `delete from EateryAccount where name = ? and email = ? and url = ?`
-        const res = await poolPromise.execute(query, ["another restaurant", "anotherrestaurant@gmail.com", "www.anotherrestaurant.com"])
+        const query = `delete from EateryAccount`
+        const res = await poolPromise.execute(query)
     })
 
     test("eatery registration should return statuscode 200 and success of 1", async () => {
-        const response = await request(app).post('/api/user/eatery').send(data);
+        const response = await request(app).post("/api/user/eatery").send(data);
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
     })
 
     test("register the same eatery with the same info twice should not return success 1", async () => {
-        const response = await request(app).post('/api/user/eatery').send(data);
+        const response = await request(app).post("/api/user/eatery").send(data);
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
 
-        const response2 = await request(app).post('/api/user/eatery').send(data);
+        const response2 = await request(app).post("/api/user/eatery").send(data);
         expect(response2.statusCode).toBe(400);
         expect(response2.body.success).toBe(0);
     })
@@ -59,4 +59,50 @@ describe("/cuisine", () => {
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
     })
+})
+
+describe("/cuisine-offer", () => {
+    const cuisineData = {
+        name: "new cuisine" //fake
+    }
+
+    const restaurantData = {
+        name: "another restaurant",
+        address: 0, //fake
+        phone: "0493186858",
+        email: "anotherrestaurant@gmail.com",
+        login: 0, //fake
+        url: "www.anotherrestaurant.com",
+    }
+
+    // have better method but this is guaranteed
+    afterEach(async () => {
+        let query = `delete from CuisineOffer`;
+        let res = await poolPromise.execute(query)
+        query = `delete from Cuisines`
+        res = await poolPromise.execute(query)
+        query = `delete from EateryAccount`
+        res = await poolPromise.execute(query)
+    })
+
+    test("restaurant linking to a cuisine would have statuscode 200 and success of 1", async () => {
+        // make new cuisine
+        let  response = await request(app).post('/api/user/cuisine').send(cuisineData)
+        const cuisineId = response.body.results.insertId
+        
+        // create the new eatery
+        response = await request(app).post('/api/user/eatery').send(restaurantData)
+        const restaurantId = response.body.results.insertId
+
+        const offerData = {
+            restaurantId: restaurantId,
+            cuisineId: cuisineId
+        }
+
+        // make cuisine offer from restaurant
+        response = await request(app).post('/api/user/cuisine-offer').send(offerData)
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+    })
+
 })
