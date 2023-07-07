@@ -42,8 +42,8 @@ export default function HomePage() {
   return (
     // Defaults to User Home Page if not logged in
     <Container maxWidth="lg">
-      {!isRestaurant  && <RestaurantHomePage/>}
-      {isRestaurant && <UserHomePage/>}
+      {isRestaurant  && <RestaurantHomePage/>}
+      {!isRestaurant && <UserHomePage/>}
     </Container>
   );
 }
