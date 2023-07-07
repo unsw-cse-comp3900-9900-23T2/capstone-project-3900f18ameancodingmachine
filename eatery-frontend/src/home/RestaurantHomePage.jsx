@@ -13,6 +13,10 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+
+const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
 /*
  * Stub for editDescription button
@@ -39,10 +43,54 @@ function uploadLayout() {
 }
 
 /*
- * Stub for uploadHours button
+ * assume that the user is in EateryAccount checked in login
  */
-function uploadHours() {
-  alert("uploadHours: Pressed uploadHours");
+async function uploadHours() {
+  // alert("uploadHours: Pressed uploadHours");
+  const day = prompt("choose day, (e.g mon,tue, wed, etc)")
+  const open = prompt("enter opening time (HH:MM)")
+  const close = prompt("enter closing time (HH:MM)")
+
+  // not correct day
+  if (!days.includes(day.toLowerCase())) {
+    alert("incorrect day")
+    return;
+  }
+
+  const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+
+  // not correct time
+  if (!timeRegex.test(open) || !timeRegex.test(close)) {
+    alert("incorrect time")
+    return;
+  }
+
+  try {
+    // get loginid
+    const result = await axios.get('api/user/')
+    let data = result.data;
+    const decrypt = jwt_decode(data.token)
+    let loginId = decrypt.result.id;
+
+    // get the restaurantId
+    const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
+    const eateryId =  eateryRes.data.data.login
+    console.log(eateryRes.data.data.login)
+
+    // insert into the database
+    const res = await axios.post('api/user/hour', {
+      day: day,
+      open: open,
+      close: close,
+      restaurantId: eateryId
+    })
+
+    alert("upload success")
+  } catch (error) {
+    alert("something is wrong in the database")
+    console.log(error)
+  }
+
   return false;
 }
 
