@@ -54,6 +54,14 @@ function createVoucher(percentage, numVouchers, startDate, endDate, reoccuring) 
   return false;
 }
 
+/*
+ * Stub for createVoucher button
+ */
+function viewVouchers() {
+  alert("viewVouchers: Pressed viewVouchers");
+  return false;
+}
+
 
 
 
@@ -73,10 +81,10 @@ export default function RestaurantHomePage() {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button variant="contained" onClick={editDescription}>Edit Description</Button>
-          <Button variant="contained">Upload Menu</Button>
-          <Button variant="contained">Upload Layout</Button>
-          <Button variant="contained">Upload Hours</Button>
+          <Button variant="contained" onClick={() => {editDescription()}}>Edit Description</Button>
+          <Button variant="contained" onClick={() => {uploadMenu()}}>Upload Menu</Button>
+          <Button variant="contained" onClick={() => {uploadLayout()}}>Upload Layout</Button>
+          <Button variant="contained" onClick={() => {uploadHours()}}>Upload Hours</Button>
         </CardActions>
       </Card>
 
@@ -113,7 +121,7 @@ export default function RestaurantHomePage() {
         </CardActions>
         
         <CardActions>
-          <Button size="large">View Created Vouchers</Button>
+          <Button size="large" onClick={() => {viewVouchers()}}>View Created Vouchers</Button>
         </CardActions>
         
       </Card>
