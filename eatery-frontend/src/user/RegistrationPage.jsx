@@ -8,7 +8,9 @@ import CardContent from '@mui/material/CardContent';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import validator from 'validator';
 import axios from 'axios';
+import isEmail from 'validator/lib/isEmail';
 
 async function createAccount(email, pass) {
   try {
@@ -64,6 +66,8 @@ async function createUser(first, last, loginId, addressId) {
 
 export default function RegistrationPage() {
   const navigate = useNavigate();
+  const [registerFail, setRegisterFail] = React.useState(false);
+  const [registerMSG, setRegisterMSG] = React.useState('');
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   //login details
@@ -78,11 +82,30 @@ export default function RegistrationPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    for ([success, message] of [
+      [validator.isEmail(email), "Please use a valid email"],
+      [validator.isStrongPassword(password), "Password length must be atleast 8 with 1 uppercase and lowercase character aswell as 1 number and symbol"],
+      [validator.isPostalCode(postCode, "AU"), "Please use a valid postal address"],
+      [!validator.isEmpty(street, { ignore_whitespace: true }) 
+        && !validator.isEmpty(suburb, { ignore_whitespace: true }) 
+        && !validator.isEmpty(region, { ignore_whitespace: true }) 
+        && !validator.isEmpty(firstName, { ignore_whitespace: true }) 
+        && !validator.isEmpty(lastName, { ignore_whitespace: true }),
+      "Please fill out all the required fields"]
+    ]) {
+      if (!success) {
+        setRegisterFail(true);
+        setRegisterMSG(message);
+      }
+      return;
+    }
+
     const loginId = await createAccount(email, password);
     const addressId = await createAddress(street, suburb, region, postCode);
     const userId = await createUser(firstName, lastName, loginId, addressId);
     console.log(userId);
-    navigate('/login')
+    navigate('/login');
   }
 
   return (
@@ -155,6 +178,7 @@ export default function RegistrationPage() {
               setPostCode(event.target.value);
             }}
           />
+          {registerFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>${registerMSG}</Typography> }
         </CardContent>
         <CardActions onClick={handleSubmit}>
           <Button size="small">REGISTER</Button>
