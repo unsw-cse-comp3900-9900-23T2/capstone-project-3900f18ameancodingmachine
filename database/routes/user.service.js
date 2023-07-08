@@ -119,7 +119,7 @@ export async function getEateryByRestaurantId(id) {
 }
 
 export async function getEateryByLoginId(id) {
-    const query = `select name, address, phone, email, login, url 
+    const query = `select id, name, address, phone, email, url 
     from EateryAccount ea
     where login = ?`;
     const values = [id]
@@ -234,7 +234,25 @@ export async function findSubscribedEateriesFromUserId(id) {
     }
 }
 
+// check if there is a business hour from a restaurant with the same day
+// if there is then just update the hour (open and close), otherwise insert the new values
 export async function insertHourFromRestaurant(data) {
+    const findQuery = `select * from BusinessHour where restaurantId = ? and day = ?`
+    const findValues = [data.restaurantId, data.day]
+    const [findResult] = await poolPromise.execute(findQuery, findValues)
+    
+    if (findResult.length != 0) {
+        const updateQuery = `update BusinessHour set open = ?, close = ? where restaurantId = ? and day = ?`;
+        const updateValues = [data.open, data.close, data.restaurantId, data.day]
+        const [updateResult] = await poolPromise.execute(updateQuery, updateValues);
+        console.log(updateResult)
+        return {
+            success: 1,
+            result: updateResult,
+            message: "business hours updated"
+        }
+    }
+
     const values = [data.restaurantId, data.day, data.open, data.close]
     const query = `insert into BusinessHour (restaurantId, day, open, close) values (?, ?, ?, ?)`;
     const [results] = await poolPromise.execute(query, values);
