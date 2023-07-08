@@ -13,12 +13,40 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+
+const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
 /*
  * Stub for editDescription button
  */
-function editDescription() {
-  alert("editDescription: Pressed editDescription");
+async function editDescription() {
+  // alert("editDescription: Pressed editDescription");
+  const description = prompt("Enter your description:")
+  try {
+    // get loginid
+    const result = await axios.get('api/user/')
+    let data = result.data;
+    const decrypt = jwt_decode(data.token)
+    let loginId = decrypt.result.id;
+
+    // get the restaurantId
+    const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
+    const eateryId =  eateryRes.data.data.id
+    console.log(eateryRes.data.data.id)
+
+    // insert into the database
+    const res = await axios.put('api/user/eatery/description', {
+      restaurantId: eateryId,
+      description: description
+    })
+
+    alert("description updated")
+  } catch (error) {
+    alert("something is wrong in the database")
+    console.log(error)
+  }
   return false;
 }
 
@@ -39,18 +67,110 @@ function uploadLayout() {
 }
 
 /*
- * Stub for uploadHours button
+ * assume that the user is in EateryAccount checked in login
  */
-function uploadHours() {
-  alert("uploadHours: Pressed uploadHours");
+async function uploadHours() {
+  // alert("uploadHours: Pressed uploadHours");
+  let day = prompt("choose day, (e.g mon,tue, wed, etc) case insensitive")
+  if (day === null) {
+    return
+  } else {
+    day = day.toLowerCase()
+  }
+  let open = prompt("enter opening time (HH:MM)")
+  if (open === null) {
+    return
+  }
+  let close = prompt("enter closing time (HH:MM)")
+  if (close === null) {
+    return
+  }
+
+  // not correct day
+  if (!days.includes(day)) {
+    alert("incorrect day")
+    return;
+  }
+
+  const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+
+  // not correct time
+  if (!timeRegex.test(open) || !timeRegex.test(close)) {
+    alert("incorrect time")
+    return;
+  } else if (open > close) {
+    alert("please input opening hour first then closing hour")
+    return;
+  }
+
+  try {
+    // get loginid
+    const result = await axios.get('api/user/')
+    let data = result.data;
+    const decrypt = jwt_decode(data.token)
+    let loginId = decrypt.result.id;
+
+    // get the restaurantId
+    const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
+    const eateryId =  eateryRes.data.data.id
+    console.log(eateryRes.data.data.id)
+
+    // insert into the database
+    const res = await axios.post('api/user/hour', {
+      day: day,
+      open: open,
+      close: close,
+      restaurantId: eateryId
+    })
+
+    console.log(res.data)
+    alert("upload success")
+  } catch (error) {
+    alert("something is wrong in the database")
+    console.log(error)
+  }
+
   return false;
 }
 
 /*
  * Stub for createVoucher button
  */
-function createVoucher(percentage, numVouchers, startDate, endDate, reoccuring) {
-  alert(`createVoucher: Pressed createVoucher \npercentage =${percentage}\nnumVouchers =${numVouchers}\nstartDate =${startDate}\nendDate =${endDate}\nreoccuring =${reoccuring}`);
+async function createVoucher(percentage, numVouchers, startDate, endDate, reoccuring) {
+
+  if (percentage === "" || numVouchers === "") { // field must be filled
+    alert("fill the voucher details");
+    return
+  } else if (startDate > endDate) { // start date must be earlier than end date
+    alert("start date older than the end date")
+    return
+  }
+
+  try {
+    // get loginid
+    const result = await axios.get('api/user/')
+    let data = result.data;
+    const decrypt = jwt_decode(data.token)
+    let loginId = decrypt.result.id;
+
+    // get the restaurantId
+    const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
+    const eateryId =  eateryRes.data.data.id
+
+    // insert into the database
+    const res = await axios.post('api/user/voucher', {
+      offeredBy: eateryId,
+      discount: percentage,
+      startOffer: startDate.toISOString().slice(0, 19).replace('T', ' '),
+      endOffer: endDate.toISOString().slice(0, 19).replace('T', ' '),
+      count: numVouchers
+    })
+
+    alert("voucher created")
+  } catch (error) {
+    alert("something is wrong in the database")
+    console.log(error)
+  }
   return false;
 }
 

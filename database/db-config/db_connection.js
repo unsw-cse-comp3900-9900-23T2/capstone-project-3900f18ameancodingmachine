@@ -1,6 +1,10 @@
 import 'dotenv/config';
 import mysql from 'mysql2';
 
+// note:
+// if you want to test the route implementation and keeping the data from database
+// use  DB_DATABASE_TEST in env which is eatery_test database
+
 // initialize pool
 const config = {
   host     : process.env.DB_HOST,
@@ -12,6 +16,7 @@ const config = {
 const pool = mysql.createPool(config)
 
 const poolPromise = pool.promise();
+
 
 export { pool, poolPromise };
 

@@ -17,9 +17,12 @@ import { createAccountInfo,
     getEateryByLogin,
     getEateryById,
     getToken,
+    createSubscribedTo,
+    showSubscribedEateries,
 } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
+import { createVoucher, updateDescription } from "./restaurant.controller.js";
 
 const router = express.Router();
 
@@ -41,13 +44,18 @@ router.post("/eatery", createEatery);
 router.post("/cuisine", createCuisine); 
 router.post("/cuisine-offer", createRestaurantCusine); 
 router.post("/hour", createBusinessHour); 
-router.post("/posts", createEateryPosts) 
-router.post("/reviews", createUserReviews) 
+router.post("/posts", createEateryPosts); 
+router.post("/reviews", createUserReviews);
+router.post("/subscribe", createSubscribedTo); 
 
 router.get("/post/:id", getPostById) 
 router.get("/review/:id", getReviewById)
 router.get("/cuisine/:id", getCuisineById) 
 router.get("/eatery/:id", getEateryById)
+router.get("/subscribe/:id", showSubscribedEateries)
+
+router.post("/voucher", createVoucher)
+router.put("/eatery/description", updateDescription)
 
 // check account based on loginid
 router.get("/eatery/login/:id", getEateryByLogin)
