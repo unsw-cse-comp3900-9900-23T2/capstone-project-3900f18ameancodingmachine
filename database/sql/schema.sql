@@ -91,7 +91,7 @@ create table Voucher (
     discount        decimal(3,2), -- 25.25%, 32.50%, etc
     startOffer      datetime, -- 2022-04-22 10:34:23:55
     endOffer        datetime, 
-    description     text,
+    count           integer,
     code            text, 
     primary key (id)
 );

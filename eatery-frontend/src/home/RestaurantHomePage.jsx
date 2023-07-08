@@ -110,7 +110,7 @@ async function uploadHours() {
  */
 async function createVoucher(percentage, numVouchers, startDate, endDate, reoccuring) {
 
-  if (percentage == "" || numVouchers == "") {
+  if (percentage == "" || numVouchers == "") { // field must be filled
     alert("fill the voucher details");
     return
   } else if (startDate > endDate) { // start date must be earlier than end date
