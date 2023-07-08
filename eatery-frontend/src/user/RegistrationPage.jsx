@@ -83,6 +83,8 @@ export default function RegistrationPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    let success, message;
+    //check each field
     for ([success, message] of [
       [validator.isEmail(email), "Please use a valid email"],
       [validator.isStrongPassword(password), "Password length must be atleast 8 with 1 uppercase and lowercase character aswell as 1 number and symbol"],
@@ -97,11 +99,21 @@ export default function RegistrationPage() {
       if (!success) {
         setRegisterFail(true);
         setRegisterMSG(message);
+        return;
       }
-      return;
     }
+    
+    //if the function has not returned, fields are appropriate
+    setRegisterFail(false);
+    setRegisterMSG('');
 
     const loginId = await createAccount(email, password);
+    //if create account returns 0
+    if (!loginId) {
+      setRegisterFail(true);
+      setRegisterMSG("An account with this email already exists");
+      return;  
+    }
     const addressId = await createAddress(street, suburb, region, postCode);
     const userId = await createUser(firstName, lastName, loginId, addressId);
     console.log(userId);
@@ -178,7 +190,7 @@ export default function RegistrationPage() {
               setPostCode(event.target.value);
             }}
           />
-          {registerFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>${registerMSG}</Typography> }
+          {registerFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>{registerMSG}</Typography> }
         </CardContent>
         <CardActions onClick={handleSubmit}>
           <Button size="small">REGISTER</Button>
