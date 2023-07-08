@@ -188,3 +188,34 @@ describe('/voucher', () => {
         expect(response.body.success).toBe(1);
     })
 })
+
+describe("/voucher", () => {
+    const restaurantData = {
+        name: "another restaurant",
+        address: 0, //fake
+        phone: "0493186858",
+        email: "anotherrestaurant@gmail.com",
+        login: 0, //fake
+        url: "www.anotherrestaurant.com",
+    }
+
+    afterEach(async () => {
+        let query = `delete from EateryAccount`
+        let res = await poolPromise.execute(query)
+    })
+
+
+    test("update description would return statuscode 200 and success 1", async () => {
+        let response = await request(app).post('/api/user/eatery').send(restaurantData)
+        const restaurantId = response.body.results.insertId
+
+        response = await request(app).put("/api/user/eatery/description").send({
+            restaurantId: restaurantId,
+            description: "hello there"
+        })
+
+        console.log(response.statusCode)
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+    })
+})

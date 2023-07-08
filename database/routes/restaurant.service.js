@@ -10,3 +10,10 @@ export async function createNewVoucher(data) {
         result: result
     }
 }
+
+export async function updateExistingDescription(body) {
+    return {
+        success: 1,
+        message: "success"
+    }
+}

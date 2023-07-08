@@ -22,13 +22,14 @@ create table UserAccount (
 );
 
 create table EateryAccount (
-    id          integer auto_increment,
-    name        text not null,
-    address     integer references Address(id),
-    phone       integer not null,
-    email       text,
-    login       integer not null references LoginInfo(id),
-    url         text,
+    id              integer auto_increment,
+    name            text not null,
+    address         integer references Address(id),
+    phone           integer not null,
+    email           text,
+    login           integer not null references LoginInfo(id),
+    url             text,
+    description     text,
     primary key (id) 
 );
 

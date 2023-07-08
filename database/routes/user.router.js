@@ -22,7 +22,7 @@ import { createAccountInfo,
 } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
-import { createVoucher } from "./restaurant.controller.js";
+import { createVoucher, updateDescription } from "./restaurant.controller.js";
 
 const router = express.Router();
 
@@ -55,6 +55,7 @@ router.get("/eatery/:id", getEateryById)
 router.get("/subscribe/:id", showSubscribedEateries)
 
 router.post("/voucher", createVoucher)
+router.put("/eatery/description", updateDescription)
 
 // check account based on loginid
 router.get("/eatery/login/:id", getEateryByLogin)
