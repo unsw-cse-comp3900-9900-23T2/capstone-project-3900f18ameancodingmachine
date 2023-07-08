@@ -47,15 +47,17 @@ function uploadLayout() {
  */
 async function uploadHours() {
   // alert("uploadHours: Pressed uploadHours");
-  const day = prompt("choose day, (e.g mon,tue, wed, etc) case insensitive")
+  let day = prompt("choose day, (e.g mon,tue, wed, etc) case insensitive")
   if (day === null) {
     return
+  } else {
+    day = day.toLowerCase()
   }
-  const open = prompt("enter opening time (HH:MM)")
+  let open = prompt("enter opening time (HH:MM)")
   if (open === null) {
     return
   }
-  const close = prompt("enter closing time (HH:MM)")
+  let close = prompt("enter closing time (HH:MM)")
   if (close === null) {
     return
   }
@@ -66,13 +68,14 @@ async function uploadHours() {
     return;
   }
 
-  day = day.toLowerCase()
-
   const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
 
   // not correct time
   if (!timeRegex.test(open) || !timeRegex.test(close)) {
     alert("incorrect time")
+    return;
+  } else if (open > close) {
+    alert("please input opening hour first then closing hour")
     return;
   }
 
@@ -96,6 +99,7 @@ async function uploadHours() {
       restaurantId: eateryId
     })
 
+    console.log(res.data)
     alert("upload success")
   } catch (error) {
     alert("something is wrong in the database")
@@ -110,7 +114,7 @@ async function uploadHours() {
  */
 async function createVoucher(percentage, numVouchers, startDate, endDate, reoccuring) {
 
-  if (percentage == "" || numVouchers == "") { // field must be filled
+  if (percentage === "" || numVouchers === "") { // field must be filled
     alert("fill the voucher details");
     return
   } else if (startDate > endDate) { // start date must be earlier than end date
