@@ -53,6 +53,8 @@ router.get("/cuisine/:id", getCuisineById)
 router.get("/eatery/:id", getEateryById)
 router.get("/subscribe/:id", showSubscribedEateries)
 
+router.post("/post", (req, res) => {return res.status(200).json({success: 1})})
+
 // check account based on loginid
 router.get("/eatery/login/:id", getEateryByLogin)
 
