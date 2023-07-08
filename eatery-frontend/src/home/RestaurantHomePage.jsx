@@ -62,6 +62,13 @@ function viewVouchers() {
   return false;
 }
 
+/*
+ *  Stub for uploadPost
+ */
+function uploadPost(title, body) {
+  alert(`uploadPost: Pressed uploadPost\nTitle: ${title}\nBody: ${body}`);
+  return false
+}
 
 
 
@@ -71,7 +78,9 @@ export default function RestaurantHomePage() {
   const [startDate, setStartDate] = React.useState('');
   const [endDate, setEndDate] = React.useState('');
   const [reoccuring, setReoccuring] = React.useState(true);
-  const [test, setTest] = React.useState('');
+  const [titlePost, setTitlePost] = React.useState('');
+  const [bodyPost, setBodyPost] = React.useState('');
+
   return (
     <Container maxWidth="lg">
       <Card sx={{ minWidth: 275 }}>
@@ -125,6 +134,33 @@ export default function RestaurantHomePage() {
         </CardActions>
         
       </Card>
+      
+      <Card sx={{ minWidth: 275 }}>
+        <CardContent>
+          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+            Create Post
+          </Typography>
+
+          <Typography sx={{ fontSize: 14 }} color="text.primary" gutterBottom>
+            Title
+          </Typography>
+          <TextField required id="title-post" placeholder="Title" value={titlePost} onChange={(event) => {
+              setTitlePost(event.target.value);
+            }}
+          />
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            Body
+          </Typography>
+          <TextField sx={{ minWidth: 500 }} multiline rows={8} required id="body-post" placeholder="Body" value={bodyPost} onChange={(event) => {
+              setBodyPost(event.target.value);
+            }}
+          />
+        </CardContent>
+        <CardActions>
+          <Button variant="contained" onClick={() => {uploadPost(titlePost,bodyPost)}}>Post</Button>
+        </CardActions>
+      </Card>
+
     </Container>
     
   );
