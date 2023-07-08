@@ -119,7 +119,7 @@ export async function getEateryByRestaurantId(id) {
 }
 
 export async function getEateryByLoginId(id) {
-    const query = `select name, address, phone, email, login, url 
+    const query = `select id, name, address, phone, email, url 
     from EateryAccount ea
     where login = ?`;
     const values = [id]

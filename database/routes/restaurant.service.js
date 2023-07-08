@@ -11,9 +11,16 @@ export async function createNewVoucher(data) {
     }
 }
 
-export async function updateExistingDescription(body) {
+export async function updateExistingDescription(data) {
+    console.log(data)
+    const query =  `update EateryAccount set description = ? where id = ?`
+    const values = [data.description, data.restaurantId]
+    const [result] = await poolPromise.execute(query, values);
+
+    console.log(result)
+    
     return {
         success: 1,
-        message: "success"
+        result: result
     }
 }
