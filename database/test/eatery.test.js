@@ -170,15 +170,20 @@ describe('/voucher', () => {
         const start = new Date().toISOString().slice(0, 19).replace('T', ' ');
         const end = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
+        console.log(start)
+        console.log(end)
+
         // input for voucher
-        // leave description and code null
+        // leave code null
         const voucherData = {
             offeredBy: restaurantId,
+            discount: 50,
             startOffer: start,
-            endOffer: end
+            endOffer: end,
+            count: 1
         }
 
-        const result = await request(app).post('/api/user/voucher').send(voucherData);
+        response = await request(app).post('/api/user/voucher').send(voucherData);
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
     })
