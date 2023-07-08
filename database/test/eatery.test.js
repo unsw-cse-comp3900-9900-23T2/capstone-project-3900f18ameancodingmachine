@@ -143,6 +143,36 @@ describe("/hour", () => {
 
     })
 
+    test("input business hour twice will just update the business hour", async () => {
+        let response = await request(app).post('/api/user/eatery').send(data)
+        const restaurantId = response.body.results.insertId
+
+        //  insert business hour
+        const hourData = {
+            restaurantId: restaurantId,
+            day: "mon",
+            open: "09:00",
+            close: "17:00"
+        }
+
+        response = await request(app).post('/api/user/hour').send(hourData)
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+
+        // insert another business hour
+        const hourData2 = {
+            restaurantId: restaurantId,
+            day: "mon",
+            open: "10:00",
+            close: "18:00"
+        }
+
+        response = await request(app).post('/api/user/hour').send(hourData2)
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+        expect(response.body.message).toBe("business hours updated")
+    })
+
 })
 
 describe('/voucher', () => {
