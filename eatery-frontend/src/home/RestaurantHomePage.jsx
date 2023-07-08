@@ -21,8 +21,32 @@ const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 /*
  * Stub for editDescription button
  */
-function editDescription() {
-  alert("editDescription: Pressed editDescription");
+async function editDescription() {
+  // alert("editDescription: Pressed editDescription");
+  const description = prompt("Enter your description:")
+  try {
+    // get loginid
+    const result = await axios.get('api/user/')
+    let data = result.data;
+    const decrypt = jwt_decode(data.token)
+    let loginId = decrypt.result.id;
+
+    // get the restaurantId
+    const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
+    const eateryId =  eateryRes.data.data.id
+    console.log(eateryRes.data.data.id)
+
+    // insert into the database
+    const res = await axios.put('api/user/eatery/description', {
+      restaurantId: eateryId,
+      description: description
+    })
+
+    alert("description updated")
+  } catch (error) {
+    alert("something is wrong in the database")
+    console.log(error)
+  }
   return false;
 }
 
@@ -88,8 +112,8 @@ async function uploadHours() {
 
     // get the restaurantId
     const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
-    const eateryId =  eateryRes.data.data.login
-    console.log(eateryRes.data.data.login)
+    const eateryId =  eateryRes.data.data.id
+    console.log(eateryRes.data.data.id)
 
     // insert into the database
     const res = await axios.post('api/user/hour', {
@@ -131,7 +155,7 @@ async function createVoucher(percentage, numVouchers, startDate, endDate, reoccu
 
     // get the restaurantId
     const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
-    const eateryId =  eateryRes.data.data.login
+    const eateryId =  eateryRes.data.data.id
 
     // insert into the database
     const res = await axios.post('api/user/voucher', {
