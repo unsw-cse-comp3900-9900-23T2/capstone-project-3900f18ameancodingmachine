@@ -144,3 +144,47 @@ describe("/hour", () => {
     })
 
 })
+
+describe('/voucher', () => {
+    const restaurantData = {
+        name: "another restaurant",
+        address: 0, //fake
+        phone: "0493186858",
+        email: "anotherrestaurant@gmail.com",
+        login: 0, //fake
+        url: "www.anotherrestaurant.com",
+    }
+
+    afterEach(async () => {
+        let query = `delete from Voucher`
+        let res = await poolPromise.execute(query)
+        query = `delete from EateryAccount`
+        res = await poolPromise.execute(query)
+    })
+
+    test('insert correct voucher data return statuscode 200 and success 1', async () => {
+        // create the new eatery
+        let response = await request(app).post('/api/user/eatery').send(restaurantData)
+        const restaurantId = response.body.results.insertId
+
+        const start = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        const end = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        console.log(start)
+        console.log(end)
+
+        // input for voucher
+        // leave code null
+        const voucherData = {
+            offeredBy: restaurantId,
+            discount: 50,
+            startOffer: start,
+            endOffer: end,
+            count: 1
+        }
+
+        response = await request(app).post('/api/user/voucher').send(voucherData);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+    })
+})
