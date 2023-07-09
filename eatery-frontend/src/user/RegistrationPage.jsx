@@ -10,9 +10,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import validator from 'validator';
 import axios from 'axios';
-import isEmail from 'validator/lib/isEmail';
 
-async function createAccount(email, pass) {
+export async function createAccount(email, pass) {
   try {
     const {data} = await axios.post('api/user/account', {
       login: email,
@@ -23,12 +22,12 @@ async function createAccount(email, pass) {
       return data.data.insertId;
     }
   } catch (error) {
-    console.log("Account information failed");
+    console.log("Failed to create account");
   }
   return 0;
 }
 
-async function createAddress(street, suburb, region, postcode) {
+export async function createAddress(street, suburb, region, postcode) {
   try {
     const {data} = await axios.post('api/user/address', {
       street: street,
@@ -87,6 +86,7 @@ export default function RegistrationPage() {
     //check each field
     for ([success, message] of [
       [validator.isEmail(email), "Please use a valid email"],
+      [confirmPassword === password, "Passwords do not match"],
       [validator.isStrongPassword(password), "Password length must be atleast 8 with 1 uppercase and lowercase character aswell as 1 number and symbol"],
       [validator.isPostalCode(postCode, "AU"), "Please use a valid postal address"],
       [!validator.isEmpty(street, { ignore_whitespace: true }) 

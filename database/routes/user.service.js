@@ -264,17 +264,17 @@ export async function insertNewCuisineName(data) {
     const [result] = await poolPromise.execute(insertQuery,[name]);
     return {
         success: 1,
-        results: result
+        data: result
     };
 }
 
 // create new eatery account
 export async function createEateryAccount(data) {
     const query = `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?, ?, ?)`;
-    const values = [data.name, data.address, data.phone, data.email, data.login, data.url];
+    const values = [data.name, data.addressId, data.phone, data.email, data.loginId, data.url];
     const [result] = await poolPromise.execute(query,values);
     return {
         success: 1,
-        results: result
+        data: result
     };
 }
