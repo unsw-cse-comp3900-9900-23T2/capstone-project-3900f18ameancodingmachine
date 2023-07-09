@@ -8,7 +8,7 @@ import jwt_decode from 'jwt-decode';
 
 export default function HomePage() {
   // Null if not logged in, True if Restaurant manager, False if User
-  const [isRestaurant, setIsRestaurant] = React.useState(null); // TODO get from backend
+  const [isRestaurant, setIsRestaurant] = React.useState(null);
 
   React.useEffect(() => {
     async function checkCookies() {
@@ -43,7 +43,7 @@ export default function HomePage() {
     // Defaults to User Home Page if not logged in
     <Container maxWidth="lg">
       {isRestaurant  && <RestaurantHomePage/>}
-      {!isRestaurant && <UserHomePage/>}
+      {!isRestaurant && <UserHomePage isLoggedIn={isRestaurant===false}/>}
     </Container>
   );
 }
