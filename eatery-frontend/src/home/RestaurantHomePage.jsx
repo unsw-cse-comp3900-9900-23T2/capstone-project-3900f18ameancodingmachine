@@ -176,6 +176,11 @@ function viewVouchers() {
 */
 async function uploadPost(title, body) {
   // alert(`uploadPost: Pressed uploadPost\nTitle: ${title}\nBody: ${body}`);
+  if (!title || !body) {
+    alert("please fill in the details");
+    return;
+  }
+  
   try {
     const eateryId = await getEateryId()
 
