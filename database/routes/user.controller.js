@@ -17,7 +17,8 @@ import {
     getPostByPostId, 
     getReviewByReviewId, 
     getEateryByRestaurantId,
-    getEateryByLoginId
+    getEateryByLoginId,
+    findSubscribedEateriesFromUserId
 } from "./user.service.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -37,6 +38,11 @@ export async function createAccountInfo(req, res) {
         const body = req.body;
         body.password = getHashOf(body.password);
         const result = await createLogin(body);
+
+        if (result.success == 0) {
+            return res.status(400).json(result);
+        }
+        
         return res.status(200).json(result);
     } catch (error) {
         console.log(err);
@@ -118,6 +124,21 @@ export async function createSubscribedTo(req, res) {
     }
 }
 
+// get eateries subscribed based on userId
+export async function showSubscribedEateries(req, res) {
+    try {
+        const id =  req.params.id;
+        const result = await findSubscribedEateriesFromUserId(id);
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
 //get user by userId
 export async function getUserById(req, res) {
     try {
@@ -155,7 +176,7 @@ export async function login(req, res) {
         const results = await getLoginByUsername(body.login);
         
         if (results.success == 0) {
-            return res.json(results);
+            return res.status(404).json(results);
         }
         //check if hashed password matches
         const result = getHashOf(body.password) === results.password;
@@ -173,7 +194,7 @@ export async function login(req, res) {
                 data: "Login successful"
             });
         } else {
-            return res.json({
+            return res.status(404).json({
                 success: 0,
                 data: "Invalid username or password"
             });
@@ -208,6 +229,9 @@ export async function createEatery(req,res) {
     try {
         const body = req.body;
         const result = await createEateryAccount(body);
+        if (result.success == 0) {
+            return res.status(400).json(result)
+        }
         return res.status(200).json(result);
     } catch (err) {
         return res.status(500).json({
@@ -309,6 +333,7 @@ export async function createRestaurantCusine(req, res) {
 export async function createBusinessHour(req, res) {
     try {
         const body = req.body;
+        console.log(body)
         const result = await insertHourFromRestaurant(body);
         return res.status(200).json(result);
     } catch (err) {

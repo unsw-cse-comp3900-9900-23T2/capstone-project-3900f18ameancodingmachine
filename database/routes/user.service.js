@@ -3,7 +3,11 @@ import { poolPromise } from "../db-config/db_connection.js";
 export async function createLogin(data) {
     //insert login details
     const [existing] = await poolPromise.execute(`select * from LoginInfo where login = ?`, [data.login]);
+<<<<<<< HEAD
     if (!existing) {
+=======
+    if (existing.length !== 0) {
+>>>>>>> main
         return {
             success: 0,
             message: 'Username already exists'
@@ -119,7 +123,7 @@ export async function getEateryByRestaurantId(id) {
 }
 
 export async function getEateryByLoginId(id) {
-    const query = `select name, address, phone, email, login, url 
+    const query = `select id, name, address, phone, email, url 
     from EateryAccount ea
     where login = ?`;
     const values = [id]
@@ -224,7 +228,35 @@ export async function insertSubscribedTo(data) {
     };  
 }
 
+export async function findSubscribedEateriesFromUserId(id) {
+    const query = `select * from userSubscription where userId = ?`
+    const value = [id]
+    const [results] = await poolPromise.execute(query, value);
+    return {
+        success: 1,
+        data: results
+    }
+}
+
+// check if there is a business hour from a restaurant with the same day
+// if there is then just update the hour (open and close), otherwise insert the new values
 export async function insertHourFromRestaurant(data) {
+    const findQuery = `select * from BusinessHour where restaurantId = ? and day = ?`
+    const findValues = [data.restaurantId, data.day]
+    const [findResult] = await poolPromise.execute(findQuery, findValues)
+    
+    if (findResult.length != 0) {
+        const updateQuery = `update BusinessHour set open = ?, close = ? where restaurantId = ? and day = ?`;
+        const updateValues = [data.open, data.close, data.restaurantId, data.day]
+        const [updateResult] = await poolPromise.execute(updateQuery, updateValues);
+        console.log(updateResult)
+        return {
+            success: 1,
+            result: updateResult,
+            message: "business hours updated"
+        }
+    }
+
     const values = [data.restaurantId, data.day, data.open, data.close]
     const query = `insert into BusinessHour (restaurantId, day, open, close) values (?, ?, ?, ?)`;
     const [results] = await poolPromise.execute(query, values);
@@ -270,6 +302,17 @@ export async function insertNewCuisineName(data) {
 
 // create new eatery account
 export async function createEateryAccount(data) {
+    const findQuery = `select * from EateryAccount where name = ? and address = ? and phone = ? and email = ? and url = ?`
+    const firstvalues = [data.name, data.address, data.phone, data.email, data.url];
+    const [findResult] = await poolPromise.execute(findQuery, firstvalues);
+    
+    if (findResult.length !== 0) {
+        return {
+            success: 0,
+            message: "Eatery account exists"
+        }
+    }
+
     const query = `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?, ?, ?)`;
     const values = [data.name, data.addressId, data.phone, data.email, data.loginId, data.url];
     const [result] = await poolPromise.execute(query,values);

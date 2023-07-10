@@ -22,13 +22,14 @@ create table UserAccount (
 );
 
 create table EateryAccount (
-    id          integer auto_increment,
-    name        text not null,
-    address     integer references Address(id),
-    phone       integer not null,
-    email       text,
-    login       integer not null references LoginInfo(id),
-    url         text,
+    id              integer auto_increment,
+    name            text not null,
+    address         integer references Address(id),
+    phone           integer not null,
+    email           text,
+    login           integer not null references LoginInfo(id),
+    url             text,
+    description     text,
     primary key (id) 
 );
 
@@ -91,7 +92,7 @@ create table Voucher (
     discount        decimal(3,2), -- 25.25%, 32.50%, etc
     startOffer      datetime, -- 2022-04-22 10:34:23:55
     endOffer        datetime, 
-    description     text,
+    count           integer,
     code            text, 
     primary key (id)
 );
