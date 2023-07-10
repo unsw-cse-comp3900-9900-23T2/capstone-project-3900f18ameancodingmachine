@@ -18,6 +18,19 @@ import jwt_decode from 'jwt-decode';
 
 const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
+// helper function to get the eatery id
+async function getEateryId() {
+  const result = await axios.get('api/user/')
+  let data = result.data;
+  const decrypt = jwt_decode(data.token)
+  let loginId = decrypt.result.id;
+
+  // get the restaurantId
+  const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
+  const eateryId =  eateryRes.data.data.id
+  return eateryId;
+}
+
 /*
  * Stub for editDescription button
  */
@@ -25,16 +38,7 @@ async function editDescription() {
   // alert("editDescription: Pressed editDescription");
   const description = prompt("Enter your description:")
   try {
-    // get loginid
-    const result = await axios.get('api/user/')
-    let data = result.data;
-    const decrypt = jwt_decode(data.token)
-    let loginId = decrypt.result.id;
-
-    // get the restaurantId
-    const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
-    const eateryId =  eateryRes.data.data.id
-    console.log(eateryRes.data.data.id)
+    const eateryId =  await getEateryId()
 
     // insert into the database
     const res = await axios.put('api/user/eatery/description', {
@@ -77,6 +81,7 @@ async function uploadHours() {
   } else {
     day = day.toLowerCase()
   }
+
   let open = prompt("enter opening time (HH:MM)")
   if (open === null) {
     return
@@ -104,16 +109,7 @@ async function uploadHours() {
   }
 
   try {
-    // get loginid
-    const result = await axios.get('api/user/')
-    let data = result.data;
-    const decrypt = jwt_decode(data.token)
-    let loginId = decrypt.result.id;
-
-    // get the restaurantId
-    const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
-    const eateryId =  eateryRes.data.data.id
-    console.log(eateryRes.data.data.id)
+    const eateryId = await getEateryId()
 
     // insert into the database
     const res = await axios.post('api/user/hour', {
@@ -133,9 +129,10 @@ async function uploadHours() {
   return false;
 }
 
-/*
- * Stub for createVoucher button
- */
+/* 
+  Stub code for creating new voucher
+  Note that logic for reoccuring has not been implemented yet
+*/
 async function createVoucher(percentage, numVouchers, startDate, endDate, reoccuring) {
 
   if (percentage === "" || numVouchers === "") { // field must be filled
@@ -147,15 +144,7 @@ async function createVoucher(percentage, numVouchers, startDate, endDate, reoccu
   }
 
   try {
-    // get loginid
-    const result = await axios.get('api/user/')
-    let data = result.data;
-    const decrypt = jwt_decode(data.token)
-    let loginId = decrypt.result.id;
-
-    // get the restaurantId
-    const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`)
-    const eateryId =  eateryRes.data.data.id
+    const eateryId =  await getEateryId();
 
     // insert into the database
     const res = await axios.post('api/user/voucher', {
@@ -182,11 +171,31 @@ function viewVouchers() {
   return false;
 }
 
-/*
- *  Stub for uploadPost
- */
-function uploadPost(title, body) {
-  alert(`uploadPost: Pressed uploadPost\nTitle: ${title}\nBody: ${body}`);
+/* 
+  upload new post, character limit hasn't been implemented yet
+*/
+async function uploadPost(title, body) {
+  // alert(`uploadPost: Pressed uploadPost\nTitle: ${title}\nBody: ${body}`);
+  if (!title || !body) {
+    alert("please fill in the details");
+    return;
+  }
+  
+  try {
+    const eateryId = await getEateryId()
+
+    // insert into the database
+    const res = await axios.post('api/user/posts', {
+      postedBy: eateryId,
+      title: title,
+      content: body
+    })
+
+    alert("new post created")
+  } catch (error) {
+    alert("something is wrong in the database")
+    console.log(error)
+  }
   return false
 }
 
