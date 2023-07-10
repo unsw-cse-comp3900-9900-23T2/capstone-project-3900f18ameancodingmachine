@@ -24,3 +24,12 @@ export async function updateExistingDescription(data) {
         result: result
     }
 }
+
+export async function getAllCuisines() {
+    const query =  `select * from Cuisines`
+    const [result] = await poolPromise.execute(query)
+    return {
+        success: 1,
+        result: result
+    }
+}

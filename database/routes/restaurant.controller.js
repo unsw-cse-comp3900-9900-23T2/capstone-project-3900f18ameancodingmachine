@@ -1,4 +1,4 @@
-import { createNewVoucher, updateExistingDescription } from "./restaurant.service.js"
+import { createNewVoucher, getAllCuisines, updateExistingDescription } from "./restaurant.service.js"
 
 export async function createVoucher(req, res) {
     try {
@@ -25,6 +25,19 @@ export async function updateDescription(req, res) {
         return res.status(500).json({
             success: 0,
             message: "Database connection error"
+        })
+    }
+}
+
+export async function getCuisines(req, res) {
+    try {
+        const results = await getAllCuisines();
+        console.log(results)
+        return res.status(200).json(results)
+    } catch (error) {
+        return res.status(500).json({
+            success: 0, 
+            message: "Database conenction error"
         })
     }
 }

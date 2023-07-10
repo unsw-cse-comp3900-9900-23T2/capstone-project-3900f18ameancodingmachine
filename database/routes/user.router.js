@@ -22,7 +22,7 @@ import { createAccountInfo,
 } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
-import { createVoucher, updateDescription } from "./restaurant.controller.js";
+import { createVoucher, getCuisines, updateDescription } from "./restaurant.controller.js";
 
 const router = express.Router();
 
@@ -50,7 +50,8 @@ router.post("/subscribe", createSubscribedTo);
 
 router.get("/post/:id", getPostById) 
 router.get("/review/:id", getReviewById)
-router.get("/cuisine/:id", getCuisineById) 
+router.get("/cuisine/:id", getCuisineById)
+router.get("/eatery/cuisines", getCuisines) 
 router.get("/eatery/:id", getEateryById)
 router.get("/subscribe/:id", showSubscribedEateries)
 

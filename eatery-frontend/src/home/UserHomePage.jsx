@@ -13,11 +13,12 @@ import Typography from '@mui/material/Typography';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-
 import RestaurantPost from './RestaurantPost'
-
-
 import axios from 'axios';
+
+const getCuisine = await axios.get('api/user/eatery/cuisines')
+const cuisines = getCuisine.data.result
+console.log(cuisines)
 
 export default function UserHomePage() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -86,8 +87,8 @@ export default function UserHomePage() {
                 <Autocomplete
                   id="cuisine-dropdown"
                   value={cuisine}
-                  options={["italian", "chines", "vietnamese"]}
-                  getOptionLabel={(option) => option.title}
+                  options={cuisines}
+                  getOptionLabel={(option) => option.name}
                   onChange={(event, newValue) => {
                     setCuisine(newValue);
                   }}
