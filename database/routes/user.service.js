@@ -3,11 +3,7 @@ import { poolPromise } from "../db-config/db_connection.js";
 export async function createLogin(data) {
     //insert login details
     const [existing] = await poolPromise.execute(`select * from LoginInfo where login = ?`, [data.login]);
-<<<<<<< HEAD
-    if (!existing) {
-=======
-    if (existing.length !== 0) {
->>>>>>> main
+    if (existing.length != 0) {
         return {
             success: 0,
             message: 'Username already exists'

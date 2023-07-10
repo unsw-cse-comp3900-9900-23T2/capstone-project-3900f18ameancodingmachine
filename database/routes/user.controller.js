@@ -27,7 +27,7 @@ import 'dotenv/config';
 const { sign } = pkg;
 
 //used to store invalidated tokens once a user logs-out
-export let tokenBlackList = [];
+export const tokenBlackList = [];
 
 //Controller functions
 //async functions are written function2
@@ -389,12 +389,12 @@ export function getToken(req, res) {
         return res.status(200).json({
             success: 1, 
             token: req.cookies.token
-        })
+        });
     } catch (error) {
         return res.status(500).json({
             success: 0, 
             message: "connection error"
-        })
+        });
     }
 }
 
