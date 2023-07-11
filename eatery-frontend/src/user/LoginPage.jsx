@@ -55,7 +55,7 @@ function LoginForm(){
   }
 
   const passRecovery = () =>{ 
-    navigate("/loginRecovery");
+    navigate("/Recovery");
   }
 
  return (

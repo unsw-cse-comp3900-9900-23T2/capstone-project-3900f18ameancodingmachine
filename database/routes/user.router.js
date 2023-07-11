@@ -23,6 +23,7 @@ import { createAccountInfo,
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
 import { createVoucher, updateDescription } from "./restaurant.controller.js";
+import { passwordRecovery } from "../nodemailer/config.js";
 
 const router = express.Router();
 
@@ -59,6 +60,9 @@ router.put("/eatery/description", updateDescription)
 
 // check account based on loginid
 router.get("/eatery/login/:id", getEateryByLogin)
+
+//Password reset
+router.post("/reset", passwordRecovery);
 
 router.get("/", checkToken, getToken);
 

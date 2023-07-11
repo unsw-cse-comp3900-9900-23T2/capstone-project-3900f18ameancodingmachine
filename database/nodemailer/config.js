@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import {generateResetcode} from "./pass_reset.js";
 
 export const config = {
     service: "gmail",
@@ -13,12 +14,12 @@ export const config = {
 
 
 //use this to send an email
-async function send(data) {
+async function sendCode(data) {
     const email = {
         from : "savourymessenger@gmail.com",
-        to : data.recipientEmail,
-        subject: data.subject,
-        text: data.text
+        to : data.email,
+        subject: "Password Recovery - Do not share",
+        text: `Your code is ${data.code}`
     };
     const transporter = nodemailer.createTransport(config);
     const info = await transporter.sendMail(email);
@@ -35,10 +36,17 @@ async function send(data) {
     }
 }
 
-export async function sendEmail(req, res) {
+export async function passwordRecovery(req, res) {
     try {
         const data = req.body;
-        const result = await send(data);
+        const resetCode = await generateResetcode(data);
+        if (resetCode.success === 0) {
+            return res.status(200).json({
+                success: 0,
+                message: "Invalid email"
+            });
+        }
+        const result = await sendCode(resetCode.data);
         return res.status(200).json(result);
     } catch (error) {
         console.log(error);

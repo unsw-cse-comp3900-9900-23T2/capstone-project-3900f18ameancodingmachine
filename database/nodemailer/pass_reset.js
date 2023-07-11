@@ -3,7 +3,7 @@ import { poolPromise } from "../db-config/db_connection.js";
 const resetCodes = [];
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-async function generateResetCode(data) {
+export async function generateResetcode(data) {
     const [existing] = await poolPromise.execute(`select * from LoginInfo where login = ?`, [data.login]);
     if (existing.length === 0) {
         return {
@@ -11,12 +11,14 @@ async function generateResetCode(data) {
             message: 'No account with this email'
         };
     }
+    //TODO: fix confusion between login and email.
     const email = data.login;
-    const code = generateResetCode(7);
-    resetCodes.push({login: email, code: code})
+    const code = generateCode(7);
+    const resetReq = {email: email, code: code};
+    resetCodes.push(resetReq);
     return {
         success: 1,
-        message: "Code generated"
+        data: resetReq
     };
 }
 
@@ -35,7 +37,7 @@ export async function verfiyResetCode(data) {
 } 
 
 //generate the random reset code
-function generateResetCode(length) {
+function generateCode(length) {
     let result = '';
     const charactersLength = characters.length;
     for ( let i = 0; i < length; i++ ) {
