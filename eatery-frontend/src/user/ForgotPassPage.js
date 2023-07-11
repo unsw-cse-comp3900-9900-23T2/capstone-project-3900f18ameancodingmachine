@@ -14,7 +14,9 @@ import Typography from '@mui/material/Typography';
 
 function EmailEntry(){
   const [email, setEmail] = React.useState('');
-  
+  const navigate = useNavigate();
+    
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -24,6 +26,7 @@ function EmailEntry(){
      *  For now simply send the email  
      */
     alert(`Sending recovery email to:  ${email}`);
+    navigate("/RecoveryCodeEntry");
     
   }
 
@@ -55,6 +58,8 @@ function EmailEntry(){
 
 function ForgotPassPage(){  
   return (
+    
+    // Defaults to User Home Page if not logged in
     <EmailEntry/>
   );
 }
