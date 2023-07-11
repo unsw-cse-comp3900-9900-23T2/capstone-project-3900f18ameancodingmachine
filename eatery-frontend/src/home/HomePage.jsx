@@ -1,21 +1,49 @@
 import * as React from 'react';
 
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
+import UserHomePage from './UserHomePage';
+import RestaurantHomePage from './RestaurantHomePage';
+import axios from 'axios';
+import jwt_decode from 'jwt-decode';
 
 export default function HomePage() {
+  // Null if not logged in, True if Restaurant manager, False if User
+  const [isRestaurant, setIsRestaurant] = React.useState(null);
+
+  React.useEffect(() => {
+    async function checkCookies() {
+      try {
+        const result = await axios.get('api/user/')
+        let data = result.data;
+        const decrypt = jwt_decode(data.token)
+        if (data.success !== 0) {
+          let loginId = decrypt.result.id;
+          // get EateryAccount, if no result then it will return an 404 error
+          // else it will go to restaurant page
+          await axios.get(`api/user/eatery/login/${loginId}`)
+          setIsRestaurant(true)
+        }
+      } catch (err) {
+        if (err.response) { // not an eatery
+          console.log(err.response.data.message)
+          setIsRestaurant(false)
+        } else { // not loggedIn
+          console.log("Not logged in")
+          // console.log(err.message)
+        }
+        
+      }
+      
+    }
+
+    checkCookies()
+  })
   
   return (
-    <Container maxWidth="md">
-      <Card sx={{ minWidth: 275 }}>
-        <CardContent>
-          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
-            Home
-          </Typography>
-        </CardContent>
-      </Card>
+    // Defaults to User Home Page if not logged in
+    <Container maxWidth="lg">
+      {isRestaurant  && <RestaurantHomePage/>}
+      {!isRestaurant && <UserHomePage isLoggedIn={isRestaurant===false}/>}
     </Container>
   );
 }

@@ -9,6 +9,8 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { NavLink } from "react-router-dom";
 
 export default function Banner() {
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);     // TODO get from backend
+  const [isRestaurant, setIsRestaurant] = React.useState(false); // TODO get from backend
 
   return (
     <AppBar position="static">
@@ -26,9 +28,14 @@ export default function Banner() {
             <HomeOutlinedIcon />
           </IconButton>
 
-          <Button color="inherit" component={NavLink} to="/login">Login</Button>
-          <Button color="inherit" component={NavLink} to="/register">Register</Button>
-          <Button color="inherit" component={NavLink} to="/create-restaurant">New Restaurant</Button>
+          {isLoggedIn && <Button color="inherit" component={NavLink} to="/" onClick={() => {
+            // Log Out in backend
+              }}>
+              Logout
+            </Button>}
+          {!isLoggedIn && <Button color="inherit" component={NavLink} to="/login">Login</Button>}
+          {!isLoggedIn && <Button color="inherit" component={NavLink} to="/register">Register</Button>}
+          {!isLoggedIn && <Button color="inherit" component={NavLink} to="/create-restaurant">New Restaurant</Button>}
         </Toolbar>
       </Container>
     </AppBar>
