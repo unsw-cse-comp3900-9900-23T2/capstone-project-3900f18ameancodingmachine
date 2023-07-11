@@ -16,9 +16,15 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import RestaurantPost from './RestaurantPost'
 import axios from 'axios';
 
+// get all of the restaurant and the cuisines from the database
+const n = 4 // change the number depending on the requirements
 const getCuisine = await axios.get('api/user/eatery/cuisines')
 const cuisines = getCuisine.data.result
-console.log(cuisines)
+const getEateries = await axios.get('api/user/eatery/all')
+const eateries = getEateries.data.result
+// n latest eateries account that is recently created
+const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
+// console.log(latestEateries)
 
 export default function UserHomePage() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -127,9 +133,10 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              <RestaurantGridItem name="Dominos" cuisine="italian" location="sydney"/>
+              {latestEateries.map((restaurant) => <RestaurantGridItem key={restaurant.id} name={restaurant.name} cuisine={restaurant.cuisine} location={restaurant.region}/>)}
+              {/* <RestaurantGridItem name="Dominos" cuisine="italian" location="sydney"/>
               <RestaurantGridItem name="Malay Chinese" cuisine="Malaysian" location="sydney"/>
-              <RestaurantGridItem name="Atom Thai" cuisine="thai" location="parrammatta"/>
+              <RestaurantGridItem name="Atom Thai" cuisine="thai" location="parrammatta"/> */}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
@@ -151,7 +158,7 @@ export default function UserHomePage() {
 function RestaurantGridItem(props) {
   return (
     <Grid xs={4} spacing={2}>
-      <RestaurantPost name={props.name} cuisine={props.cuisine} location={props.location} />
+      <RestaurantPost key={props.id} name={props.name} cuisine={props.cuisine} location={props.location} />
     </Grid>
   );
 }
