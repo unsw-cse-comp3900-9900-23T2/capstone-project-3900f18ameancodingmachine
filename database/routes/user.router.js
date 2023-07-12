@@ -1,7 +1,6 @@
 import { createAccountInfo, 
     createAddressInfo, 
     createUser, 
-    createEatery, 
     getAllUsers, 
     getUserById, 
     login,
@@ -19,10 +18,11 @@ import { createAccountInfo,
     getToken,
     createSubscribedTo,
     showSubscribedEateries,
+    getEateryFiltered,
 } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
-import { createVoucher, getCuisines, getEateries, updateDescription } from "./restaurant.controller.js";
+import { createVoucher, getCuisines, getEateries, updateDescription, createEatery } from "./restaurant.controller.js";
 
 const router = express.Router();
 
@@ -40,7 +40,8 @@ router.get("/:id", getUserById)
 router.post("/login", login); 
 router.put("/logout", logout); 
 
-router.post("/eatery", createEatery); 
+router.post("/eatery", createEatery);
+router.get("/eatery/find", getEateryFiltered) 
 router.get("/eatery/all", getEateries);
 router.get("/eatery/all/:limit", getEateries)
 router.post("/cuisine", createCuisine); 

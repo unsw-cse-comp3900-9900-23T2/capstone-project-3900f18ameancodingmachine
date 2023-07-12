@@ -9,7 +9,6 @@ import {
     getUsers,
     getUserByUserId, 
     getLoginByUsername, 
-    createEateryAccount, 
     insertNewCuisineName, 
     insertCuisineFromRestaurant, 
     insertHourFromRestaurant, 
@@ -18,6 +17,7 @@ import {
     getReviewByReviewId, 
     getEateryByRestaurantId,
     getEateryByLoginId,
+    getEateryByFilter,
     findSubscribedEateriesFromUserId
 } from "./user.service.js";
 import crypto from "crypto";
@@ -225,22 +225,6 @@ export function logout(req, res) {
     }
 }
 
-export async function createEatery(req,res) {
-    try {
-        const body = req.body;
-        const result = await createEateryAccount(body);
-        if (result.success == 0) {
-            return res.status(400).json(result)
-        }
-        return res.status(200).json(result);
-    } catch (err) {
-        return res.status(500).json({
-            success: 0,
-            message: "Database conenction error"
-        });
-    }
-}
-
 export async function createCuisine(req,res) {
     try {
         const body = req.body;
@@ -380,6 +364,24 @@ export async function getEateryByLogin(req, res) {
             success: 0,
             message: "Database connection error"
         });
+    }
+}
+
+export async function getEateryFiltered(req, res) {
+    try {
+        const data = req.query;
+        const result = await getEateryByFilter(data);
+        if (result.success == 0) {
+            return res.status(404).json(result);
+        } else {
+            return res.status(200).json(result)
+        }
+    } catch(err) {
+        console.log(err)
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        })
     }
 }
 

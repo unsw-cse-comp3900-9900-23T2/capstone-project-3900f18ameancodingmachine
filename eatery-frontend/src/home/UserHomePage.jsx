@@ -22,9 +22,9 @@ const getCuisine = await axios.get('api/user/eatery/cuisines')
 const cuisines = getCuisine.data.result
 const getEateries = await axios.get('api/user/eatery/all')
 const eateries = getEateries.data.result
-// n latest eateries account that is recently created
+// top n eateries account that is recently created
+// since eatery id is auto increment, sort by id in descending order
 const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
-// console.log(latestEateries)
 
 export default function UserHomePage() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -32,6 +32,8 @@ export default function UserHomePage() {
   const [cuisine, setCuisine] = React.useState(null);
 
   React.useEffect(() => {
+    /* check whether user has a token
+    if user has a token, user is logged in */
     async function checkLogin() {
       try {
         const result = await axios.get('api/user/'); // use checkToken as middleware to verify token
@@ -133,10 +135,8 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              {latestEateries.map((restaurant) => <RestaurantGridItem key={restaurant.id} name={restaurant.name} cuisine={restaurant.cuisine} location={restaurant.region}/>)}
-              {/* <RestaurantGridItem name="Dominos" cuisine="italian" location="sydney"/>
-              <RestaurantGridItem name="Malay Chinese" cuisine="Malaysian" location="sydney"/>
-              <RestaurantGridItem name="Atom Thai" cuisine="thai" location="parrammatta"/> */}
+              {/* region is used instead of location, might change later */}
+              {latestEateries.map((restaurant) => <RestaurantGridItem key={restaurant.id} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.suburb || restaurant.region}/>)}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
