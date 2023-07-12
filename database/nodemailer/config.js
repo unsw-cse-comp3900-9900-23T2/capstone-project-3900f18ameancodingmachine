@@ -17,7 +17,7 @@ export const config = {
 async function sendCode(data) {
     const email = {
         from : "savourymessenger@gmail.com",
-        to : data.email,
+        to : data.login,
         subject: "Password Recovery - Do not share",
         text: `Your code is ${data.code}`
     };
@@ -52,7 +52,7 @@ export async function passwordRecovery(req, res) {
         console.log(error);
         return res.status(500).json({
             success: 0,
-            message: "Email Error"
+            message: "Database Error"
         });
     }
 }

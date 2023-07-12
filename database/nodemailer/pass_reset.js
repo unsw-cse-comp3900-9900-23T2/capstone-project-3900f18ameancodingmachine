@@ -14,7 +14,7 @@ export async function generateResetcode(data) {
     //TODO: fix confusion between login and email.
     const email = data.login;
     const code = generateCode(7);
-    const resetReq = {email: email, code: code};
+    const resetReq = {login: email, code: code};
     resetCodes.push(resetReq);
     return {
         success: 1,
@@ -22,18 +22,20 @@ export async function generateResetcode(data) {
     };
 }
 
-export async function verfiyResetCode(data) {
-    const result = resetCodes.find(element => element.login == data.login);
-    if (result && result.code == data.code) {
-        return {
+export function verfiyResetCode(req, res) {
+    const data = req.params;
+    console.log(data.code)
+    const result = resetCodes.find(element => element.login === data.login);
+    if (result && result.code === data.code) {
+        return res.status(200).json({
             success: 1,
             message: "Code matches"
-        };
+        });
     }
-    return {
+    return res.json({
         success: 0,
         message: "Invalid code"
-    };
+    });
 } 
 
 //generate the random reset code

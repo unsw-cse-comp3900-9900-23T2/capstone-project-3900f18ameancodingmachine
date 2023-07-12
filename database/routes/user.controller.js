@@ -18,7 +18,8 @@ import {
     getReviewByReviewId, 
     getEateryByRestaurantId,
     getEateryByLoginId,
-    findSubscribedEateriesFromUserId
+    findSubscribedEateriesFromUserId,
+    resetPassword
 } from "./user.service.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -376,6 +377,20 @@ export async function getEateryByLogin(req, res) {
 
     } catch (err) {
         console.log(err)
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+export async function forgottenPasswordReset(req, res) {
+    try {
+        const data = req.data;
+        const result = await resetPassword(data);
+        return res.status(200).json(result);
+    } catch (err) {
+        console.log(err);
         return res.status(500).json({
             success: 0,
             message: "Database connection error"

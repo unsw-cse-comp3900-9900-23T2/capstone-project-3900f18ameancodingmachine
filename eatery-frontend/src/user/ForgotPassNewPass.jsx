@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import * as React from 'react';
+import axios from 'axios';
+import validator from 'validator';
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -15,16 +17,26 @@ import Typography from '@mui/material/Typography';
  *  This function should send the password reset along with the verification code to
  *  reset the users password
  */
-function resetPass(pass){
-    alert(`resetPass: Sending Password to be reset with new value\nPassword = ${pass}`);
-    return true
+async function resetPass(login, password) {
+    try {
+        //ERROR HERE!!!!
+        const {data} = await axios.post("api/user/resetpassword", {login: login, password: password});
+        if (data.success) {
+            console.log("Password has been reset");
+            return true;
+        }
+    } catch {
+        console.log("Password reset has failed");    
+    } 
+    return false;
 } 
 
 function ForgotPassNewPass(){
     const [newPass, setNewPass] = React.useState('');
     const [checkNewPass, setCheckNewPass] = React.useState('');
     const [isPassMatch, setIsPassMatch] = React.useState(true);
-
+    const [isPassStrong, setIsPassStrong] = React.useState(true);
+    const { state } = useLocation();
     const navigate = useNavigate();
 
     /* 
@@ -47,14 +59,17 @@ function ForgotPassNewPass(){
      * and navigates to the main screen.
      * Otherwise it does nothing
      */
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         if (checkPassMatch(newPass, checkNewPass)){
-            resetPass(newPass);
-            navigate("/");
+            if (validator.isStrongPassword(newPass)) {
+                await resetPass(state.login, newPass);
+                navigate("/");    
+            } else {
+                setIsPassStrong(false);
+            }
         }
-
-      }
+    }
     
     return (
         <Container maxWidth="md">
@@ -78,6 +93,7 @@ function ForgotPassNewPass(){
                     }}
                 />
                 {!isPassMatch && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>Passwords Do Not Match</Typography> }
+                {!isPassStrong && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>Password length must be atleast 8 with 1 uppercase and lowercase character aswell as 1 number and symbol</Typography> }
                 </CardContent>
                 <CardActions>
                 <Button size="small" onClick={handleSubmit}>Submit Code</Button>

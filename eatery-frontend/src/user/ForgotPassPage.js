@@ -12,6 +12,18 @@ import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
+async function sendRecoveryEmail(email) {
+  try {
+    const {data} = await axios.post("api/user/reset", {login: email});
+    if (data.success) {
+      console.log("Email successfully sent");
+      return true;
+    }
+  } catch {
+    console.log("Failed to send email");
+  }
+  return false;
+}
 
 function EmailEntry(){
   const [email, setEmail] = React.useState('');
@@ -22,10 +34,8 @@ function EmailEntry(){
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const {data} = await axios.post("api/user/reset", {login: email});
-    if (data.success) {
-      console.log("reset email success")
-      navigate("/RecoveryCodeEntry");
+    if (await sendRecoveryEmail(email)) {
+      navigate("/RecoveryCodeEntry", {state: { login: email}});
     }
     setResetFail(true);
     

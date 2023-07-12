@@ -224,6 +224,17 @@ export async function insertSubscribedTo(data) {
     };  
 }
 
+//used for password recovery
+export async function resetPassword(data) {
+    const query = `update LoginInfo set password = ? where login = ?`;
+    const value = [data.password, data.login];
+    const [result] = await poolPromise.execute(query, value);
+    return {
+        success: 1,
+        data: result
+    }
+}
+
 export async function findSubscribedEateriesFromUserId(id) {
     const query = `select * from userSubscription where userId = ?`
     const value = [id]
