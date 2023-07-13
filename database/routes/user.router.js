@@ -43,7 +43,6 @@ router.put("/logout", logout);
 router.post("/eatery", createEatery);
 router.get("/eatery/find", getEateryFiltered) 
 router.get("/eatery/all", getEateries);
-router.get("/eatery/all/:limit", getEateries)
 router.post("/cuisine", createCuisine); 
 router.post("/cuisine-offer", createRestaurantCusine); 
 router.post("/hour", createBusinessHour); 
