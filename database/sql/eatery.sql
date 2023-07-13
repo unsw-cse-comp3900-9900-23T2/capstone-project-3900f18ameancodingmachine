@@ -2,7 +2,6 @@
 
 -- refresh view table
 drop view if exists restaurantInfo;
-drop view if exists restaurantTempInfo;
 drop view if exists restaurantLoginInfo;
 drop view if exists restaurantCuisines;
 drop view if exists restaurantBusinessHour;
@@ -49,7 +48,7 @@ join    Cuisines c on (co.cuisineId = c.id)
 
 -- restaurant business hour
 create view restaurantBusinessHour as
-select  ea.name, bh.day, bh.open, bh.close
+select  ea.id, ea.name, bh.day, bh.open, bh.close
 from    EateryAccount ea 
 join    BusinessHour bh on (ea.id = bh.restaurantId)
 ;
