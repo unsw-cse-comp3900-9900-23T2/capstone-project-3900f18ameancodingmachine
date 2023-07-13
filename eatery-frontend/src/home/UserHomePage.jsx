@@ -30,6 +30,7 @@ export default function UserHomePage() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [location, setLocation] = React.useState(null);
   const [cuisine, setCuisine] = React.useState(null);
+  const [dietary, setDietary] = React.useState(null);
 
   React.useEffect(() => {
     /* check whether user has a token
@@ -102,6 +103,20 @@ export default function UserHomePage() {
                   }}
                   renderInput={(params) => (
                     <TextField {...params} label="Cuisine" />
+                  )}
+                />
+              </Grid>
+              <Grid xs={4}>
+                <Autocomplete
+                  id="dietary-dropdown"
+                  value={dietary}
+                  options={["lactose free", "gluten free", "vegetarian"]}
+                  getOptionLabel={(option) => option}
+                  onChange={(event, newValue) => {
+                    setDietary(newValue);
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Dietary" />
                   )}
                 />
               </Grid>

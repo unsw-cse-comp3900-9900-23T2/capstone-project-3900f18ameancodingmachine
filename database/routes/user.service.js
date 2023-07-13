@@ -332,6 +332,15 @@ export async function getEateryByFilter(data) {
         values.push(data.location)
     }
 
+    if (data.restriction) {
+        if (values.length == 0) {
+            query += ` diet = ?`
+        } else {
+            query += ` and diet = ?`
+        }
+        values.push(data.restriction)
+    }
+
     const [result] = await poolPromise.execute(query,values);
     if (result.length == 0) {
         return {

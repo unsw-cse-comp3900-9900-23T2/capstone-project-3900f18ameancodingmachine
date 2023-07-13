@@ -22,11 +22,14 @@ select
     a.suburb, 
     a.region, 
     a.postcode,
-    c.name as cuisine
+    c.name as cuisine,
+    dr.restriction as diet
 from         EateryAccount ea
 left join    Address a on (ea.address = a.id)
 left join    CuisineOffer co on (co.restaurantId = ea.id)
 left join    Cuisines c on (co.cuisineId = c.id)
+left join    provideDietary pd on (pd.restaurantId = ea.id)
+left join    DietaryRestrictions dr on (dr.id = pd.dietId)
 ;
 
 -- restaurant login info
