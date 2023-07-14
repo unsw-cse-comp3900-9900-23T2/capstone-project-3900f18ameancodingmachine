@@ -8,9 +8,10 @@ import CardContent from '@mui/material/CardContent';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import validator from 'validator';
 import axios from 'axios';
 
-async function createAccount(email, pass) {
+export async function createAccount(email, pass) {
   try {
     const {data} = await axios.post('api/user/account', {
       login: email,
@@ -21,12 +22,12 @@ async function createAccount(email, pass) {
       return data.data.insertId;
     }
   } catch (error) {
-    console.log("Account information failed");
+    console.log("Failed to create account");
   }
   return 0;
 }
 
-async function createAddress(street, suburb, region, postcode) {
+export async function createAddress(street, suburb, region, postcode) {
   try {
     const {data} = await axios.post('api/user/address', {
       street: street,
@@ -53,7 +54,7 @@ async function createUser(first, last, loginId, addressId) {
       addressId: addressId
     });
     if (data.success) {
-      console.log("User created");
+      console.log("User successfully created");
       return data.data.insertId;
     }
   } catch (error) {
@@ -64,6 +65,8 @@ async function createUser(first, last, loginId, addressId) {
 
 export default function RegistrationPage() {
   const navigate = useNavigate();
+  const [registerFail, setRegisterFail] = React.useState(false);
+  const [registerMSG, setRegisterMSG] = React.useState('');
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   //login details
@@ -78,11 +81,43 @@ export default function RegistrationPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    let success, message;
+    //check each field
+    for ([success, message] of [
+      [validator.isEmail(email), "Please use a valid email"],
+      [confirmPassword === password, "Passwords do not match"],
+      [validator.isStrongPassword(password), "Password length must be atleast 8 with 1 uppercase and lowercase character aswell as 1 number and symbol"],
+      [validator.isPostalCode(postCode, "AU"), "Please use a valid postal address"],
+      [!validator.isEmpty(street, { ignore_whitespace: true }) 
+        && !validator.isEmpty(suburb, { ignore_whitespace: true }) 
+        && !validator.isEmpty(region, { ignore_whitespace: true }) 
+        && !validator.isEmpty(firstName, { ignore_whitespace: true }) 
+        && !validator.isEmpty(lastName, { ignore_whitespace: true }),
+      "Please fill out all the required fields"]
+    ]) {
+      if (!success) {
+        setRegisterFail(true);
+        setRegisterMSG(message);
+        return;
+      }
+    }
+    
+    //if the function has not returned, fields are appropriate
+    setRegisterFail(false);
+    setRegisterMSG('');
+
     const loginId = await createAccount(email, password);
+    //if create account returns 0
+    if (!loginId) {
+      setRegisterFail(true);
+      setRegisterMSG("An account with this email already exists");
+      return;  
+    }
     const addressId = await createAddress(street, suburb, region, postCode);
     const userId = await createUser(firstName, lastName, loginId, addressId);
     console.log(userId);
-    navigate('/login')
+    navigate('/login');
   }
 
   return (
@@ -155,6 +190,7 @@ export default function RegistrationPage() {
               setPostCode(event.target.value);
             }}
           />
+          {registerFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>{registerMSG}</Typography> }
         </CardContent>
         <CardActions onClick={handleSubmit}>
           <Button size="small">REGISTER</Button>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import * as React from 'react';
+import axios from 'axios';
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -11,22 +12,32 @@ import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
+async function sendRecoveryEmail(email) {
+  try {
+    const {data} = await axios.post("api/user/reset", {login: email});
+    if (data.success) {
+      console.log("Email successfully sent");
+      return true;
+    }
+  } catch {
+    console.log("Failed to send email");
+  }
+  return false;
+}
 
 function EmailEntry(){
   const [email, setEmail] = React.useState('');
+  const [resetFail, setResetFail] = React.useState(false);
   const navigate = useNavigate();
     
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    /*
-     *  Send email with a link to reset password for associated
-     *  Email to that email address
-     *  For now simply send the email  
-     */
-    alert(`Sending recovery email to:  ${email}`);
-    navigate("/RecoveryCodeEntry");
+    if (await sendRecoveryEmail(email)) {
+      navigate("/RecoveryCodeEntry", {state: { login: email}});
+    }
+    setResetFail(true);
     
   }
 
@@ -44,6 +55,7 @@ function EmailEntry(){
             setEmail(event.target.value);
           }}
         />
+      {resetFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>"No account created with this email"</Typography> }
       </CardContent>
       
       <CardActions>

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import * as React from 'react';
+import axios from 'axios';
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -18,26 +19,32 @@ import Typography from '@mui/material/Typography';
  *  This will most likely be done by saving the submitted code as a
  *  cookie and resend it with the new password to reverify.
  */
-function checkCode(code){
-    alert(`checkCode: Defaulting to True\nValue = ${code}`);
-    return true
+async function checkCode(login, code){
+  try {
+    const {data} = await axios.get(`api/user/checkreset/${login}/${code}`)
+    if (data.success) {
+      console.log("Correct reset code was entered");
+      return true;
+    }
+  } catch {
+    console.log("Code check error");
+  }
+  return false;
 }
 
 function ForgotPassCodeEntry() {
     const codeRef = React.useRef('');
     const navigate = useNavigate();
-  
-    const handleSubmit = (event) => {
+    const { state } = useLocation();
+    const [resetFail, setResetFail] = React.useState(false);
+
+    const handleSubmit = async (event) => {
       event.preventDefault();
-  
-      const code = codeRef.current.value; // Retrieve the value from the ref
-      /*
-       *  Send email with a link to reset password for associated
-       *  Email to that email address
-       *  For now simply send the email  
-       */
-      checkCode(code);
-      navigate("/RecoveryNewPass");
+      if (await checkCode(state.login, codeRef.current.value)) {
+        console.log("Moving to password reset page")
+        navigate("/RecoveryNewPass", {state: { login: state.login}});    
+      }
+      setResetFail(true);
     }
   
     return (
@@ -52,8 +59,8 @@ function ForgotPassCodeEntry() {
             </Typography>
             <TextField required id="set-code" label="code" inputRef={codeRef} />
   
+          {resetFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>"Incorrect Code"</Typography> }
           </CardContent>
-  
           <CardActions>
             <Button size="small" onClick={handleSubmit}>Submit Code</Button>
           </CardActions>
