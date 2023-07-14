@@ -22,7 +22,7 @@ import { createAccountInfo,
 } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
-import { createVoucher, getCuisines, getEateries, updateDescription, createEatery } from "./restaurant.controller.js";
+import { createVoucher, getCuisines, getEateries, updateDescription, createEatery, createEateryDietary } from "./restaurant.controller.js";
 
 const router = express.Router();
 
@@ -43,6 +43,7 @@ router.put("/logout", logout);
 router.post("/eatery", createEatery);
 router.get("/eatery/find", getEateryFiltered) 
 router.get("/eatery/all", getEateries);
+router.post("/eatery/dietary", createEateryDietary)
 router.post("/cuisine", createCuisine); 
 router.post("/cuisine-offer", createRestaurantCusine); 
 router.post("/hour", createBusinessHour); 
