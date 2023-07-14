@@ -7,8 +7,8 @@ export const config = {
     port: 587,
     secure: true,
     auth: {
-        user: "savourymessenger@gmail.com",
-        pass: "garnmfzabynfuzst"
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 };
 
@@ -16,7 +16,7 @@ export const config = {
 //use this to send an email
 async function sendCode(data) {
     const email = {
-        from : "savourymessenger@gmail.com",
+        from : process.env.EMAIL_USER,
         to : data.login,
         subject: "Password Recovery - Do not share",
         text: `Your code is ${data.code}`
