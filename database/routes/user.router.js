@@ -19,10 +19,13 @@ import { createAccountInfo,
     createSubscribedTo,
     showSubscribedEateries,
     getEateryFiltered,
+    forgottenPasswordReset,
 } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
 import { createVoucher, getCuisines, getEateries, updateDescription, createEatery, createEateryDietary } from "./restaurant.controller.js";
+import { passwordRecovery } from "../nodemailer/config.js";
+import { verfiyResetCode } from "../nodemailer/pass_reset.js";
 
 const router = express.Router();
 
@@ -63,6 +66,11 @@ router.put("/eatery/description", updateDescription)
 
 // check account based on loginid
 router.get("/eatery/login/:id", getEateryByLogin)
+
+//Password reset
+router.post("/reset", passwordRecovery);
+router.get("/checkreset/:login/:code", verfiyResetCode);
+router.post("/resetpassword", forgottenPasswordReset);
 
 router.get("/", checkToken, getToken);
 

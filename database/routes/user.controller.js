@@ -18,7 +18,8 @@ import {
     getEateryByRestaurantId,
     getEateryByLoginId,
     getEateryByFilter,
-    findSubscribedEateriesFromUserId
+    findSubscribedEateriesFromUserId,
+    resetPassword
 } from "./user.service.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -27,7 +28,7 @@ import 'dotenv/config';
 const { sign } = pkg;
 
 //used to store invalidated tokens once a user logs-out
-export let tokenBlackList = [];
+export const tokenBlackList = [];
 
 //Controller functions
 //async functions are written function2
@@ -175,7 +176,7 @@ export async function login(req, res) {
         const body = req.body;
         const results = await getLoginByUsername(body.login);
         
-        if (results.success == 0) {
+        if (!results.success) {
             return res.status(404).json(results);
         }
         //check if hashed password matches
@@ -385,18 +386,33 @@ export async function getEateryFiltered(req, res) {
     }
 }
 
+export async function forgottenPasswordReset(req, res) {
+    try {
+        req.body.password = getHashOf(req.body.password);
+        const data = req.body;
+        const result = await resetPassword(data);
+        return res.status(200).json(result);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
 // get user token
 export function getToken(req, res) {
     try {
         return res.status(200).json({
             success: 1, 
             token: req.cookies.token
-        })
+        });
     } catch (error) {
         return res.status(500).json({
             success: 0, 
             message: "connection error"
-        })
+        });
     }
 }
 

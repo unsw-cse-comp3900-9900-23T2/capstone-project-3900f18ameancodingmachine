@@ -3,7 +3,7 @@ import { poolPromise } from "../db-config/db_connection.js";
 export async function createLogin(data) {
     //insert login details
     const [existing] = await poolPromise.execute(`select * from LoginInfo where login = ?`, [data.login]);
-    if (existing.length !== 0) {
+    if (existing.length != 0) {
         return {
             success: 0,
             message: 'Username already exists'
@@ -224,6 +224,17 @@ export async function insertSubscribedTo(data) {
     };  
 }
 
+//used for password recovery
+export async function resetPassword(data) {
+    const query = `update LoginInfo set password = ? where login = ?`;
+    const value = [data.password, data.login];
+    const [result] = await poolPromise.execute(query, value);
+    return {
+        success: 1,
+        data: result
+    }
+}
+
 export async function findSubscribedEateriesFromUserId(id) {
     const query = `select * from userSubscription where userId = ?`
     const value = [id]
@@ -292,7 +303,7 @@ export async function insertNewCuisineName(data) {
     const [result] = await poolPromise.execute(insertQuery,[name]);
     return {
         success: 1,
-        results: result
+        data: result
     };
 }
 
