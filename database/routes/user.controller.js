@@ -176,7 +176,7 @@ export async function login(req, res) {
         const body = req.body;
         const results = await getLoginByUsername(body.login);
         
-        if (results.success == 0) {
+        if (!results.success) {
             return res.status(404).json(results);
         }
         //check if hashed password matches
@@ -386,7 +386,8 @@ export async function getEateryByLogin(req, res) {
 
 export async function forgottenPasswordReset(req, res) {
     try {
-        const data = req.data;
+        req.body.password = getHashOf(req.body.password);
+        const data = req.body;
         const result = await resetPassword(data);
         return res.status(200).json(result);
     } catch (err) {
