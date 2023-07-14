@@ -299,4 +299,156 @@ describe('/subscribe', () => {
     })
 })
 
+/**
+ * test case:
+ * 1. find based of restaurant name
+ * 2. find based on location
+ * 3. find based on cuisine
+ * 4. find based on dietary restrictions
+ * 5. one wrong info
+ * 6. name of search is subset of restaurant name
+*/
+describe("/eatery/find", () => {
+
+    const addressData = {
+        street: "unicorn street",
+        suburb: "dirtland",
+        region: "NSW",
+        postcode: "2025"
+    }
+
+    const cuisineData = {
+        name: "japanese"
+    }
+
+    beforeEach(async () => {
+        let  response = await request(app).post('/api/user/cuisine').send(cuisineData)
+        const cuisineId = response.body.results.insertId
+
+        response = await request(app).post("/api/user/address").send(addressData)
+        const eateryAddressId = response.body.data.insertId
+
+        const restaurantData = {
+            name: "another restaurant",
+            address: eateryAddressId,
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            login: 0, //fake 
+            url: "www.anotherrestaurant.com",
+        }
+
+        // create the new eatery
+        response = await request(app).post('/api/user/eatery').send(restaurantData)
+        const restaurantId = response.body.results.insertId
+
+        const offerData = {
+            restaurantId: restaurantId,
+            cuisineId: cuisineId
+        }
+
+        // make cuisine offer from restaurant
+        response = await request(app).post('/api/user/cuisine-offer').send(offerData)
+        let restriction = "gluten free"
+        let query = `insert into DietaryRestrictions(restriction) values (?)`
+        let res = await poolPromise.execute(query, [restriction])
+        const dietId = res[0].insertId
+        query = `insert into provideDietary(restaurantId, dietId) values (?,?)`
+        await poolPromise.execute(query, [restaurantId, dietId])
+    })
+    
+    afterEach(async() => {
+        let query = `delete from CuisineOffer`
+        let res = await poolPromise.execute(query)
+        query = `delete from Address`;
+        res = await poolPromise.execute(query);
+        query = `delete from EateryAccount`;
+        res = await poolPromise.execute(query);
+        query = `delete from Cuisines`;
+        res = await poolPromise.execute(query);
+        query = `delete from DietaryRestrictions`;
+        res = await poolPromise.execute(query);
+        query = `delete from provideDietary`;
+        res = await poolPromise.execute(query);
+    })
+
+    test("find based on restaurant name", async () => {
+        const query = {
+            name: "another restaurant"
+        }
+        
+        let response = await request(app).get('/api/user/eatery/find').query(query)
+
+        // if 200 it found something, else it becomes 404
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+        expect(response.body.results.length).toBe(1)
+    })
+
+    test("find based on location / suburb", async () => {
+        const query = {
+            location: "dirtland"
+        }
+        
+        let response = await request(app).get('/api/user/eatery/find').query(query)
+
+        // if 200 it found something, else it becomes 404
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+        expect(response.body.results.length).toBe(1)
+    })
+
+    test("find based on cuisine", async () => {
+        const query = {
+            cuisine: "japanese"
+        }
+        
+        let response = await request(app).get('/api/user/eatery/find').query(query)
+
+        // if 200 it found something, else it becomes 404
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+        expect(response.body.results.length).toBe(1)
+    })
+    
+    test("find based on dietary restrictions", async () => {
+        const query = {
+            restriction: "gluten free"
+        }
+        
+        let response = await request(app).get('/api/user/eatery/find').query(query)
+
+        // if 200 it found something, else it becomes 404
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+        expect(response.body.results.length).toBe(1)
+    })
+
+    test("one wrong information should return no results", async () => {
+        const query = {
+            name: "a restaurant",
+            restriction: "gluten free"
+        }
+        
+        let response = await request(app).get('/api/user/eatery/find').query(query)
+
+        // if 200 it found something, else it becomes 404
+        expect(response.statusCode).toBe(404);
+        expect(response.body.success).toBe(0);
+    })
+
+    test("find based on subset of restaurant name", async () => {
+        const query = {
+            name: "restaurant"
+        }
+        
+        let response = await request(app).get('/api/user/eatery/find').query(query)
+
+        // if 200 it found something, else it becomes 404
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+        expect(response.body.results.length).toBe(1)
+    })
+    
+})
+
 
