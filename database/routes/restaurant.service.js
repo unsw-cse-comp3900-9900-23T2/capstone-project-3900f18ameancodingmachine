@@ -1,5 +1,14 @@
-import { poolPromise } from "../db-config/db_connection.js"
+import { pool, poolPromise } from "../db-config/db_connection.js"
 
+/**
+ * insert new voucher details into the database
+ * @param {object} data 
+ * @param {string} data.offeredBy   restaurantId
+ * @param {float} data.discount     discount for the coupon
+ * @param {date} data.startOffer    coupon starting offer
+ * @param {date} data.endOffer      coupon ending offer
+ * @param {int} data.count          number of coupon generated     
+ */
 export async function createNewVoucher(data) {
     const query = `insert into Voucher(offeredBy, discount, startOffer, endOffer, count) values (?,?,?,?,?)`
     const values = [data.offeredBy, data.discount, data.startOffer, data.endOffer, data.count]
@@ -61,4 +70,41 @@ export async function createEateryAccount(data) {
         success: 1,
         results: result
     };
+}
+
+/**
+ * insert new dietary into the database
+ * @param {object} data
+ * @param {int} data.id - eatery id
+ * @param {string} data.restriction - name of the dietrary restriction 
+ * @returns {object} - object contain success of 1 and result of insert query
+ */
+export async function createRestaurantDietary(data) {
+    // find existing dietary
+    const findQuery = `select id from DietaryRestrictions where restriction = ?`
+    const findValue = [data.restriction]
+    const [findResult] = await poolPromise.execute(findQuery, findValue)
+    let dietId;
+
+    if (findResult.length !== 0) {
+        // get existing dietary
+        dietId = findResult[0].id
+    } else {
+        // insert new dietary
+        const insertQuery1 = `insert into DietaryRestrictions(restriction) values (?)`
+        const values1 = [data.restriction]
+        const result1 = await poolPromise.execute(insertQuery1, values1)
+        dietId = result1.insertId
+        console.log("insert result")
+        console.log(result1)
+    }
+    console.log(dietId)
+    const insertQuery = `insert into provideDietary(restaurantId, dietId) values (?, ?)`
+    const insertValues = [data.id, dietId]
+    const [result] = await poolPromise.execute(insertQuery, insertValues)
+    return {
+        success: 1,
+        result: result
+    }
+
 }

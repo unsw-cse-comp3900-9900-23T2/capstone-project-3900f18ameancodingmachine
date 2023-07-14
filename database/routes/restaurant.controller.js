@@ -1,4 +1,4 @@
-import { createNewVoucher, getAllCuisines, getAllEateries, updateExistingDescription, createEateryAccount } from "./restaurant.service.js"
+import { createNewVoucher, getAllCuisines, getAllEateries, updateExistingDescription, createEateryAccount, createRestaurantDietary } from "./restaurant.service.js"
 
 export async function createVoucher(req, res) {
     try {
@@ -67,6 +67,33 @@ export async function createEatery(req,res) {
         return res.status(500).json({
             success: 0,
             message: "Database conenction error"
+        });
+    }
+}
+
+/**
+ * 
+ * @param {Request} req 
+ * @param {Response} res 
+ * @returns result called from service function with statuscode 200
+ * @returns object with success: 0 and duplicate record message with statuscode 409
+ * @returns object with success: 0 and database connection error with statuscode 500
+ */
+export async function createEateryDietary(req, res) {
+    try {
+        const body = req.body;
+        const result = await createRestaurantDietary(body);
+        return res.status(200).json(result);
+    } catch (err) {
+        if (err.errno == 1062) {
+            return res.status(409).json({
+                success: 0,
+                message: "Entered duplicate record"
+            });
+        }
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
         });
     }
 }
