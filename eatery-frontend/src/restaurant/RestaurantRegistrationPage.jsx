@@ -100,6 +100,7 @@ export default function RestaurantRegistrationPage() {
       return;  
     }
     const addressId = await createAddress(street, suburb, region, postCode);
+    console.log(addressId)
     const eateryId = await createEatery(name, addressId, phoneNumber, email, loginId, website);
     console.log(eateryId);
     navigate('/login');

@@ -53,7 +53,7 @@ export async function getAllEateries() {
 // create new eatery account
 export async function createEateryAccount(data) {
     const findQuery = `select * from EateryAccount where name = ? and address = ? and phone = ? and email = ? and url = ?`
-    const firstvalues = [data.name, data.address, data.phone, data.email, data.url];
+    const firstvalues = [data.name, data.addressId, data.phone, data.email, data.url];
     const [findResult] = await poolPromise.execute(findQuery, firstvalues);
     
     if (findResult.length !== 0) {
@@ -64,7 +64,7 @@ export async function createEateryAccount(data) {
     }
 
     const query = `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?, ?, ?)`;
-    const values = [data.name, data.address, data.phone, data.email, data.login, data.url];
+    const values = [data.name, data.addressId, data.phone, data.email, data.loginId, data.url];
     const [result] = await poolPromise.execute(query,values);
     return {
         success: 1,
