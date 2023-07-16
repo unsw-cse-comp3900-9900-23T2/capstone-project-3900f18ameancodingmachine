@@ -32,7 +32,7 @@ async function checkCredentials(email, pass){
   return false;
 }
 
-function LoginForm(){
+export default function LoginForm(){
   const navigate = useNavigate();
   const [logInFail, setLogInFail] = useState(false);
   const [email, setEmail] = React.useState('');
@@ -47,11 +47,10 @@ function LoginForm(){
      *  Else print underneath "Incorrect Email or Password" 
      */
     if (await checkCredentials(email, password)){
-      console.log("success")
+      console.log("success");
       navigate("/");
     };
     setLogInFail(true);
-    
   }
 
   const passRecovery = () =>{ 
@@ -91,16 +90,5 @@ function LoginForm(){
 
     </Card>
   </Container>
-
-  )
+ );
 }
-
-function LoginPage(){  
-  return (
-    <LoginForm/>
-  );
-}
-
-
-
-export default LoginPage;
