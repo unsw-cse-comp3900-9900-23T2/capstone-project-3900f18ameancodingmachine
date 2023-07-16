@@ -51,9 +51,11 @@ create table RestaurantOwners (
 );
 
 create table SubscribedTo (
-    userId          integer references UserAccount(id),
+    userId          integer,
     restaurantId    integer references EateryAccount(id),
-    primary key (userId, restaurantId) 
+    primary key (userId, restaurantId),
+    FOREIGN KEY (userId) REFERENCES UserAccount(id),
+    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id)
 );
 
 create table Reviews (
@@ -104,15 +106,19 @@ create table DietaryRestrictions (
 );
 
 create table userDietary (
-    userId      integer references UserAccount(id),
-    dietId      integer references DietaryRestrictions(id),
-    primary key (userId, dietId)
+    userId      integer,
+    dietId      integer,
+    primary key (userId, dietId),
+    FOREIGN KEY (userId) REFERENCES UserAccount(id),
+    FOREIGN KEY (dietId) REFERENCES DietaryRestrictions(id)
 );
 
 create table provideDietary (
-    restaurantId    integer references EateryAccount(id),
-    dietId          integer references DietaryRestrictions(id),
-    primary key (restaurantId, dietId)
+    restaurantId    integer,
+    dietId          integer,
+    primary key (restaurantId, dietId),
+    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id),
+    FOREIGN KEY (dietId) REFERENCES DietaryRestrictions(id)
 );
 
 create table BusinessHour (

@@ -307,24 +307,61 @@ export async function insertNewCuisineName(data) {
     };
 }
 
-// create new eatery account
-export async function createEateryAccount(data) {
-    const findQuery = `select * from EateryAccount where name = ? and address = ? and phone = ? and email = ? and url = ?`
-    const firstvalues = [data.name, data.address, data.phone, data.email, data.url];
-    const [findResult] = await poolPromise.execute(findQuery, firstvalues);
-    
-    if (findResult.length !== 0) {
-        return {
-            success: 0,
-            message: "Eatery account exists"
-        }
+// find restaurant based on restaurant name, cuisine, and location (suburb)
+// does not include dietary yet
+export async function getEateryByFilter(data) {
+    console.log(data)
+    let query = `select * from restaurantInfo where`
+    let values = []
+
+    /**
+     * since data one of the queries may be missing,
+     * change the queries based on user requirement
+     * e.g: if user does not filter by cuisine, change the queries
+     * so that it finds restaurant based on cuisine
+    */
+    if (data.name) {
+        query += ` name like ?`
+        values.push(`%` + data.name + `%`)
     }
 
-    const query = `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?, ?, ?)`;
-    const values = [data.name, data.addressId, data.phone, data.email, data.loginId, data.url];
+    if (data.cuisine) {
+        if (values.length == 0) {
+            query += ` cuisine = ?`
+        } else {
+            query += ` and cuisine = ?`
+        }
+        values.push(data.cuisine)
+    }
+
+    if (data.location) {
+        if (values.length == 0) {
+            query += ` suburb = ?`
+        } else {
+            query += ` and suburb = ?`
+        }
+        values.push(data.location)
+    }
+
+    if (data.restriction) {
+        if (values.length == 0) {
+            query += ` diet = ?`
+        } else {
+            query += ` and diet = ?`
+        }
+        values.push(data.restriction)
+    }
+
     const [result] = await poolPromise.execute(query,values);
-    return {
-        success: 1,
-        data: result
-    };
+    if (result.length == 0) {
+        return {
+            success: 0,
+            message: "no such eateries exist"
+        };
+    } else {
+        return {
+            success: 1,
+            results: result
+        };
+    }
 }

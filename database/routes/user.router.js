@@ -1,7 +1,6 @@
 import { createAccountInfo, 
     createAddressInfo, 
     createUser, 
-    createEatery, 
     getAllUsers, 
     getUserById, 
     login,
@@ -19,11 +18,12 @@ import { createAccountInfo,
     getToken,
     createSubscribedTo,
     showSubscribedEateries,
+    getEateryFiltered,
     forgottenPasswordReset,
 } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
-import { createVoucher, updateDescription } from "./restaurant.controller.js";
+import { createVoucher, getCuisines, getEateries, updateDescription, createEatery, createEateryDietary } from "./restaurant.controller.js";
 import { passwordRecovery } from "../nodemailer/config.js";
 import { verfiyResetCode } from "../nodemailer/pass_reset.js";
 
@@ -43,7 +43,10 @@ router.get("/:id", getUserById)
 router.post("/login", login); 
 router.put("/logout", logout); 
 
-router.post("/eatery", createEatery); 
+router.post("/eatery", createEatery);
+router.get("/eatery/find", getEateryFiltered) 
+router.get("/eatery/all", getEateries);
+router.post("/eatery/dietary", createEateryDietary)
 router.post("/cuisine", createCuisine); 
 router.post("/cuisine-offer", createRestaurantCusine); 
 router.post("/hour", createBusinessHour); 
@@ -53,7 +56,8 @@ router.post("/subscribe", createSubscribedTo);
 
 router.get("/post/:id", getPostById) 
 router.get("/review/:id", getReviewById)
-router.get("/cuisine/:id", getCuisineById) 
+router.get("/cuisine/:id", getCuisineById)
+router.get("/eatery/cuisines", getCuisines) 
 router.get("/eatery/:id", getEateryById)
 router.get("/subscribe/:id", showSubscribedEateries)
 

@@ -200,9 +200,6 @@ describe('/voucher', () => {
         const start = new Date().toISOString().slice(0, 19).replace('T', ' ');
         const end = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-        console.log(start)
-        console.log(end)
-
         // input for voucher
         // leave code null
         const voucherData = {
@@ -244,8 +241,88 @@ describe("/voucher", () => {
             description: "hello there"
         })
 
-        console.log(response.statusCode)
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
     })
 })
+
+describe("/eatery/all", () => {
+    const restaurantData = {
+        name: "another restaurant",
+        address: 0, //fake
+        phone: "0493186858",
+        email: "anotherrestaurant@gmail.com",
+        login: 0, //fake
+        url: "www.anotherrestaurant.com",
+    }
+
+    afterEach(async () => {
+        let query = `delete from EateryAccount`
+        let res = await poolPromise.execute(query)
+    })
+
+    test("getting all eateries should just return statuscode 200 and success of 1", async () => {
+        let response = await request(app).post('/api/user/eatery').send(restaurantData)
+        const restaurantId = response.body.results.insertId
+
+        response = await request(app).get("/api/user/eatery/all").send({
+            restaurantId: restaurantId,
+            description: "hello there"
+        })
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+    })
+
+    test("input 1 restaurant return only 1 restaurant", async () => {
+        let response = await request(app).post('/api/user/eatery').send(restaurantData)
+        const restaurantId = response.body.results.insertId
+
+        response = await request(app).get("/api/user/eatery/all").send({
+            restaurantId: restaurantId,
+            description: "hello there"
+        })
+
+        expect(response.body.result.length).toBe(1)
+    })
+
+})
+
+// test cases:
+// 1. search based on name
+// 2. search based on suburb
+// 3. search based on cuisine
+// 4. maybe a mix
+// describe("/eatery/find", () => {
+//     const restaurantData1 = {
+//         name: "restaurant 1",
+//         address: 0, //fake
+//         phone: "0493186858",
+//         email: "restaurant1@gmail.com",
+//         login: 0, //fake
+//         url: "www.restaurant1.com",
+//     }
+
+//     const restaurantData2 = {
+//         name: "restaurant 2",
+//         address: 0, //fake
+//         phone: "0493186858",
+//         email: "restaurant2@gmail.com",
+//         login: 0, //fake
+//         url: "www.restaurant1.com",
+//     }
+
+//     const restaurantData3 = {
+//         name: "restaurant 3",
+//         address: 0, //fake
+//         phone: "0493186858",
+//         email: "restaurant3@gmail.com",
+//         login: 0, //fake
+//         url: "www.restaurant3.com",
+//     }
+
+//     afterEach(async () => {
+//         let query = `delete from EateryAccount`
+//         let res = await poolPromise.execute(query)
+//     })
+// })

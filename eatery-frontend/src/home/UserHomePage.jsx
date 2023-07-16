@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useContext, useEffect } from 'react';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
@@ -13,32 +13,45 @@ import Typography from '@mui/material/Typography';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-
+import { UserContext } from '../App.jsx';
 import RestaurantPost from './RestaurantPost'
-
 
 import axios from 'axios';
 
-export default function UserHomePage() {
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [location, setLocation] = React.useState(null);
-  const [cuisine, setCuisine] = React.useState(null);
+// get all of the restaurant and the cuisines from the database
+const n = 4 // change the number depending on the requirements
+const getCuisine = await axios.get('api/user/eatery/cuisines')
+const cuisines = getCuisine.data.result
+const getEateries = await axios.get('api/user/eatery/all')
+const eateries = getEateries.data.result
+// top n eateries account that is recently created
+// since eatery id is auto increment, sort by id in descending order
+const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
 
-  React.useEffect(() => {
+export default function UserHomePage() {
+  // Null: not logged in, true: user, false: restaurant
+  const { userContext, setUserContext } = useContext(UserContext);
+
+  const [location, setLocation] = useState(null);
+  const [cuisine, setCuisine] = useState(null);
+  const [dietary, setDietary] = useState(null);
+
+  useEffect(() => {
+    /* check whether user has a token
+    if user has a token, user is logged in */
     async function checkLogin() {
       try {
         const result = await axios.get('api/user/'); // use checkToken as middleware to verify token
         let data = result.data;
         if (data.success !== 0) {
-          setIsLoggedIn(true)
+          setUserContext(true)
           console.log("is logged in")
         }
       } catch (err) {
         // error when checking token using checktoken
-        setIsLoggedIn(false)
+        setUserContext(null);
         console.log("Not logged in")
-      }
-      
+      } 
     }
     checkLogin()
   })
@@ -86,13 +99,27 @@ export default function UserHomePage() {
                 <Autocomplete
                   id="cuisine-dropdown"
                   value={cuisine}
-                  options={["italian", "chines", "vietnamese"]}
-                  getOptionLabel={(option) => option.title}
+                  options={cuisines}
+                  getOptionLabel={(option) => option.name}
                   onChange={(event, newValue) => {
                     setCuisine(newValue);
                   }}
                   renderInput={(params) => (
                     <TextField {...params} label="Cuisine" />
+                  )}
+                />
+              </Grid>
+              <Grid xs={4}>
+                <Autocomplete
+                  id="dietary-dropdown"
+                  value={dietary}
+                  options={["lactose free", "gluten free", "vegetarian"]}
+                  getOptionLabel={(option) => option}
+                  onChange={(event, newValue) => {
+                    setDietary(newValue);
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Dietary" />
                   )}
                 />
               </Grid>
@@ -105,8 +132,8 @@ export default function UserHomePage() {
           </Grid>
         </CardContent>
         <CardActions>
-          {isLoggedIn && <Button variant="contained" onClick={() => {}}>View Past Bookings</Button>}
-          {isLoggedIn && <Button variant="contained" onClick={() => {}}>View Subscriptions</Button>}
+          {userContext===true && <Button variant="contained" onClick={() => {}}>View Past Bookings</Button>}
+          {userContext===true && <Button variant="contained" onClick={() => {}}>View Subscriptions</Button>}
         </CardActions>
         <CardContent>
           <Grid container spacing={2}>
@@ -126,9 +153,8 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              <RestaurantGridItem name="Dominos" cuisine="italian" location="sydney"/>
-              <RestaurantGridItem name="Malay Chinese" cuisine="Malaysian" location="sydney"/>
-              <RestaurantGridItem name="Atom Thai" cuisine="thai" location="parrammatta"/>
+              {/* region is used instead of location, might change later */}
+              {latestEateries.map((restaurant) => <RestaurantGridItem key={restaurant.id} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.suburb || restaurant.region}/>)}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
@@ -150,7 +176,7 @@ export default function UserHomePage() {
 function RestaurantGridItem(props) {
   return (
     <Grid xs={4} spacing={2}>
-      <RestaurantPost name={props.name} cuisine={props.cuisine} location={props.location} />
+      <RestaurantPost key={props.id} name={props.name} cuisine={props.cuisine} location={props.location} />
     </Grid>
   );
 }
