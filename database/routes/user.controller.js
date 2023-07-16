@@ -3,7 +3,8 @@ import {
     createAddress, 
     createLogin, 
     createUse, 
-    createNewPost, 
+    createNewPost,
+    createNewUserDietary, 
     createReviews,
     insertSubscribedTo, 
     getUsers,
@@ -394,6 +395,26 @@ export async function forgottenPasswordReset(req, res) {
         return res.status(200).json(result);
     } catch (err) {
         console.log(err);
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+export async function createUserDietary(req, res) {
+    try {
+        const body = req.body;
+        const result = await createNewUserDietary(body);
+        return res.status(200).json(result);
+    } catch (err) {
+        console.log(err)
+        if (err.errno == 1062) {
+            return res.status(409).json({
+                success: 0,
+                message: "Entered duplicate record"
+            });
+        }
         return res.status(500).json({
             success: 0,
             message: "Database connection error"

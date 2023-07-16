@@ -307,19 +307,44 @@ export async function insertNewCuisineName(data) {
     };
 }
 
-// find restaurant based on restaurant name, cuisine, and location (suburb)
-// does not include dietary yet
+export async function createNewUserDietary(data) {
+    // find existing dietary
+    const findQuery = `select id from DietaryRestrictions where restriction = ?`
+    const findValue = [data.restriction]
+    const [findResult] = await poolPromise.execute(findQuery, findValue)
+    let dietId;
+
+    if (findResult.length !== 0) {
+        // get existing dietary
+        console.log("found dietary")
+        dietId = findResult[0].id
+    } else {
+        // insert new dietary
+        const insertQuery1 = `insert into DietaryRestrictions(restriction) values (?)`
+        const values1 = [data.restriction]
+        const result1 = await poolPromise.execute(insertQuery1, values1)
+        console.log(result1)
+        dietId = result1[0].insertId
+        console.log("new dietary")
+        console.log(dietId)
+    }
+    
+    const insertQuery = `insert into userDietary(userId, dietId) values (?, ?)`
+    const insertValues = [data.id, dietId]
+    const [result] = await poolPromise.execute(insertQuery, insertValues)
+    return {
+        success: 1,
+        result: result
+    }
+}
+
+// find restaurant based on restaurant name, cuisine, location (suburb)
+// as well as dietary restrictions 
 export async function getEateryByFilter(data) {
     console.log(data)
     let query = `select * from restaurantInfo where`
     let values = []
 
-    /**
-     * since data one of the queries may be missing,
-     * change the queries based on user requirement
-     * e.g: if user does not filter by cuisine, change the queries
-     * so that it finds restaurant based on cuisine
-    */
     if (data.name) {
         query += ` name like ?`
         values.push(`%` + data.name + `%`)

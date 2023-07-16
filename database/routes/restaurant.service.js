@@ -94,7 +94,7 @@ export async function createRestaurantDietary(data) {
         const insertQuery1 = `insert into DietaryRestrictions(restriction) values (?)`
         const values1 = [data.restriction]
         const result1 = await poolPromise.execute(insertQuery1, values1)
-        dietId = result1.insertId
+        dietId = result1[0].insertId
         console.log("insert result")
         console.log(result1)
     }

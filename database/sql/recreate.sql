@@ -1,3 +1,4 @@
+-- clear and reset the database
 drop table if exists provideDietary;
 drop table if exists SubscribedTo;
 drop table if exists userDietary;
@@ -12,7 +13,7 @@ create table provideDietary (
 
 create table SubscribedTo (
     userId          integer,
-    restaurantId    integer references EateryAccount(id),
+    restaurantId    integer,
     primary key (userId, restaurantId),
     FOREIGN KEY (userId) REFERENCES UserAccount(id),
     FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id)

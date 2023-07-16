@@ -20,6 +20,7 @@ import { createAccountInfo,
     showSubscribedEateries,
     getEateryFiltered,
     forgottenPasswordReset,
+    createUserDietary,
 } from "./user.controller.js";
 import express from 'express';
 import { checkToken } from "../auth/tokenvalid.js";
@@ -46,6 +47,7 @@ router.put("/logout", logout);
 router.post("/eatery", createEatery);
 router.get("/eatery/find", getEateryFiltered) 
 router.get("/eatery/all", getEateries);
+router.post("/dietary", createUserDietary)
 router.post("/eatery/dietary", createEateryDietary)
 router.post("/cuisine", createCuisine); 
 router.post("/cuisine-offer", createRestaurantCusine); 

@@ -52,7 +52,7 @@ create table RestaurantOwners (
 
 create table SubscribedTo (
     userId          integer,
-    restaurantId    integer references EateryAccount(id),
+    restaurantId    integer,
     primary key (userId, restaurantId),
     FOREIGN KEY (userId) REFERENCES UserAccount(id),
     FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id)
