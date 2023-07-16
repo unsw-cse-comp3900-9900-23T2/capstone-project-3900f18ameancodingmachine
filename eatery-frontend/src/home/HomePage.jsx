@@ -43,7 +43,7 @@ export default function HomePage() {
     // Defaults to User Home Page if not logged in
     <Container maxWidth="lg">
       {userContext === false  && <RestaurantHomePage/>}
-      {userContext !== false && <UserHomePage isLoggedIn={userContext === true}/>}
+      {userContext !== false && <UserHomePage/>}
     </Container>
   );
 }
