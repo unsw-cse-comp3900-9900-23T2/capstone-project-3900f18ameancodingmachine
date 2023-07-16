@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useContext, useEffect } from 'react';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
@@ -13,7 +13,9 @@ import Typography from '@mui/material/Typography';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { UserContext } from '../App.jsx';
 import RestaurantPost from './RestaurantPost'
+
 import axios from 'axios';
 
 // get all of the restaurant and the cuisines from the database
@@ -27,12 +29,14 @@ const eateries = getEateries.data.result
 const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
 
 export default function UserHomePage() {
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [location, setLocation] = React.useState(null);
-  const [cuisine, setCuisine] = React.useState(null);
-  const [dietary, setDietary] = React.useState(null);
+  // Null: not logged in, true: user, false: restaurant
+  const { userContext, setUserContext } = useContext(UserContext);
 
-  React.useEffect(() => {
+  const [location, setLocation] = useState(null);
+  const [cuisine, setCuisine] = useState(null);
+  const [dietary, setDietary] = useState(null);
+
+  useEffect(() => {
     /* check whether user has a token
     if user has a token, user is logged in */
     async function checkLogin() {
@@ -40,15 +44,14 @@ export default function UserHomePage() {
         const result = await axios.get('api/user/'); // use checkToken as middleware to verify token
         let data = result.data;
         if (data.success !== 0) {
-          setIsLoggedIn(true)
+          setUserContext(true)
           console.log("is logged in")
         }
       } catch (err) {
         // error when checking token using checktoken
-        setIsLoggedIn(false)
+        setUserContext(null);
         console.log("Not logged in")
-      }
-      
+      } 
     }
     checkLogin()
   })
@@ -129,8 +132,8 @@ export default function UserHomePage() {
           </Grid>
         </CardContent>
         <CardActions>
-          {isLoggedIn && <Button variant="contained" onClick={() => {}}>View Past Bookings</Button>}
-          {isLoggedIn && <Button variant="contained" onClick={() => {}}>View Subscriptions</Button>}
+          {userContext===true && <Button variant="contained" onClick={() => {}}>View Past Bookings</Button>}
+          {userContext===true && <Button variant="contained" onClick={() => {}}>View Subscriptions</Button>}
         </CardActions>
         <CardContent>
           <Grid container spacing={2}>
