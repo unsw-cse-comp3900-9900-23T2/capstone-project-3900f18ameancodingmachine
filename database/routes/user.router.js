@@ -13,6 +13,7 @@ import { createAccountInfo,
     createUserReviews, 
     logout,
     getCuisineById,
+    getDieteries,
     getEateryByLogin,
     getEateryById,
     getToken,
@@ -45,16 +46,17 @@ router.post("/login", login);
 router.put("/logout", logout); 
 
 router.post("/eatery", createEatery);
-router.get("/eatery/find", getEateryFiltered) 
+router.get("/eatery/find", getEateryFiltered); 
 router.get("/eatery/all", getEateries);
-router.post("/dietary", createUserDietary)
+router.post("/dietary", createUserDietary);
+router.get("/dietary/all", getDieteries);
 router.post("/eatery/dietary", createEateryDietary)
 router.post("/cuisine", createCuisine); 
 router.post("/cuisine-offer", createRestaurantCusine); 
 router.post("/hour", createBusinessHour); 
 router.post("/posts", createEateryPosts); 
 router.post("/reviews", createUserReviews);
-router.post("/subscribe", createSubscribedTo); 
+router.put("/subscribe", createSubscribedTo); 
 
 router.get("/post/:id", getPostById) 
 router.get("/review/:id", getReviewById)

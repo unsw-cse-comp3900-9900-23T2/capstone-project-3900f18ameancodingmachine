@@ -20,7 +20,8 @@ import {
     getEateryByLoginId,
     getEateryByFilter,
     findSubscribedEateriesFromUserId,
-    resetPassword
+    resetPassword,
+    getAllDietaries
 } from "./user.service.js";
 import crypto from "crypto";
 import pkg from "jsonwebtoken";
@@ -32,7 +33,6 @@ const { sign } = pkg;
 export const tokenBlackList = [];
 
 //Controller functions
-//async functions are written function2
 
 //create account in LoginInfo table
 export async function createAccountInfo(req, res) {
@@ -118,7 +118,12 @@ export async function createSubscribedTo(req, res) {
         const result = await insertSubscribedTo(body);
         return res.status(200).json(result);
     } catch (error) {
-        console.log(err);
+        if (error.errno == 1062) {
+            return res.status(409).json({
+                success: 0,
+                message: "User already subscribed"
+            });
+        }
         return res.status(500).json({
             success: 0,
             message: "Database connection error"
@@ -408,13 +413,25 @@ export async function createUserDietary(req, res) {
         const result = await createNewUserDietary(body);
         return res.status(200).json(result);
     } catch (err) {
-        console.log(err)
+        // 1062 is error from mysql when insert duplicate value 
         if (err.errno == 1062) {
             return res.status(409).json({
                 success: 0,
                 message: "Entered duplicate record"
             });
         }
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        });
+    }
+}
+
+export async function getDieteries(req, res) {
+    try {
+        const result = await getAllDietaries();
+        return res.status(200).json(result);
+    } catch (error) {
         return res.status(500).json({
             success: 0,
             message: "Database connection error"

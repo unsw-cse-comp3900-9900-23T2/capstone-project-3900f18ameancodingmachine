@@ -338,6 +338,15 @@ export async function createNewUserDietary(data) {
     }
 }
 
+export async function getAllDietaries() {
+    const query =  `select * from DietaryRestrictions`
+    const [result] = await poolPromise.execute(query)
+    return {
+        success: 1,
+        result: result
+    }
+}
+
 // find restaurant based on restaurant name, cuisine, location (suburb)
 // as well as dietary restrictions 
 export async function getEateryByFilter(data) {
