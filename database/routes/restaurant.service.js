@@ -1,13 +1,13 @@
-import { pool, poolPromise } from "../db-config/db_connection.js"
+import { poolPromise } from '../db-config/db_connection.js'
 
 /**
  * insert new voucher details into the database
- * @param {object} data 
+ * @param {object} data
  * @param {string} data.offeredBy   restaurantId
  * @param {float} data.discount     discount for the coupon
  * @param {date} data.startOffer    coupon starting offer
  * @param {date} data.endOffer      coupon ending offer
- * @param {int} data.count          number of coupon generated     
+ * @param {int} data.count          number of coupon generated
  */
 export async function createNewVoucher(data) {
     const query = `insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)`
@@ -16,95 +16,94 @@ export async function createNewVoucher(data) {
 
     return {
         success: 1,
-        result: result
+        results: result
     }
 }
 
-export async function updateExistingDescription(data) {
+export async function updateExistingDescription (data) {
     console.log(data)
-    const query =  `update EateryAccount set description = ? where id = ?`
+    const query = 'update EateryAccount set description = ? where id = ?'
     const values = [data.description, data.restaurantId]
-    const [result] = await poolPromise.execute(query, values);
-    
+    const [result] = await poolPromise.execute(query, values)
+
     return {
         success: 1,
-        result: result
+        results: result
     }
 }
 
-export async function getAllCuisines() {
-    const query =  `select * from Cuisines`
+export async function getAllCuisines () {
+    const query = 'select * from Cuisines'
     const [result] = await poolPromise.execute(query)
     return {
         success: 1,
-        result: result
+        results: result
     }
 }
 
-export async function getAllEateries() {
-    const query =  `select * from restaurantInfo`
+export async function getAllEateries () {
+    const query = 'select * from restaurantInfo'
     const [result] = await poolPromise.execute(query)
     return {
         success: 1,
-        result: result
+        results: result
     }
 }
 
 // create new eatery account
-export async function createEateryAccount(data) {
-    const findQuery = `select * from EateryAccount where name = ? and address = ? and phone = ? and email = ? and url = ?`
-    const firstvalues = [data.name, data.addressId, data.phone, data.email, data.url];
-    const [findResult] = await poolPromise.execute(findQuery, firstvalues);
-    
+export async function createEateryAccount (data) {
+    const findQuery = 'select * from EateryAccount where name = ? and address = ? and phone = ? and email = ? and url = ?'
+    const firstvalues = [data.name, data.addressId, data.phone, data.email, data.url]
+    const [findResult] = await poolPromise.execute(findQuery, firstvalues)
+
     if (findResult.length !== 0) {
         return {
             success: 0,
-            message: "Eatery account exists"
+            message: 'Eatery account exists'
         }
     }
 
-    const query = `insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?, ?, ?)`;
-    const values = [data.name, data.addressId, data.phone, data.email, data.loginId, data.url];
-    const [result] = await poolPromise.execute(query,values);
+    const query = 'insert into EateryAccount(name, address, phone, email, login, url) values (?, ?, ?, ?, ?, ?)'
+    const values = [data.name, data.addressId, data.phone, data.email, data.loginId, data.url]
+    const [result] = await poolPromise.execute(query, values)
     return {
         success: 1,
         results: result
-    };
+    }
 }
 
 /**
  * insert new dietary into the database
  * @param {object} data
  * @param {int} data.id - eatery id
- * @param {string} data.restriction - name of the dietrary restriction 
+ * @param {string} data.restriction - name of the dietrary restriction
  * @returns {object} - object contain success of 1 and result of insert query
  */
-export async function createRestaurantDietary(data) {
+export async function createRestaurantDietary (data) {
     // find existing dietary
-    const findQuery = `select id from DietaryRestrictions where restriction = ?`
+    const findQuery = 'select id from DietaryRestrictions where restriction = ?'
     const findValue = [data.restriction]
     const [findResult] = await poolPromise.execute(findQuery, findValue)
-    let dietId;
+    let dietId
 
     if (findResult.length !== 0) {
         // get existing dietary
         dietId = findResult[0].id
     } else {
         // insert new dietary
-        const insertQuery1 = `insert into DietaryRestrictions(restriction) values (?)`
+        const insertQuery1 = 'insert into DietaryRestrictions(restriction) values (?)'
         const values1 = [data.restriction]
         const result1 = await poolPromise.execute(insertQuery1, values1)
-        dietId = result1.insertId
-        console.log("insert result")
+        dietId = result1[0].insertId
+        console.log('insert result')
         console.log(result1)
     }
     console.log(dietId)
-    const insertQuery = `insert into provideDietary(restaurantId, dietId) values (?, ?)`
+    const insertQuery = 'insert into provideDietary(restaurantId, dietId) values (?, ?)'
     const insertValues = [data.id, dietId]
     const [result] = await poolPromise.execute(insertQuery, insertValues)
     return {
         success: 1,
-        result: result
+        results: result
     }
-
 }

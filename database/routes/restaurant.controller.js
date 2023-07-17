@@ -1,99 +1,100 @@
-import { createNewVoucher, getAllCuisines, getAllEateries, updateExistingDescription, createEateryAccount, createRestaurantDietary } from "./restaurant.service.js"
+import { createNewVoucher, getAllCuisines, getAllEateries, updateExistingDescription, createEateryAccount, createRestaurantDietary } from './restaurant.service.js'
 
-export async function createVoucher(req, res) {
+export async function createVoucher (req, res) {
     try {
         const body = req.body
         console.log(body)
         const result = await createNewVoucher(body)
         return res.status(200).json(result)
-    } catch(err) {
-        console.log(err);
-        return res.status(500).json({
-            success: 0,
-            message: "Database connection error"
-        })
-    }
-}
-
-export async function updateDescription(req, res) {
-    try {
-        const body = req.body
-        const result = await updateExistingDescription(body);
-        return res.status(200).json(result);
     } catch (err) {
         console.log(err)
         return res.status(500).json({
             success: 0,
-            message: "Database connection error"
+            message: 'Database connection error'
         })
     }
 }
 
-export async function getCuisines(req, res) {
+export async function updateDescription (req, res) {
     try {
-        const results = await getAllCuisines();
-        console.log(results)
-        return res.status(200).json(results)
-    } catch (error) {
-        return res.status(500).json({
-            success: 0, 
-            message: "Database conenction error"
-        })
-    }
-}
-
-export async function getEateries(req, res) {
-    try {
-        const results = await getAllEateries();
-        console.log(results)
-        return res.status(200).json(results)
-    } catch (error) {
-        return res.status(500).json({
-            success: 0, 
-            message: "Database connection error"
-        })
-    }
-}
-
-export async function createEatery(req,res) {
-    try {
-        const body = req.body;
-        const result = await createEateryAccount(body);
-        if (result.success == 0) {
-            return res.status(400).json(result)
-        }
-        return res.status(200).json(result);
+        const body = req.body
+        const result = await updateExistingDescription(body)
+        return res.status(200).json(result)
     } catch (err) {
+        console.log(err)
         return res.status(500).json({
             success: 0,
-            message: "Database conenction error"
-        });
+            message: 'Database connection error'
+        })
+    }
+}
+
+export async function getCuisines (req, res) {
+    try {
+        const results = await getAllCuisines()
+        console.log(results)
+        return res.status(200).json(results)
+    } catch (error) {
+        return res.status(500).json({
+            success: 0,
+            message: 'Database conenction error'
+        })
+    }
+}
+
+export async function getEateries (req, res) {
+    try {
+        const results = await getAllEateries()
+        console.log(results)
+        return res.status(200).json(results)
+    } catch (error) {
+        return res.status(500).json({
+            success: 0,
+            message: 'Database connection error'
+        })
+    }
+}
+
+export async function createEatery (req, res) {
+    try {
+        const body = req.body
+        const result = await createEateryAccount(body)
+        if (result.success === 0) {
+            return res.status(400).json(result)
+        }
+        return res.status(200).json(result)
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({
+            success: 0,
+            message: 'Database conenction error'
+        })
     }
 }
 
 /**
- * 
- * @param {Request} req 
- * @param {Response} res 
+ *
+ * @param {Request} req
+ * @param {Response} res
  * @returns result called from service function with statuscode 200
  * @returns object with success: 0 and duplicate record message with statuscode 409
  * @returns object with success: 0 and database connection error with statuscode 500
  */
-export async function createEateryDietary(req, res) {
+export async function createEateryDietary (req, res) {
     try {
-        const body = req.body;
-        const result = await createRestaurantDietary(body);
-        return res.status(200).json(result);
+        const body = req.body
+        const result = await createRestaurantDietary(body)
+        return res.status(200).json(result)
     } catch (err) {
-        if (err.errno == 1062) {
+        if (err.errno === 1062) {
             return res.status(409).json({
                 success: 0,
-                message: "Entered duplicate record"
-            });
+                message: 'Entered duplicate record'
+            })
         }
         return res.status(500).json({
             success: 0,
-            message: "Database connection error"
-        });
+            message: 'Database connection error'
+        })
     }
 }
