@@ -21,9 +21,10 @@ import axios from 'axios';
 // get all of the restaurant and the cuisines from the database
 const n = 4 // change the number depending on the requirements
 const getCuisine = await axios.get('api/user/eatery/cuisines')
-const cuisines = getCuisine.data.result
+const cuisines = getCuisine.data.results
 const getEateries = await axios.get('api/user/eatery/all')
-const eateries = getEateries.data.result
+console.log(getEateries)
+const eateries = getEateries.data.results
 // top n eateries account that is recently created
 // since eatery id is auto increment, sort by id in descending order
 const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
@@ -54,7 +55,7 @@ export default function UserHomePage() {
       } 
     }
     checkLogin()
-  })
+  }, [setUserContext])
 
   return (
     <Container maxWidth="lg">

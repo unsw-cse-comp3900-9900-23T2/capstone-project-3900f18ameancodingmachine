@@ -23,21 +23,23 @@ export default function HomePage() {
           // get EateryAccount, if no result then it will return an 404 error
           // else it will go to restaurant page
           await axios.get(`api/user/eatery/login/${loginId}`);
+          console.log("is a restaurant")
           setUserContext(false);
         }
       } catch (err) {
         if (err.response) { // not an eatery
           console.log(err.response.data.message);
           console.log(err.response.data);
+          console.log("set to true")
           setUserContext(true);
         } else { // not loggedIn
+          setUserContext(null)
           console.log("Not logged in");
-          setUserContext(null);
         }
       }
     }
     checkCookies()
-  })
+  }, [setUserContext])
   
   return (
     // Defaults to User Home Page if not logged in

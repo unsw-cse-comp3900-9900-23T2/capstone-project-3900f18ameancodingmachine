@@ -167,10 +167,10 @@ describe("/reviews", () => {
        // create eatery account, leaves address
         const eateryAccount = {
             name: "another restaurant",
-            address: 0, //fake
+            addressId: 0, //fake
             phone: "0493186858",
             email: "anotherrestaurant@gmail.com",
-            login: eateryLoginId, 
+            loginId: eateryLoginId, 
             url: "www.anotherrestaurant.com",
         }
 
@@ -225,10 +225,10 @@ describe('/subscribe', () => {
 
     const eateryAccount = {
         name: "another restaurant",
-        address: 0, //fake
+        addressId: 0, //fake
         phone: "0493186858",
         email: "anotherrestaurant@gmail.com",
-        login: 0, //fake 
+        loginId: 0, //fake 
         url: "www.anotherrestaurant.com",
     }
 
@@ -255,7 +255,7 @@ describe('/subscribe', () => {
             restaurantId: eateryAccountId
         }
 
-        response = await request(app).post("/api/user/subscribe").send(subscribeData)
+        response = await request(app).put("/api/user/subscribe").send(subscribeData)
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
     })
@@ -267,10 +267,10 @@ describe('/subscribe', () => {
 
         const eateryAccount2 = {
             name: "another restaurant",
-            address: eateryAddressId,
+            addressId: eateryAddressId,
             phone: "0493186858",
             email: "anotherrestaurant@gmail.com",
-            login: 0, //fake 
+            loginId: 0, //fake 
             url: "www.anotherrestaurant.com",
         }
 
@@ -285,7 +285,7 @@ describe('/subscribe', () => {
             restaurantId: eateryAccountId
         }
 
-        response = await request(app).post("/api/user/subscribe").send(subscribeData)
+        response = await request(app).put("/api/user/subscribe").send(subscribeData)
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
 
@@ -323,17 +323,17 @@ describe("/eatery/find", () => {
 
     beforeEach(async () => {
         let  response = await request(app).post('/api/user/cuisine').send(cuisineData)
-        const cuisineId = response.body.results.insertId
+        const cuisineId = response.body.data.insertId
 
         response = await request(app).post("/api/user/address").send(addressData)
         const eateryAddressId = response.body.data.insertId
 
         const restaurantData = {
             name: "another restaurant",
-            address: eateryAddressId,
+            addressId: eateryAddressId,
             phone: "0493186858",
             email: "anotherrestaurant@gmail.com",
-            login: 0, //fake 
+            loginId: 0, //fake 
             url: "www.anotherrestaurant.com",
         }
 

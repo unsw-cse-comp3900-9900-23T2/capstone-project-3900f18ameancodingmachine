@@ -118,6 +118,7 @@ export async function createSubscribedTo(req, res) {
         const result = await insertSubscribedTo(body);
         return res.status(200).json(result);
     } catch (error) {
+        console.log(error)
         if (error.errno == 1062) {
             return res.status(409).json({
                 success: 0,
