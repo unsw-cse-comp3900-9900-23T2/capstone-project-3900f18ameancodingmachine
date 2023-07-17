@@ -32,6 +32,16 @@ export async function updateExistingDescription (data) {
     }
 }
 
+export async function getAllEateryVouchers (Id) {
+    const query = 'select * from Voucher where offeredBy = ?'
+    const value = [Id]
+    const [result] = await poolPromise.execute(query, value)
+    return {
+        success: 1,
+        results: result
+    }
+}
+
 export async function getAllCuisines () {
     const query = 'select * from Cuisines'
     const [result] = await poolPromise.execute(query)

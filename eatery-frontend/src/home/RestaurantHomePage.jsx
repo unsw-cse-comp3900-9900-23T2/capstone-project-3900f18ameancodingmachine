@@ -15,6 +15,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
+import { ListItem } from '@mui/material';
 
 const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
@@ -160,7 +161,7 @@ async function createVoucher(percentage, numVouchers, startDate, endDate, reoccu
 
   try {
     const eateryId =  await getEateryId();
-    const voucherCode = generateVoucherCode();
+    let voucherCode = generateVoucherCode();
     voucherCode += (reoccuring ? 'RE':'');
     // insert into the database
     const res = await axios.post('api/user/voucher', {
@@ -183,9 +184,24 @@ async function createVoucher(percentage, numVouchers, startDate, endDate, reoccu
 /*
  * Stub for createVoucher button
  */
-function viewVouchers() {
-  alert("viewVouchers: Pressed viewVouchers");
-  return false;
+async function viewVouchers() {
+  try {
+    const eateryId = await getEateryId();
+    const {data} = await axios.get(`api/user/eatery/vouchers/${eateryId}`);
+    const listItems = data.results.map((element) => {
+      return (
+      <><li>{element.discount}</li>
+      <li>{element.count}</li>
+      <li>{element.startOffer}</li>
+      <li>{element.endOffer}</li></>
+      )
+    })
+    return listItems
+  } catch (error) {
+    alert("something is wrong in the database")
+    console.log(error)
+  }
+  return
 }
 
 /* 

@@ -1,4 +1,4 @@
-import { createNewVoucher, getAllCuisines, getAllEateries, updateExistingDescription, createEateryAccount, createRestaurantDietary } from './restaurant.service.js'
+import { createNewVoucher, getAllCuisines, getAllEateries, updateExistingDescription, createEateryAccount, createRestaurantDietary, getAllEateryVouchers } from './restaurant.service.js'
 
 export async function createVoucher (req, res) {
     try {
@@ -26,6 +26,20 @@ export async function updateDescription (req, res) {
             success: 0,
             message: 'Database connection error'
         })
+    }
+}
+
+export async function getEateryVouchers (req, res) {
+    try {
+        const id = req.params.id;
+        const results = await getAllEateryVouchers(id)
+        return res.status(200).json(results)    
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: 'Database connection error'
+        })    
     }
 }
 
