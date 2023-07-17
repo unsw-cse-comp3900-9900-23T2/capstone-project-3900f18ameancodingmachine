@@ -16,7 +16,7 @@ export async function createNewVoucher (data) {
 
     return {
         success: 1,
-        result
+        results: result
     }
 }
 
@@ -28,7 +28,7 @@ export async function updateExistingDescription (data) {
 
     return {
         success: 1,
-        result
+        results: result
     }
 }
 
@@ -37,7 +37,7 @@ export async function getAllCuisines () {
     const [result] = await poolPromise.execute(query)
     return {
         success: 1,
-        result
+        results: result
     }
 }
 
@@ -46,7 +46,7 @@ export async function getAllEateries () {
     const [result] = await poolPromise.execute(query)
     return {
         success: 1,
-        result
+        results: result
     }
 }
 
@@ -104,6 +104,6 @@ export async function createRestaurantDietary (data) {
     const [result] = await poolPromise.execute(insertQuery, insertValues)
     return {
         success: 1,
-        result
+        results: result
     }
 }
