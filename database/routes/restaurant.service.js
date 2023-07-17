@@ -20,6 +20,12 @@ export async function createNewVoucher (data) {
     }
 }
 
+/**
+ * update description of the restaurant stored in the database
+ * @param {object} data
+ * @param {text} data.description
+ * @param {integer} data.restaurantId
+ */
 export async function updateExistingDescription (data) {
     console.log(data)
     const query = 'update EateryAccount set description = ? where id = ?'
@@ -32,6 +38,9 @@ export async function updateExistingDescription (data) {
     }
 }
 
+/**
+ * get all cuisine name
+*/
 export async function getAllCuisines () {
     const query = 'select * from Cuisines'
     const [result] = await poolPromise.execute(query)
@@ -41,6 +50,16 @@ export async function getAllCuisines () {
     }
 }
 
+/**
+ * get all eateries info/details which includes:
+ * - name
+ * - address
+ * - phone
+ * - email
+ * - url
+ * - cuisines offerred
+ * - dietary preferences provided
+*/
 export async function getAllEateries () {
     const query = 'select * from restaurantInfo'
     const [result] = await poolPromise.execute(query)
@@ -50,7 +69,16 @@ export async function getAllEateries () {
     }
 }
 
-// create new eatery account
+/**
+ * create new eatery account and store it to database
+ * just return object with message and success 0 if duplicate account exists
+ * @param {object} data
+ * @param {string} data.name
+ * @param {integer} data.addressId
+ * @param {string} data.phone
+ * @param {string} data.email
+ * @param {string} data.url
+ */
 export async function createEateryAccount (data) {
     const findQuery = 'select * from EateryAccount where name = ? and address = ? and phone = ? and email = ? and url = ?'
     const firstvalues = [data.name, data.addressId, data.phone, data.email, data.url]
@@ -73,11 +101,10 @@ export async function createEateryAccount (data) {
 }
 
 /**
- * insert new dietary into the database
+ * insert restaurant dietary into the database
  * @param {object} data
  * @param {int} data.id - eatery id
  * @param {string} data.restriction - name of the dietrary restriction
- * @returns {object} - object contain success of 1 and result of insert query
  */
 export async function createRestaurantDietary (data) {
     // find existing dietary
@@ -105,5 +132,36 @@ export async function createRestaurantDietary (data) {
     return {
         success: 1,
         results: result
+    }
+}
+
+/**
+ * insert restaurants menu item into the database
+ * @param {Object} data
+ * @param {int} data.restaurantId
+ * @param {string} data.category
+ * @param {string} data.name - name of the menu
+ * @param {float} data.price
+ * @param {string} data.description
+ */
+export async function createNewMenu (data) {
+    const findQuery = 'select id from RestaurantMenu where restaurantId = ? and name = ? and category = ?'
+    const findValue = [data.restaurantId, data.name, data.category]
+    const [findResult] = await poolPromise.execute(findQuery, findValue)
+
+    if (findResult.length === 0) {
+        return {
+            success: 0,
+            message: 'Duplicate record exist'
+        }
+    }
+
+    const insertQuery = 'insert into RestaurantMenu(restaurantId, category, name, price, description) values (?,?,?,?,?)'
+    const insertValues = [data.restaurantId, data.category, data.name, data.price, data.description]
+    const [insertResult] = await poolPromise.execute(insertQuery, insertValues)
+
+    return {
+        success: 1,
+        results: insertResult
     }
 }
