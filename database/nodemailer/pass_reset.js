@@ -27,6 +27,8 @@ export function verfiyResetCode(req, res) {
     console.log(data.code)
     const result = resetCodes.find(element => element.login === data.login);
     if (result && result.code === data.code) {
+        //remove all reset codes for user
+        resetCodes = resetCodes.filter(element => element.login != data.login);
         return res.status(200).json({
             success: 1,
             message: "Code matches"
