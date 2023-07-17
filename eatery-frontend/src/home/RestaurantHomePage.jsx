@@ -18,6 +18,8 @@ import jwt_decode from 'jwt-decode';
 
 const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
+////HELPER FUNCTIONS////
+
 // helper function to get the eatery id
 async function getEateryId() {
   const result = await axios.get('api/user/')
@@ -30,6 +32,19 @@ async function getEateryId() {
   const eateryId =  eateryRes.data.data.id
   return eateryId;
 }
+
+//TODO: fix small chance of clashes
+function generateVoucherCode() {
+  let result = '';
+  const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for ( let i = 0; i < 5; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  result += "$";
+  return result;
+}
+////////////////////////
 
 /*
  * Stub for editDescription button
@@ -145,14 +160,16 @@ async function createVoucher(percentage, numVouchers, startDate, endDate, reoccu
 
   try {
     const eateryId =  await getEateryId();
-
+    const voucherCode = generateVoucherCode();
+    voucherCode += (reoccuring ? 'RE':'');
     // insert into the database
     const res = await axios.post('api/user/voucher', {
       offeredBy: eateryId,
       discount: percentage,
       startOffer: startDate.toISOString().slice(0, 19).replace('T', ' '),
       endOffer: endDate.toISOString().slice(0, 19).replace('T', ' '),
-      count: numVouchers
+      count: numVouchers,
+      code: voucherCode
     })
 
     alert("voucher created")

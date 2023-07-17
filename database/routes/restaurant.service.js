@@ -10,8 +10,8 @@ import { pool, poolPromise } from "../db-config/db_connection.js"
  * @param {int} data.count          number of coupon generated     
  */
 export async function createNewVoucher(data) {
-    const query = `insert into Voucher(offeredBy, discount, startOffer, endOffer, count) values (?,?,?,?,?)`
-    const values = [data.offeredBy, data.discount, data.startOffer, data.endOffer, data.count]
+    const query = `insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)`
+    const values = [data.offeredBy, data.discount, data.startOffer, data.endOffer, data.count, data.code]
     const result = await poolPromise.execute(query, values)
 
     return {
