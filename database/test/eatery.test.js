@@ -14,10 +14,10 @@ afterAll((done) => {
 describe("/eatery", () => {
     const data = {
         name: "another restaurant",
-        address: 0, //fake
+        addressId: 0, //fake
         phone: "0493186858",
         email: "anotherrestaurant@gmail.com",
-        login: 0, //fake
+        loginId: 0, //fake
         url: "www.anotherrestaurant.com",
     }
 
@@ -68,10 +68,10 @@ describe("/cuisine-offer", () => {
 
     const restaurantData = {
         name: "another restaurant",
-        address: 0, //fake
+        addressId: 0, //fake
         phone: "0493186858",
         email: "anotherrestaurant@gmail.com",
-        login: 0, //fake
+        loginId: 0, //fake
         url: "www.anotherrestaurant.com",
     }
 
@@ -88,7 +88,7 @@ describe("/cuisine-offer", () => {
     test("restaurant linking to a cuisine would have statuscode 200 and success of 1", async () => {
         // make new cuisine
         let  response = await request(app).post('/api/user/cuisine').send(cuisineData)
-        const cuisineId = response.body.results.insertId
+        const cuisineId = response.body.data.insertId
         
         // create the new eatery
         response = await request(app).post('/api/user/eatery').send(restaurantData)
@@ -110,10 +110,10 @@ describe("/cuisine-offer", () => {
 describe("/hour", () => {
     const data = {
         name: "another restaurant",
-        address: 0, //fake
+        addressId: 0, //fake
         phone: "0493186858",
         email: "anotherrestaurant@gmail.com",
-        login: 0, //fake
+        loginId: 0, //fake
         url: "www.anotherrestaurant.com",
     }
 
@@ -178,10 +178,10 @@ describe("/hour", () => {
 describe('/voucher', () => {
     const restaurantData = {
         name: "another restaurant",
-        address: 0, //fake
+        addressId: 0, //fake
         phone: "0493186858",
         email: "anotherrestaurant@gmail.com",
-        login: 0, //fake
+        loginId: 0, //fake
         url: "www.anotherrestaurant.com",
     }
 
@@ -219,10 +219,10 @@ describe('/voucher', () => {
 describe("/voucher", () => {
     const restaurantData = {
         name: "another restaurant",
-        address: 0, //fake
+        addressId: 0, //fake
         phone: "0493186858",
         email: "anotherrestaurant@gmail.com",
-        login: 0, //fake
+        loginId: 0, //fake
         url: "www.anotherrestaurant.com",
     }
 
@@ -249,10 +249,10 @@ describe("/voucher", () => {
 describe("/eatery/all", () => {
     const restaurantData = {
         name: "another restaurant",
-        address: 0, //fake
+        addressId: 0, //fake
         phone: "0493186858",
         email: "anotherrestaurant@gmail.com",
-        login: 0, //fake
+        loginId: 0, //fake
         url: "www.anotherrestaurant.com",
     }
 
@@ -264,7 +264,6 @@ describe("/eatery/all", () => {
     test("getting all eateries should just return statuscode 200 and success of 1", async () => {
         let response = await request(app).post('/api/user/eatery').send(restaurantData)
         const restaurantId = response.body.results.insertId
-
         response = await request(app).get("/api/user/eatery/all").send({
             restaurantId: restaurantId,
             description: "hello there"
@@ -283,7 +282,7 @@ describe("/eatery/all", () => {
             description: "hello there"
         })
 
-        expect(response.body.result.length).toBe(1)
+        expect(response.body.results.length).toBe(1)
     })
 
 })
@@ -296,28 +295,28 @@ describe("/eatery/all", () => {
 // describe("/eatery/find", () => {
 //     const restaurantData1 = {
 //         name: "restaurant 1",
-//         address: 0, //fake
+//         addressId: 0, //fake
 //         phone: "0493186858",
 //         email: "restaurant1@gmail.com",
-//         login: 0, //fake
+//         loginId: 0, //fake
 //         url: "www.restaurant1.com",
 //     }
 
 //     const restaurantData2 = {
 //         name: "restaurant 2",
-//         address: 0, //fake
+//         addressId: 0, //fake
 //         phone: "0493186858",
 //         email: "restaurant2@gmail.com",
-//         login: 0, //fake
+//         loginId: 0, //fake
 //         url: "www.restaurant1.com",
 //     }
 
 //     const restaurantData3 = {
 //         name: "restaurant 3",
-//         address: 0, //fake
+//         addressId: 0, //fake
 //         phone: "0493186858",
 //         email: "restaurant3@gmail.com",
-//         login: 0, //fake
+//         loginId: 0, //fake
 //         url: "www.restaurant3.com",
 //     }
 
