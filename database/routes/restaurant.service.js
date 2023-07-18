@@ -9,9 +9,9 @@ import { poolPromise } from '../db-config/db_connection.js'
  * @param {date} data.endOffer      coupon ending offer
  * @param {int} data.count          number of coupon generated
  */
-export async function createNewVoucher (data) {
-    const query = 'insert into Voucher(offeredBy, discount, startOffer, endOffer, count) values (?,?,?,?,?)'
-    const values = [data.offeredBy, data.discount, data.startOffer, data.endOffer, data.count]
+export async function createNewVoucher(data) {
+    const query = `insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)`
+    const values = [data.offeredBy, data.discount, data.startOffer, data.endOffer, data.count, data.code]
     const result = await poolPromise.execute(query, values)
 
     return {
@@ -26,6 +26,16 @@ export async function updateExistingDescription (data) {
     const values = [data.description, data.restaurantId]
     const [result] = await poolPromise.execute(query, values)
 
+    return {
+        success: 1,
+        results: result
+    }
+}
+
+export async function getAllEateryVouchers (Id) {
+    const query = 'select * from Voucher where offeredBy = ?'
+    const value = [Id]
+    const [result] = await poolPromise.execute(query, value)
     return {
         success: 1,
         results: result
