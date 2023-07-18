@@ -5,7 +5,8 @@ import {
     updateExistingDescription,
     createEateryAccount,
     createRestaurantDietary,
-    createNewMenu
+    createNewMenu,
+    getMenuByRestaurantId,
 } from './restaurant.service.js'
 
 export async function createVoucher (req, res) {
@@ -105,6 +106,22 @@ export async function createMenu (req, res) {
         const result = await createNewMenu(body)
         return res.status(200).json(result)
     } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            message: 'Database connection error'
+        })
+    }
+}
+
+export async function getMenuByRestaurantId (req, res) {
+    try {
+        const id = req.params.id
+        const result = await (id)
+        if (result.success === 0) { // restaurant not found
+            return res.status(404).json(result)
+        }
+        return res.status(200).json(result)
+    } catch (error) {
         return res.status(500).json({
             success: 0,
             message: 'Database connection error'

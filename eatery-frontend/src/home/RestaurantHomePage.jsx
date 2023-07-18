@@ -57,8 +57,34 @@ async function editDescription() {
 /*
  * Stub for uploadMenu button
  */
-function uploadMenu() {
-  alert("uploadMenu: Pressed uploadMenu");
+async function uploadMenu() {
+  alert("uploadMenu: Pressed uploadMenu")
+  let category = prompt("Enter a category")
+  let name = prompt("Enter a name of the menu")
+  let price = prompt("Enter a price of the menu")
+  let desc = prompt("Enter a description for this menu")
+
+  if (isNaN(price)) {
+    return
+  }
+  
+  try {
+    const eateryId = await getEateryId()
+
+    // insert into the database
+    const res = await axios.post('api/user/menu', {
+      category: category,
+      name: name,
+      price: price,
+      description: desc,
+    })
+
+    console.log(res.data)
+    alert("upload success")
+  } catch (error) {
+    alert("something is wrong in the database")
+    console.log(error)
+  }
   return false;
 }
 

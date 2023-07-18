@@ -26,7 +26,7 @@ import {
 } from './user.controller.js'
 import express from 'express'
 import { checkToken } from '../auth/tokenvalid.js'
-import { createVoucher, getCuisines, getEateries, updateDescription, createEatery, createEateryDietary } from './restaurant.controller.js'
+import { createVoucher, getCuisines, getEateries, updateDescription, createEatery, createEateryDietary, createMenu, getMenuByRestaurantId } from './restaurant.controller.js'
 import { passwordRecovery } from '../nodemailer/config.js'
 import { verfiyResetCode } from '../nodemailer/pass_reset.js'
 
@@ -64,9 +64,11 @@ router.get('/review/:id', getReviewById)
 router.get('/cuisine/:id', getCuisineById)
 router.get('/eatery/cuisines', getCuisines)
 router.get('/eatery/:id', getEateryById)
+router.get('/menu/:id', getMenuByRestaurantId)
 router.get('/subscribe/:id', showSubscribedEateries)
 
 router.post('/voucher', createVoucher)
+router.post('/menu', createMenu)
 router.put('/eatery/description', updateDescription)
 
 // check account based on loginid

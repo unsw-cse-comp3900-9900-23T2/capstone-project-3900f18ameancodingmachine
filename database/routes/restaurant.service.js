@@ -165,3 +165,21 @@ export async function createNewMenu (data) {
         results: insertResult
     }
 }
+
+export async function getMenuByRestaurantId (id) {
+    // gets user by id
+    const query = 'select id, restaurantId, category, name, price, description from RestaurantMenu where restaurantId = ?'
+    const values = [id]
+    const [results] = await poolPromise.execute(query, values)
+
+    if (results.length === 0) {
+        return {
+            success: 0,
+            message: 'Restaurant not found'
+        }
+    }
+    return {
+        success: 1,
+        data: results[0]
+    }
+}
