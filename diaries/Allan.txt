@@ -9,3 +9,23 @@ Week 2
 Week 3
 - keep doing the proposal
 - help a bit in system architecture explaining why we use mysql as the database
+
+week 4
+- setup database connection
+- implementing several routes related to eatery account 
+- restructuring callback functions to await/async function for better readability
+
+week 5
+- implementing the logic of the user homepage and the restaurant homepage
+- encountered bug where if i send an axios request to the server, it will throw 413 error
+
+week 6
+- finally fix the bug by installing cors as well as running server and frontend in separate port
+- make unit test for database and routes to check mainly for the status code
+
+week 7
+- implement inserting business hour, post and vouchers in restaurant home page
+- made implementation for showing top n new restaurant that is recently created 
+- made filter implementation (backend) based on restaurant name, cuisine, location as well as 
+  dietary restrictions
+- plan to make a dietary routers for restaurant and user

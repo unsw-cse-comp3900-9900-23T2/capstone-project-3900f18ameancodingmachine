@@ -40,3 +40,18 @@ Wednesday 21-06
 
 Thursday 22-06
 - Made very basic login and home page setups to later be implemented
+
+Week 5
+
+Week 6
+Saturday 08-07
+- Implemented restaurant homepage with associated buttons
+
+Week 7
+Tuesday 11-07
+- Implemented more pages for use in password reset
+
+Sunday 23-07
+- Started working on designs to give the site a cleaner look
+
+Week 8

@@ -1,0 +1,5 @@
+# ignore any files related to API configuration
+.env
+
+# ignore node_modules
+node_modules/

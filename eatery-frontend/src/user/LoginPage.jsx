@@ -1,8 +1,8 @@
-import './LoginPage.css'
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import * as React from 'react';
+import axios from 'axios';
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -16,21 +16,29 @@ import Typography from '@mui/material/Typography';
  *  Checks credentials with backend, if successful set the recieved sessionID and returns true
  *  Otherwise return false
  */
-function checkCredentials(email, pass){
-  /*
-   *  If the credentials are successful set appropriate cookies for homepage
-   */
-  alert(`LoginPage.js: checkCredentials\nThe email you entered was: ${email}\nThe password you entered was: ${pass}`);
+async function checkCredentials(email, pass){
+  try {
+    const {data} = await axios.post('api/user/login', {
+      login: email,
+      password: pass
+    })
+    if (data.success) {
+      console.log("Login success!")
+      return true;
+    }
+  } catch {
+    console.log("Failed login request")
+  }
   return false;
 }
 
-function LoginForm(){
+export default function LoginForm(){
   const navigate = useNavigate();
   const [logInFail, setLogInFail] = useState(false);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     /*
@@ -38,11 +46,15 @@ function LoginForm(){
      *  If so, proceed to homepage as a logged in user
      *  Else print underneath "Incorrect Email or Password" 
      */
-    if (checkCredentials(email, password)){
+    if (await checkCredentials(email, password)){
+      console.log("success");
       navigate("/");
     };
     setLogInFail(true);
-    
+  }
+
+  const passRecovery = () =>{ 
+    navigate("/Recovery");
   }
 
  return (
@@ -73,21 +85,10 @@ function LoginForm(){
       </CardActions>
       
       <CardActions>
-        <Button size="small">Forgot Password? TODO: Modify to link to Forgot Password Page</Button>
+        <Button size="small" onClick={passRecovery}>Forgot Password?</Button>
       </CardActions>
 
     </Card>
   </Container>
-
-  )
+ );
 }
-
-function LoginPage(){  
-  return (
-    <LoginForm/>
-  );
-}
-
-
-
-export default LoginPage;
