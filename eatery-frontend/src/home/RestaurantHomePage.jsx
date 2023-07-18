@@ -15,7 +15,9 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
-import { ListItem } from '@mui/material';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 
 const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
@@ -23,9 +25,9 @@ const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
 // helper function to get the eatery id
 async function getEateryId() {
-  const result = await axios.get('api/user/')
+  const result = await axios.get('api/user/');
   let data = result.data;
-  const decrypt = jwt_decode(data.token)
+  const decrypt = jwt_decode(data.token);
   let loginId = decrypt.result.id;
 
   // get the restaurantId
@@ -184,24 +186,18 @@ async function createVoucher(percentage, numVouchers, startDate, endDate, reoccu
 /*
  * Stub for createVoucher button
  */
-async function viewVouchers() {
+async function viewVouchers(setVouchers) {
+  console.log("Viewing vouchers");
   try {
     const eateryId = await getEateryId();
     const {data} = await axios.get(`api/user/eatery/vouchers/${eateryId}`);
-    const listItems = data.results.map((element) => {
-      return (
-      <><li>{element.discount}</li>
-      <li>{element.count}</li>
-      <li>{element.startOffer}</li>
-      <li>{element.endOffer}</li></>
-      )
-    })
-    return listItems
+    console.log(data.results);
+    setVouchers(data.results);
   } catch (error) {
-    alert("something is wrong in the database")
-    console.log(error)
+    alert("something is wrong in the database");
+    console.log(error);
+    setVouchers([]);
   }
-  return
 }
 
 /* 
@@ -242,6 +238,7 @@ export default function RestaurantHomePage() {
   const [reoccuring, setReoccuring] = React.useState(true);
   const [titlePost, setTitlePost] = React.useState('');
   const [bodyPost, setBodyPost] = React.useState('');
+  const [vouchers, setVouchers] = React.useState([]);
 
   return (
     <Container maxWidth="lg">
@@ -292,8 +289,23 @@ export default function RestaurantHomePage() {
         </CardActions>
         
         <CardActions>
-          <Button size="large" onClick={() => {viewVouchers()}}>View Created Vouchers</Button>
+          <Button size="large" onClick={() => {viewVouchers(setVouchers)}}>View Created Vouchers</Button>
         </CardActions>
+
+        <CardContent>
+          <List>
+            {vouchers.map(voucher => {
+              return (
+                <ListItem>
+                  <ListItemText primary={voucher.discount} />
+                  <ListItemText primary={voucher.count} />
+                  <ListItemText primary={voucher.startOffer} />
+                  <ListItemText primary={voucher.endOffer} />
+                </ListItem>
+              );
+            })}
+          </List>
+        </CardContent>
         
       </Card>
       
