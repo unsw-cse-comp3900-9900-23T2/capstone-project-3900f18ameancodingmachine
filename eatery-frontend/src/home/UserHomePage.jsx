@@ -34,6 +34,7 @@ const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
  *  curSubs is a local array which will return the results of the function
  *  index is an int which will tell the database where to start returning subscriptions from
  *  count is an int which will tell the database how many subscriptions from index to return
+ *    if count = 0, load all ***even if index is invalid*** 
  * 
  *  If the index does not exist return an error
  *  If the count is not completeble, return as many as possible
@@ -48,25 +49,36 @@ const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
  *        loadSubscriptions(curSubs, 4, 2) => ERROR (Not sure exactly how this error should be handled)
  * 
  */
-async function loadSubscriptions(curSubs, index, count) {
-  console.log("Loading Subscriptions");
-  try {
-    const eateryId = await getEateryId();
-    // Use correct API call
-    const {data} = await axios.get(`api/user/subscriptions/`);
-    console.log(data.results);
-    setVouchers(data.results);
-  } catch (error) {
-    alert("something is wrong in the database");
-    console.log(error);
-    setVouchers([]);
+async function loadSubscriptions(setCurrentSubs, index, count) {
+  const fullyLoadedData = [
+    {name: "TempName0", cuisine: "TempCuisine0", location: "TempLocation0"},
+    {name: "TempName1", cuisine: "TempCuisine1", location: "TempLocation1"},
+    {name: "TempName2", cuisine: "TempCuisine2", location: "TempLocation2"},
+    {name: "TempName3", cuisine: "TempCuisine3", location: "TempLocation3"},
+    {name: "TempName4", cuisine: "TempCuisine4", location: "TempLocation4"},
+    {name: "TempName5", cuisine: "TempCuisine5", location: "TempLocation5"},
+    {name: "TempName6", cuisine: "TempCuisine6", location: "TempLocation6"},
+    {name: "TempName7", cuisine: "TempCuisine7", location: "TempLocation7"},
+    {name: "TempName8", cuisine: "TempCuisine8", location: "TempLocation8"},
+    {name: "TempName9", cuisine: "TempCuisine9", location: "TempLocation9"}
+  ]
+  if (count === 0) {
+    setCurrentSubs(fullyLoadedData);
+    return;
   }
+  setCurrentSubs(fullyLoadedData.slice(index, index+count));
+  return
+  
 }
 
 export default function UserHomePage() {
   // Null: not logged in, true: user, false: restaurant
   const { userContext, setUserContext } = useContext(UserContext);
+  
   const [viewSubscriptions, setViewSubscriptions] = useState(false);
+  const [currentSubs, setCurrentSubs] = useState([]);
+  const [currentSubsIndex, setCurrentSubsIndex] = useState(0);
+  const [currentSubsCount, setCurrentSubsCount] = useState(3);
 
   const [location, setLocation] = useState(null);
   const [cuisine, setCuisine] = useState(null);
@@ -91,6 +103,26 @@ export default function UserHomePage() {
     }
     checkLogin()
   }, [setUserContext])
+
+  const handleOnClickViewSubscriptions = () => {
+    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
+    setViewSubscriptions(true);
+  };
+
+  const handleOnClickRightSubscriptions = () => {
+    setCurrentSubsIndex(currentSubsIndex+3);
+    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
+  };
+
+  const handleOnClickLeftSubscriptions = () => {
+    setCurrentSubsIndex(currentSubsIndex-3);
+    if (currentSubsIndex < 0) {
+      setCurrentSubsIndex(0)
+    }
+    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
+  };
+
+
 
   return (
     <Container maxWidth="lg">
@@ -169,15 +201,22 @@ export default function UserHomePage() {
         </CardContent>
         <CardActions>
           {userContext===true && <Button variant="contained" onClick={() => {}}>View Past Bookings</Button>}
-          {userContext===true && !viewSubscriptions ? <Button variant="contained" onClick={() => {setViewSubscriptions(true)}}>View Subscriptions</Button> : <Button variant="contained" onClick={() => {setViewSubscriptions(false)}}>Hide Subscriptions</Button>}
+          {userContext===true && !viewSubscriptions ? <Button variant="contained" onClick={{handleOnClickViewSubscriptions}}>View Subscriptions</Button> : <Button variant="contained" onClick={() => {setViewSubscriptions(false)}}>Hide Subscriptions</Button>}
         </CardActions>
         {
         viewSubscriptions === true &&
-        <CardContent>
+        <CardContent sx={{bgcolor: 'lightgrey'}}>
+          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+            My Subscriptions
+          </Typography>
           <Grid container xs={12} spacing={2}>
-            <RestaurantGridItem name="Dominos" cuisine="italian" location="sydney"/>
-            <RestaurantGridItem name="Malay Chinese" cuisine="Malaysian" location="sydney"/>
-            <RestaurantGridItem name="Atom Thai" cuisine="thai" location="parrammatta"/>
+            {currentSubsIndex!==0 && <Button variant="contained" onClick={handleOnClickRightSubscriptions}>&lt;</Button>}
+            {currentSubs.map(currentSub => {
+              return (          
+                <RestaurantGridItem name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
+              );
+            })}
+            <Button variant="contained" onClick={handleOnClickLeftSubscriptions}>&gt;</Button>
           </Grid>
         </CardContent>
         }
