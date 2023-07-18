@@ -58,37 +58,37 @@ export default function LoginForm(){
   }
 
  return (
-  <Container maxWidth="md">
-    <Card sx={{ minWidth: 275 }}>
-      <CardContent>
-        <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
-          Log In
-        </Typography>
-        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          Email Address
-        </Typography>
-        <TextField required id="register-email" label="email" value={email} onChange={(event) => {
-            setEmail(event.target.value);
-          }}
-        />
-        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          Password
-        </Typography>
-        <TextField required type="password" id="register-password" label="Password" value={password} onChange={(event) => {
-            setPassword(event.target.value);
-          }}
-        />
-        {logInFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>Incorrect Email or Password</Typography> }
-      </CardContent>
-      <CardActions onClick={handleSubmit}>
-        <Button size="small">Log In</Button>
-      </CardActions>
-      
-      <CardActions>
-        <Button size="small" onClick={passRecovery}>Forgot Password?</Button>
-      </CardActions>
+  <Container maxWidth="md" sx={{bgcolor: "white"}}>
+      <Card sx={{ minWidth: 250, m: 20, border: "10px groove #61dafb"}}>
+        <CardContent>
+          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+            Log In
+          </Typography>
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            Email Address
+          </Typography>
+          <TextField fullWidth required id="register-email" label="email" value={email} onChange={(event) => {
+              setEmail(event.target.value);
+            }}
+          />
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            Password
+          </Typography>
+          <TextField fullWidth required type="password" id="register-password" label="Password" value={password} onChange={(event) => {
+              setPassword(event.target.value);
+            }}
+          />
+          {logInFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>Incorrect Email or Password</Typography> }
+        </CardContent>
+        <CardActions onClick={handleSubmit}>
+          <Button size="small">Log In</Button>
+        </CardActions>
+        
+        <CardActions>
+          <Button size="small" onClick={passRecovery}>Forgot Password?</Button>
+        </CardActions>
 
-    </Card>
+      </Card>
   </Container>
  );
 }
