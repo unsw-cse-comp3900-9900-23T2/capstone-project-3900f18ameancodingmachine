@@ -191,8 +191,13 @@ async function viewVouchers(setVouchers) {
   try {
     const eateryId = await getEateryId();
     const {data} = await axios.get(`api/user/eatery/vouchers/${eateryId}`);
-    console.log(data.results);
-    setVouchers(data.results);
+    let results = data.results;
+    //adding column titles
+    results.unshift({id: "Id", offeredBy: "offeredBy", discount: "discount(%)", startOffer: "start", endOffer: "end", count: "quantity", code: "code"})
+    if (results.length === 1) {
+      results.push({id: "N/A", offeredBy: "N/A", discount: "N/A", startOffer: "N/A", endOffer: "N/A", count: "N/A", code: "N/A"});  
+    }
+    setVouchers(results);
   } catch (error) {
     alert("something is wrong in the database");
     console.log(error);
@@ -290,17 +295,20 @@ export default function RestaurantHomePage() {
         
         <CardActions>
           <Button size="large" onClick={() => {viewVouchers(setVouchers)}}>View Created Vouchers</Button>
+          <Button size="large" onClick={() => {setVouchers([])}}>Hide Vouchers</Button>
         </CardActions>
 
         <CardContent>
           <List>
+
             {vouchers.map(voucher => {
               return (
                 <ListItem>
                   <ListItemText primary={voucher.discount} />
                   <ListItemText primary={voucher.count} />
-                  <ListItemText primary={voucher.startOffer} />
-                  <ListItemText primary={voucher.endOffer} />
+                  <ListItemText primary={voucher.code} />
+                  <ListItemText primary={voucher.startOffer.slice(0,10)} />
+                  <ListItemText primary={voucher.endOffer.slice(0,10)} />
                 </ListItem>
               );
             })}
