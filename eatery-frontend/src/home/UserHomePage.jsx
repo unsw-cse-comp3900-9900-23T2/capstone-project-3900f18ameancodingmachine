@@ -49,7 +49,7 @@ const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
  *        loadSubscriptions(curSubs, 4, 2) => ERROR (Not sure exactly how this error should be handled)
  * 
  */
-async function loadSubscriptions(setCurrentSubs, index, count) {
+function loadSubscriptions(setCurrentSubs, index, count) {
   const fullyLoadedData = [
     {name: "TempName0", cuisine: "TempCuisine0", location: "TempLocation0"},
     {name: "TempName1", cuisine: "TempCuisine1", location: "TempLocation1"},
@@ -67,7 +67,7 @@ async function loadSubscriptions(setCurrentSubs, index, count) {
     return;
   }
   setCurrentSubs(fullyLoadedData.slice(index, index+count));
-  return
+  return;
   
 }
 
@@ -104,21 +104,25 @@ export default function UserHomePage() {
     checkLogin()
   }, [setUserContext])
 
-  const handleOnClickViewSubscriptions = () => {
+  useEffect(() => {
+    /*
+     *  Whenever the currentSubsIndex is toggled, load subscriptions with current index
+     */
+    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
+  }, [currentSubsIndex]);
+
+  function handleOnClickViewSubscriptions(){
     loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
     setViewSubscriptions(true);
   };
 
-  const handleOnClickRightSubscriptions = () => {
-    setCurrentSubsIndex(currentSubsIndex+3);
+  function handleOnClickRightSubscriptions(){
+    setCurrentSubsIndex((prevIndex) => prevIndex + 3);
     loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
   };
 
-  const handleOnClickLeftSubscriptions = () => {
-    setCurrentSubsIndex(currentSubsIndex-3);
-    if (currentSubsIndex < 0) {
-      setCurrentSubsIndex(0)
-    }
+  function handleOnClickLeftSubscriptions(){
+    setCurrentSubsIndex((prevIndex) => Math.max(prevIndex - 3, 0))
     loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
   };
 
@@ -201,7 +205,8 @@ export default function UserHomePage() {
         </CardContent>
         <CardActions>
           {userContext===true && <Button variant="contained" onClick={() => {}}>View Past Bookings</Button>}
-          {userContext===true && !viewSubscriptions ? <Button variant="contained" onClick={{handleOnClickViewSubscriptions}}>View Subscriptions</Button> : <Button variant="contained" onClick={() => {setViewSubscriptions(false)}}>Hide Subscriptions</Button>}
+          {userContext===true && !viewSubscriptions && <Button variant="contained" onClick={handleOnClickViewSubscriptions}>View Subscriptions</Button>}
+          {userContext===true && viewSubscriptions && <Button variant="contained" onClick={() => {setViewSubscriptions(false)}}>Hide Subscriptions</Button>}
         </CardActions>
         {
         viewSubscriptions === true &&
@@ -209,14 +214,14 @@ export default function UserHomePage() {
           <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
             My Subscriptions
           </Typography>
-          <Grid container xs={12} spacing={2}>
-            {currentSubsIndex!==0 && <Button variant="contained" onClick={handleOnClickRightSubscriptions}>&lt;</Button>}
+          <Grid container xs={12} spacing={1} sx={{gridGap: -10}}>
+            {currentSubsIndex !==0 && <Button variant="contained" onClick={handleOnClickLeftSubscriptions}>&lt;</Button>}
             {currentSubs.map(currentSub => {
               return (          
                 <RestaurantGridItem name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
               );
             })}
-            <Button variant="contained" onClick={handleOnClickLeftSubscriptions}>&gt;</Button>
+            {currentSubs.length === 3 && <Button variant="contained" onClick={handleOnClickRightSubscriptions}>&gt;</Button>}
           </Grid>
         </CardContent>
         }
