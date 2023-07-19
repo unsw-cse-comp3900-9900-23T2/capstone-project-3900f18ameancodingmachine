@@ -8,6 +8,7 @@ import {
     insertSubscribedTo,
     getUsers,
     getUserByUserId,
+    getUserByLoginId,
     getLoginByUsername,
     insertNewCuisineName,
     insertCuisineFromRestaurant,
@@ -151,6 +152,23 @@ export async function getUserById (req, res) {
     try {
         const id = req.params.id
         const result = await getUserByUserId(id)
+        if (result.success === 0) { // user not found
+            return res.status(404).json(result)
+        }
+        return res.status(200).json(result)
+    } catch (error) {
+        return res.status(500).json({
+            success: 0,
+            message: 'Database connection error'
+        })
+    }
+}
+
+// get user by login id
+export async function getUserByLogin (req, res) {
+    try {
+        const id = req.params.id
+        const result = await getUserByLoginId(id)
         if (result.success === 0) { // user not found
             return res.status(404).json(result)
         }
