@@ -32,6 +32,40 @@ export async function updateExistingDescription (data) {
     }
 }
 
+//////////for search//////////////
+export async function getEateriesByCuisine (data) {
+    const query = 'select * from restaurantCuisines where cuisine = ?'
+    const values = [data.cuisine]
+    const [result] = await poolPromise.execute(query, values)
+
+    return {
+        success: 1,
+        results: result
+    }
+}
+
+export async function getEateriesByDiet (data) {
+    const query = 'select * from restaurantProvideDietaries where restriction = ?'
+    const values = [data.dietary]
+    const [result] = await poolPromise.execute(query, values)
+
+    return {
+        success: 1,
+        results: result
+    }
+}
+
+export async function getEateriesByCuisine (data) {
+    const query = 'select * from restaurantCuisines where cuisine = ?'
+    const values = [data.cuisine]
+    const [result] = await poolPromise.execute(query, values)
+
+    return {
+        success: 1,
+        results: result
+    }
+}
+
 export async function getAllEateryVouchers (Id) {
     const query = 'select * from Voucher where offeredBy = ?'
     const value = [Id]
@@ -59,6 +93,7 @@ export async function getAllEateries () {
         results: result
     }
 }
+
 
 // create new eatery account
 export async function createEateryAccount (data) {
