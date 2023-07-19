@@ -28,10 +28,12 @@ export default function RestaurantPost(props) {
         userId: userId,
         restaurantId: restaurantId
       })
+      console.log("subscribed")
       setIsSubscribed(true);
     } catch (error) {
       if (error.response.status === 409) {
         console.log("already subscribed")
+        setIsSubscribed(true);
       } else {
         console.log(error) 
       }
@@ -42,7 +44,16 @@ export default function RestaurantPost(props) {
    *  Function to unsubscribe user
    */
   async function userUnSubscribe() {
-    setIsSubscribed(false);
+    try {
+      await axios.put('api/user/unsubscribe', {
+        userId: userId,
+        restaurantId: restaurantId
+      })
+      console.log("unsubscribed")
+      setIsSubscribed(false);
+    } catch (error) {
+      console.log(error) 
+    }
   }
 
 
