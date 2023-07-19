@@ -44,7 +44,7 @@ function ForgotPassNewPass(){
      *  It sets isPassMatch and returns the same value
      */
     function checkPassMatch(newPass, checkNewPass){
-        if (newPass == checkNewPass) {
+        if (newPass === checkNewPass) {
             setIsPassMatch(true);
             return true
         }

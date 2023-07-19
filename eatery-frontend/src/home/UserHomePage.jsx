@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
@@ -17,6 +17,26 @@ import { UserContext } from '../App.jsx';
 import RestaurantPost from './RestaurantPost'
 import jwt_decode from 'jwt-decode';
 import axios from 'axios';
+
+import {LoadScript, Autocomplete as MapAutoComplete } from "@react-google-maps/api";
+
+const LocationAutocomplete = ({ apiKey, onPlaceChanged }) => {
+  const autocompleteRef = useRef(null);
+
+  return (
+    <MapAutoComplete
+      onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+      onPlaceChanged={() => {
+        if (autocompleteRef.current !== null) {
+          const place = autocompleteRef.current.getPlace();
+          onPlaceChanged(place);
+        }
+      }}
+    >
+      <input type="text" placeholder="Enter a location" />
+    </MapAutoComplete>
+  );
+};
 
 // get all of the restaurant and the cuisines from the database
 const n = 4 // change the number depending on the requirements
@@ -183,18 +203,9 @@ export default function UserHomePage() {
             </Grid>
             <Grid container xs={12} spacing={2}>
               <Grid xs={4}>
-                <Autocomplete
-                  id="location-dropdown"
-                  value={location}
-                  options={["sydney", "melbourne", "adelaide"]}
-                  getOptionLabel={(option) => option.title}
-                  onChange={(event, newValue) => {
-                    setLocation(newValue);
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Location" />
-                  )}
-                />
+                <LoadScript googleMapsApiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"} libraries={["places"]}>
+                  <LocationAutocomplete apiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"} onPlaceChanged={setLocation} />
+                </LoadScript>
               </Grid>
               <Grid xs={4}>
                 <Autocomplete
