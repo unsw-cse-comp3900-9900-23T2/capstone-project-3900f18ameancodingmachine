@@ -28,6 +28,7 @@ const eateries = getEateries.data.results
 // top n eateries account that is recently created
 // since eatery id is auto increment, sort by id in descending order
 const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
+let loginId
 
 const getUserSubscribers = async() => {
   try {
@@ -45,10 +46,24 @@ const getUserSubscribers = async() => {
     return subscribedEateries
   } catch (error) {
     console.log(error)
+    return [
+      {name: "TempName0", cuisine: "TempCuisine0", location: "TempLocation0"},
+      {name: "TempName1", cuisine: "TempCuisine1", location: "TempLocation1"},
+      {name: "TempName2", cuisine: "TempCuisine2", location: "TempLocation2"},
+      {name: "TempName3", cuisine: "TempCuisine3", location: "TempLocation3"},
+      {name: "TempName4", cuisine: "TempCuisine4", location: "TempLocation4"},
+      {name: "TempName5", cuisine: "TempCuisine5", location: "TempLocation5"},
+      {name: "TempName6", cuisine: "TempCuisine6", location: "TempLocation6"},
+      {name: "TempName7", cuisine: "TempCuisine7", location: "TempLocation7"},
+      {name: "TempName8", cuisine: "TempCuisine8", location: "TempLocation8"},
+      {name: "TempName9", cuisine: "TempCuisine9", location: "TempLocation9"},
+      {name: "TempName10", cuisine: "TempCuisine8", location: "TempLocation8"},
+      {name: "TempName11", cuisine: "TempCuisine9", location: "TempLocation9"}
+    ]
   }
 }
 
-const eateriesSubscribed = await getUserSubscribers()
+let eateriesSubscribed = []
 
 /*
  * TODO: Stub for loadSubscriptions button
@@ -70,22 +85,9 @@ const eateriesSubscribed = await getUserSubscribers()
  *        loadSubscriptions(curSubs, 4, 2) => ERROR (Not sure exactly how this error should be handled)
  * 
  */
-function loadSubscriptions(setCurrentSubs, index, count) {
+async function loadSubscriptions(setCurrentSubs, index, count) {
   let fullyLoadedData = eateriesSubscribed
-  // const fullyLoadedData = [
-  //   {name: "TempName0", cuisine: "TempCuisine0", location: "TempLocation0"},
-  //   {name: "TempName1", cuisine: "TempCuisine1", location: "TempLocation1"},
-  //   {name: "TempName2", cuisine: "TempCuisine2", location: "TempLocation2"},
-  //   {name: "TempName3", cuisine: "TempCuisine3", location: "TempLocation3"},
-  //   {name: "TempName4", cuisine: "TempCuisine4", location: "TempLocation4"},
-  //   {name: "TempName5", cuisine: "TempCuisine5", location: "TempLocation5"},
-  //   {name: "TempName6", cuisine: "TempCuisine6", location: "TempLocation6"},
-  //   {name: "TempName7", cuisine: "TempCuisine7", location: "TempLocation7"},
-  //   {name: "TempName8", cuisine: "TempCuisine8", location: "TempLocation8"},
-  //   {name: "TempName9", cuisine: "TempCuisine9", location: "TempLocation9"},
-  //   {name: "TempName10", cuisine: "TempCuisine8", location: "TempLocation8"},
-  //   {name: "TempName11", cuisine: "TempCuisine9", location: "TempLocation9"}
-  // ]
+  
   if (count === 0) {
     setCurrentSubs(fullyLoadedData);
     return;
@@ -116,6 +118,9 @@ export default function UserHomePage() {
         const result = await axios.get('api/user/'); // use checkToken as middleware to verify token
         let data = result.data;
         if (data.success !== 0) {
+          const decrypt = jwt_decode(data.token)
+          loginId = decrypt.result.id;
+          eateriesSubscribed = await getUserSubscribers()
           setUserContext(true)
           console.log("is logged in")
         }
