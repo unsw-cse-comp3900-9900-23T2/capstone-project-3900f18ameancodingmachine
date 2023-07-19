@@ -60,7 +60,9 @@ function loadSubscriptions(setCurrentSubs, index, count) {
     {name: "TempName6", cuisine: "TempCuisine6", location: "TempLocation6"},
     {name: "TempName7", cuisine: "TempCuisine7", location: "TempLocation7"},
     {name: "TempName8", cuisine: "TempCuisine8", location: "TempLocation8"},
-    {name: "TempName9", cuisine: "TempCuisine9", location: "TempLocation9"}
+    {name: "TempName9", cuisine: "TempCuisine9", location: "TempLocation9"},
+    {name: "TempName10", cuisine: "TempCuisine8", location: "TempLocation8"},
+    {name: "TempName11", cuisine: "TempCuisine9", location: "TempLocation9"}
   ]
   if (count === 0) {
     setCurrentSubs(fullyLoadedData);
@@ -210,12 +212,12 @@ export default function UserHomePage() {
         </CardActions>
         {
         viewSubscriptions === true &&
-        <CardContent sx={{bgcolor: 'lightgrey'}}>
+        <CardContent sx={{bgcolor: '#FAFAFA', border: "10px groove #61dafb"}}>
           <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
             My Subscriptions
           </Typography>
           <Grid sx={{alignSelf: 'center'}} container spacing={2}>
-            {currentSubsIndex !== 0 ? <Button variant="contained" onClick={handleOnClickLeftSubscriptions}>&lt;</Button> : <Button variant="contained" sx={{visibility:'hidden'}} >&lt;</Button>}
+            {currentSubsIndex !== 0 ? <Button variant="contained" onClick={handleOnClickLeftSubscriptions} sx={{minHeight: 295}}>&lt;</Button> : <Button variant="contained" sx={{visibility:'hidden'}} >&lt;</Button>}
             {currentSubs.map(currentSub => {
               return (     
                 <SubscriptionGridItem name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
@@ -275,7 +277,7 @@ function RestaurantGridItem(props) {
 
 function SubscriptionGridItem(props) {
   return (
-    <Grid xs={3.3} spacing={2}>
+    <Grid xs={3.33} spacing={2}>
       <RestaurantPost key={props.id} name={props.name} cuisine={props.cuisine} location={props.location} />
     </Grid>
   );
