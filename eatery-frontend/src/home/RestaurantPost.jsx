@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { useState} from 'react';
+
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -12,6 +14,24 @@ import paella from './paella.jpg'
 
 
 export default function RestaurantPost(props) {
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  /*  TODO
+   *  Function to subscribe user
+   *  I believe you should be able to use the props variable to pass in an id to access the correct voucher 
+   */
+  async function userSubscribe() {
+    setIsSubscribed(true);
+  }
+  
+  /*  TODO
+   *  Function to unsubscribe user
+   */
+  async function userUnSubscribe() {
+    setIsSubscribed(false);
+  }
+
+
   return (
     <Container maxWidth="sm">
       <Card sx={{ minWidth: 100 }}>
@@ -32,6 +52,7 @@ export default function RestaurantPost(props) {
         <CardActions>
           <Button size="small">Share</Button>
           <Button size="small">Learn More</Button>
+          {isSubscribed ? <Button size="small" onClick={userUnSubscribe}>Unsub</Button> : <Button size="small" onClick={userSubscribe}>Sub</Button>}
         </CardActions>
       </Card>
     </Container>
