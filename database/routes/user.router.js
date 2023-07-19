@@ -4,6 +4,7 @@ import {
     createUser,
     getAllUsers,
     getUserById,
+    getUserByLogin,
     login,
     getPostById,
     getReviewById,
@@ -72,6 +73,7 @@ router.put('/eatery/description', updateDescription)
 // check account based on loginid
 router.get('/eatery/login/:id', getEateryByLogin)
 router.get('/eatery/vouchers/:id', getEateryVouchers)
+router.get('/login/:id', getUserByLogin)
 
 // Password reset
 router.post('/reset', passwordRecovery)

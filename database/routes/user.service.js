@@ -60,6 +60,16 @@ export async function getUsers () {
     }
 }
 
+export async function getUserByLoginId (id) {
+    // gets all users
+    const query = 'select id, first, last, login, address from UserAccount where login = ?'
+    const [results] = await poolPromise.execute(query, [id])
+    return {
+        success: 1,
+        data: results
+    }
+}
+
 export async function getUserByUserId (id) {
     // gets user by id
     const query = 'select id, first, last, login, address from UserAccount where id = ?'
@@ -236,7 +246,10 @@ export async function resetPassword (data) {
 }
 
 export async function findSubscribedEateriesFromUserId (id) {
-    const query = 'select * from userSubscription where userId = ?'
+    const query = 'select \
+    restaurantId, name, street, \
+    suburb, region, postcode, phone, email, url, cuisine \
+    from userSubscription where userId = ?'
     const value = [id]
     const [results] = await poolPromise.execute(query, value)
     return {
@@ -347,8 +360,10 @@ export async function getAllDietaries () {
     }
 }
 
-// find restaurant based on restaurant name, cuisine, location (suburb)
-// as well as dietary restrictions
+/**
+ * find restaurant based on restaurant name, cuisine, location (suburb)
+ * as well as dietary restrictions
+*/
 export async function getEateryByFilter (data) {
     console.log(data)
     let query = 'select * from restaurantInfo where'

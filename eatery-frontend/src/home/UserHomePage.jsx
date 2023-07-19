@@ -15,7 +15,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { UserContext } from '../App.jsx';
 import RestaurantPost from './RestaurantPost'
-
+import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 
 // get all of the restaurant and the cuisines from the database
@@ -28,6 +28,27 @@ const eateries = getEateries.data.results
 // top n eateries account that is recently created
 // since eatery id is auto increment, sort by id in descending order
 const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
+
+const getUserSubscribers = async() => {
+  try {
+    let result = await axios.get('api/user/')
+    let data = result.data;
+    const decrypt = jwt_decode(data.token)
+    const loginId = decrypt.result.id;
+    
+    result = await axios.get(`api/user/login/${loginId}`)
+    const userId = result.data.data[0].id
+
+    result = await axios.get(`api/user/subscribe/${userId}`)
+    let subscribedEateries = result.data.data
+    subscribedEateries = subscribedEateries.map(eatery => ({name: eatery.name, cuisine: eatery.cuisine || "not added", location: eatery.suburb}))
+    return subscribedEateries
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const eateriesSubscribed = await getUserSubscribers()
 
 /*
  * TODO: Stub for loadSubscriptions button
@@ -50,20 +71,21 @@ const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
  * 
  */
 function loadSubscriptions(setCurrentSubs, index, count) {
-  const fullyLoadedData = [
-    {name: "TempName0", cuisine: "TempCuisine0", location: "TempLocation0"},
-    {name: "TempName1", cuisine: "TempCuisine1", location: "TempLocation1"},
-    {name: "TempName2", cuisine: "TempCuisine2", location: "TempLocation2"},
-    {name: "TempName3", cuisine: "TempCuisine3", location: "TempLocation3"},
-    {name: "TempName4", cuisine: "TempCuisine4", location: "TempLocation4"},
-    {name: "TempName5", cuisine: "TempCuisine5", location: "TempLocation5"},
-    {name: "TempName6", cuisine: "TempCuisine6", location: "TempLocation6"},
-    {name: "TempName7", cuisine: "TempCuisine7", location: "TempLocation7"},
-    {name: "TempName8", cuisine: "TempCuisine8", location: "TempLocation8"},
-    {name: "TempName9", cuisine: "TempCuisine9", location: "TempLocation9"},
-    {name: "TempName10", cuisine: "TempCuisine8", location: "TempLocation8"},
-    {name: "TempName11", cuisine: "TempCuisine9", location: "TempLocation9"}
-  ]
+  let fullyLoadedData = eateriesSubscribed
+  // const fullyLoadedData = [
+  //   {name: "TempName0", cuisine: "TempCuisine0", location: "TempLocation0"},
+  //   {name: "TempName1", cuisine: "TempCuisine1", location: "TempLocation1"},
+  //   {name: "TempName2", cuisine: "TempCuisine2", location: "TempLocation2"},
+  //   {name: "TempName3", cuisine: "TempCuisine3", location: "TempLocation3"},
+  //   {name: "TempName4", cuisine: "TempCuisine4", location: "TempLocation4"},
+  //   {name: "TempName5", cuisine: "TempCuisine5", location: "TempLocation5"},
+  //   {name: "TempName6", cuisine: "TempCuisine6", location: "TempLocation6"},
+  //   {name: "TempName7", cuisine: "TempCuisine7", location: "TempLocation7"},
+  //   {name: "TempName8", cuisine: "TempCuisine8", location: "TempLocation8"},
+  //   {name: "TempName9", cuisine: "TempCuisine9", location: "TempLocation9"},
+  //   {name: "TempName10", cuisine: "TempCuisine8", location: "TempLocation8"},
+  //   {name: "TempName11", cuisine: "TempCuisine9", location: "TempLocation9"}
+  // ]
   if (count === 0) {
     setCurrentSubs(fullyLoadedData);
     return;
