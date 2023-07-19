@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useState} from 'react';
+import { useState } from 'react';
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -15,12 +15,23 @@ import axios from 'axios';
 
 
 export default function RestaurantPost(props) {
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  // to preserve the state on whether the user has subscribed or not
+  // store the state in key-value pair where key -> subscribe(userId)(restaurantId)
   const restaurantId = props.id
   const userId = props.user
+  const mainKey = `subscribe`
+  const uid = mainKey.concat('', userId, restaurantId)
+
+  const [isSubscribed, setIsSubscribed] = useState(() => {
+    const subscribedState = localStorage.getItem(uid)
+    if (subscribedState !== null) {
+      return subscribedState
+    }
+    return false;
+  });
+
   /*  TODO
    *  Function to subscribe user
-   *  I believe you should be able to use the props variable to pass in an id to access the correct voucher 
    */
   async function userSubscribe() {
     try {
@@ -29,18 +40,18 @@ export default function RestaurantPost(props) {
         restaurantId: restaurantId
       })
       console.log("subscribed")
-      setIsSubscribed(true);
+      setIsSubscribed(true)
+      localStorage.setItem(uid, true)
     } catch (error) {
       if (error.response.status === 409) {
-        console.log("already subscribed")
-        setIsSubscribed(true);
+        alert("already subscribed")
       } else {
         console.log(error) 
       }
     }
   }
   
-  /*  TODO
+  /*
    *  Function to unsubscribe user
    */
   async function userUnSubscribe() {
@@ -50,7 +61,8 @@ export default function RestaurantPost(props) {
         restaurantId: restaurantId
       })
       console.log("unsubscribed")
-      setIsSubscribed(false);
+      setIsSubscribed(false)
+      localStorage.setItem(uid, false)
     } catch (error) {
       console.log(error) 
     }
