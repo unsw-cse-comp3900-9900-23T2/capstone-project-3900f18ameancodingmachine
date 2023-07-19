@@ -214,11 +214,11 @@ export default function UserHomePage() {
           <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
             My Subscriptions
           </Typography>
-          <Grid container xs={12} spacing={1} sx={{gridGap: -10}}>
-            {currentSubsIndex !==0 && <Button variant="contained" onClick={handleOnClickLeftSubscriptions}>&lt;</Button>}
+          <Grid sx={{alignSelf: 'center'}} container spacing={2}>
+            {currentSubsIndex !== 0 ? <Button variant="contained" onClick={handleOnClickLeftSubscriptions}>&lt;</Button> : <Button variant="contained" sx={{visibility:'hidden'}} >&lt;</Button>}
             {currentSubs.map(currentSub => {
-              return (          
-                <RestaurantGridItem name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
+              return (     
+                <SubscriptionGridItem name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
               );
             })}
             {currentSubs.length === 3 && <Button variant="contained" onClick={handleOnClickRightSubscriptions}>&gt;</Button>}
@@ -268,6 +268,14 @@ export default function UserHomePage() {
 function RestaurantGridItem(props) {
   return (
     <Grid xs={4} spacing={2}>
+      <RestaurantPost key={props.id} name={props.name} cuisine={props.cuisine} location={props.location} />
+    </Grid>
+  );
+}
+
+function SubscriptionGridItem(props) {
+  return (
+    <Grid xs={3.3} spacing={2}>
       <RestaurantPost key={props.id} name={props.name} cuisine={props.cuisine} location={props.location} />
     </Grid>
   );
