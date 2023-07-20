@@ -33,9 +33,9 @@ export async function updateExistingDescription (data) {
 }
 
 //////////for search//////////////
-export async function getEateriesByCuisine (data) {
-    const query = 'select * from restaurantCuisines where cuisine = ?'
-    const values = [data.cuisine]
+export async function getEateriesBySearchString (string) {
+    const query = 'select * from restaurantInfo where diet regexp ?'
+    const values = [string]
     const [result] = await poolPromise.execute(query, values)
 
     return {
@@ -44,9 +44,9 @@ export async function getEateriesByCuisine (data) {
     }
 }
 
-export async function getEateriesByDiet (data) {
-    const query = 'select * from restaurantProvideDietaries where restriction = ?'
-    const values = [data.dietary]
+export async function getEateriesByDiet (diet) {
+    const query = 'select * from restaurantInfo where diet = ?'
+    const values = [diet]
     const [result] = await poolPromise.execute(query, values)
 
     return {
@@ -55,9 +55,9 @@ export async function getEateriesByDiet (data) {
     }
 }
 
-export async function getEateriesByCuisine (data) {
-    const query = 'select * from restaurantCuisines where cuisine = ?'
-    const values = [data.cuisine]
+export async function getEateriesByCuisine (cuisine) {
+    const query = 'select * from restaurantInfo where cuisine = ?'
+    const values = [cuisine]
     const [result] = await poolPromise.execute(query, values)
 
     return {

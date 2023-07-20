@@ -1,4 +1,6 @@
-import { createNewVoucher, getAllCuisines, getAllEateries, updateExistingDescription, createEateryAccount, createRestaurantDietary, getAllEateryVouchers } from './restaurant.service.js'
+import { getEateriesBySearchString, getEateriesByDiet, getEateriesByCuisine, createNewVoucher, getAllCuisines, getAllEateries, updateExistingDescription, createEateryAccount, createRestaurantDietary, getAllEateryVouchers } from './restaurant.service.js'
+import axios from 'axios'
+import 'dotenv/config';
 
 export async function createVoucher (req, res) {
     try {
@@ -83,6 +85,64 @@ export async function createEatery (req, res) {
             success: 0,
             message: 'Database conenction error'
         })
+    }
+}
+
+//use google's distance matrix API
+async function getDistanceBetweenAddresses(address1, address2) {
+    try {
+      const response = await axios.get(
+        'https://maps.googleapis.com/maps/api/distancematrix/json',
+        {
+          params: {
+            origins: address1,
+            destinations: address2,
+            key: process.env.GOOGLE_API_KEY,
+          },
+        }
+      )
+  
+      const distance = response.data.rows[0].elements[0].distance.value/1000
+      return distance
+    } catch (error) {
+      console.error('Error fetching distance:', error.message)
+      return -1
+    }
+}
+
+//search functionality
+export async function getSearchResults(req, res) {
+    try {
+        const body = req.params
+        let cuisineMatch = []
+        let dietMatch = []
+        //
+        if (body.cuisine) {
+            cuisineMatch = (await getEateriesByCuisine(body.cuisine)).results;
+        }
+        //
+        if (body.diet) {
+            dietMatch = (await getEateriesByDiet(body.diet)).results;
+        }
+        let intersection = []
+
+        if (cuisineMatch.length >= 0 && dietMatch.length >= 0) {
+            intersection = cuisineMatch.filter(element => dietMatch.find(element2 => element2.id === element.id))
+        } else {
+            intersection = cuisineMatch.length >= dietMatch.length ? cuisineMatch : dietMatch
+        }
+
+        const result = intersection.filter(async element => await getDistanceBetweenAddresses((element.street + ', ' + element.suburb + ', ' + element.region), body.address) <= body.distance)
+        return res.status(200).json({
+            success: 1,
+            results: result
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: 'Database conenction error'
+        }) 
     }
 }
 
