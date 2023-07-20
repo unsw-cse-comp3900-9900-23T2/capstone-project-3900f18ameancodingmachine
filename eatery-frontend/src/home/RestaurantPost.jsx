@@ -49,6 +49,7 @@ export default function RestaurantPost(props) {
       console.log("subscribed")
       setIsSubscribed(true)
       localStorage.setItem(uid, true)
+      window.location.reload(false)
     } catch (error) {
       if (error.response.status === 409) {
         alert("already subscribed")
@@ -70,6 +71,7 @@ export default function RestaurantPost(props) {
       console.log("unsubscribed")
       setIsSubscribed(false)
       localStorage.removeItem(uid)
+      window.location.reload(false)
     } catch (error) {
       console.log(error) 
     }
