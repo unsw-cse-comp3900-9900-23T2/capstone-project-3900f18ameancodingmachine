@@ -19,6 +19,8 @@ async function logOut(setUserContext) {
       console.log('reset to null');
       setUserContext(null); // Reset user context
     }
+    // reload page to re-render
+    window.location.reload(false)
   } catch (err) {
     console.log(err.response)
   }

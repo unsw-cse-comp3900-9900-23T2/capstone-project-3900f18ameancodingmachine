@@ -43,7 +43,7 @@ function EmailEntry(){
 
  return (
   <Container maxWidth="md">
-    <Card sx={{ minWidth: 275 }}>
+    <Card sx={{ maxWidth: 500, m: 10, border: "10px inset #61dafb", bgcolor: "#F5F5F5"}}>
       <CardContent>
         <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
           Password Recovery
@@ -51,15 +51,15 @@ function EmailEntry(){
         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
           Enter Email Address
         </Typography>
-        <TextField required id="register-email" label="email" value={email} onChange={(event) => {
+        <TextField sx={{bgcolor: "white"}} required id="register-email" label="email" value={email} onChange={(event) => {
             setEmail(event.target.value);
           }}
         />
-      {resetFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>"No account created with this email"</Typography> }
+      {resetFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>No account created with this email</Typography> }
       </CardContent>
       
       <CardActions>
-        <Button size="small" onClick={handleSubmit}>Recover Password</Button>
+        <Button size="small" onClick={handleSubmit} sx={{maxWidth: 200, bgcolor: "white", borderRadius: '4px'}}>Recover Password</Button>
       </CardActions>
 
     </Card>
