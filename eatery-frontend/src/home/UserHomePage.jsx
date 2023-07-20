@@ -33,36 +33,24 @@ let userId
 
 const getUserSubscribers = async() => {
   try {
-    let result = await axios.get('api/user/')
-    let data = result.data;
-    const decrypt = jwt_decode(data.token)
-    const loginId = decrypt.result.id;
-
-    result = await axios.get(`api/user/subscribe/${userId}`)
+    const result = await axios.get(`api/user/subscribe/${userId}`)
     let subscribedEateries = result.data.data
-    subscribedEateries = subscribedEateries.map(eatery => ({key: eatery.restaurantId, user:userId, id: eatery.restaurantId, name: eatery.name, cuisine: eatery.cuisine || "not added", location: eatery.suburb}))
+    subscribedEateries = subscribedEateries.map(eatery => ({
+      key: eatery.restaurantId, 
+      user:userId, 
+      id: eatery.restaurantId, 
+      name: eatery.name, 
+      cuisine: eatery.cuisine || "not added", 
+      location: eatery.suburb
+    }))
     return subscribedEateries
   } catch (error) {
     console.log(error)
-    return [
-      {id: 1, name: "TempName0", cuisine: "TempCuisine0", location: "TempLocation0"},
-      {id: 2, name: "TempName1", cuisine: "TempCuisine1", location: "TempLocation1"},
-      {id: 3, name: "TempName2", cuisine: "TempCuisine2", location: "TempLocation2"},
-      {id: 4, name: "TempName3", cuisine: "TempCuisine3", location: "TempLocation3"},
-      {id: 5, name: "TempName4", cuisine: "TempCuisine4", location: "TempLocation4"},
-      {id: 6, name: "TempName5", cuisine: "TempCuisine5", location: "TempLocation5"},
-      {id: 7, name: "TempName6", cuisine: "TempCuisine6", location: "TempLocation6"},
-      {id: 8, name: "TempName7", cuisine: "TempCuisine7", location: "TempLocation7"},
-      {id: 9, name: "TempName8", cuisine: "TempCuisine8", location: "TempLocation8"},
-      {id: 10, name: "TempName9", cuisine: "TempCuisine9", location: "TempLocation9"},
-      {id: 11, name: "TempName10", cuisine: "TempCuisine8", location: "TempLocation8"},
-      {id: 12, name: "TempName11", cuisine: "TempCuisine9", location: "TempLocation9"}
-    ]
   }
 }
 
 let eateriesSubscribed = []
-
+let latestEateriesArr = []
 /*
  * TODO: Stub for loadSubscriptions button
  *  curSubs is a local array which will return the results of the function
@@ -83,7 +71,7 @@ let eateriesSubscribed = []
  *        loadSubscriptions(curSubs, 4, 2) => ERROR (Not sure exactly how this error should be handled)
  * 
  */
-async function loadSubscriptions(setCurrentSubs, index, count) {
+function loadSubscriptions(setCurrentSubs, index, count) {
   let fullyLoadedData = eateriesSubscribed
   console.log(fullyLoadedData)
   if (count === 0) {
@@ -95,6 +83,22 @@ async function loadSubscriptions(setCurrentSubs, index, count) {
   
 }
 
+async function getLatestEateries()  {
+  const getEateries = await axios.get('api/user/eatery/all')
+  const eateries = getEateries.data.results
+  let newEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
+
+  newEateries = newEateries.map(eatery => ({
+    key: eatery.id, 
+    user: userId || null, 
+    id: eatery.id, 
+    name: eatery.name, 
+    cuisine: eatery.cuisine || "not added", 
+    location: eatery.suburb
+  }))
+  return newEateries
+}
+
 export default function UserHomePage() {
   // Null: not logged in, true: user, false: restaurant
   const { userContext, setUserContext } = useContext(UserContext);
@@ -104,6 +108,8 @@ export default function UserHomePage() {
   const [currentSubsIndex, setCurrentSubsIndex] = useState(0);
   const [currentSubsCount, setCurrentSubsCount] = useState(3);
 
+  const [newRestaurants, setNewRestaurants] = useState([])
+
   const [location, setLocation] = useState(null);
   const [cuisine, setCuisine] = useState(null);
   const [dietary, setDietary] = useState(null);
@@ -111,7 +117,7 @@ export default function UserHomePage() {
   useEffect(() => {
     /* check whether user has a token
     if user has a token, user is logged in */
-    async function checkLogin() {
+    async function loading() {
       try {
         const result = await axios.get('api/user/'); // use checkToken as middleware to verify token
         let data = result.data;
@@ -128,9 +134,12 @@ export default function UserHomePage() {
         // error when checking token using checktoken
         setUserContext(null);
         console.log("Not logged in")
-      } 
+      }
+      
+      latestEateriesArr = await getLatestEateries()
+      setNewRestaurants(latestEateriesArr)
     }
-    checkLogin()
+    loading()
   }, [setUserContext])
 
   useEffect(() => {
@@ -274,7 +283,7 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              {latestEateries.map((restaurant) => <RestaurantGridItem key={restaurant.id} id={restaurant.id} user={userId} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.suburb || restaurant.region}/>)}
+              {newRestaurants.map((restaurant) => <RestaurantGridItem key={restaurant.id} id={restaurant.id} user={userId} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.suburb || restaurant.region}/>)}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>

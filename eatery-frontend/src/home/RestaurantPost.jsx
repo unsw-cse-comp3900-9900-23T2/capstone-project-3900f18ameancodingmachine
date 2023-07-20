@@ -22,12 +22,13 @@ export default function RestaurantPost(props) {
   const mainKey = `subscribe`
   const uid = mainKey.concat('', userId, restaurantId)
 
+  // localStorage.removeItem(uid)
+  // console.log(props)
+  // console.log(localStorage.getItem(uid))
+
   const [isSubscribed, setIsSubscribed] = useState(() => {
     const subscribedState = localStorage.getItem(uid)
-    if (subscribedState !== null) {
-      return subscribedState
-    }
-    return false;
+    return subscribedState ? subscribedState : false
   });
 
   /*  TODO
@@ -68,7 +69,7 @@ export default function RestaurantPost(props) {
       })
       console.log("unsubscribed")
       setIsSubscribed(false)
-      localStorage.setItem(uid, false)
+      localStorage.removeItem(uid)
     } catch (error) {
       console.log(error) 
     }
