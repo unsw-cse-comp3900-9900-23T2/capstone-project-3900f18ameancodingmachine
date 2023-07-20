@@ -73,7 +73,7 @@ function ForgotPassNewPass(){
     
     return (
         <Container maxWidth="md">
-            <Card sx={{ minWidth: 275 }}>
+            <Card sx={{ maxWidth: 500, m: 10, border: "10px inset #61dafb", bgcolor: "#F5F5F5"}}>
                 <CardContent>
                 <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
                     Code Entry
@@ -81,14 +81,14 @@ function ForgotPassNewPass(){
                 <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                     Enter New Password
                 </Typography>
-                <TextField required id="set-newPass" label="Password" value={newPass} onChange={(event) => {
+                <TextField sx={{bgcolor: "white"}} required id="set-newPass" label="Password" value={newPass} onChange={(event) => {
                     setNewPass(event.target.value);
                     }}
                 />
                 <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                     Re-Enter New Password
                 </Typography>
-                <TextField required id="set-checkNewPass" label="Re-Enter Password" value={checkNewPass} onChange={(event) => {
+                <TextField sx={{bgcolor: "white"}} required id="set-checkNewPass" label="Re-Enter Password" value={checkNewPass} onChange={(event) => {
                     setCheckNewPass(event.target.value);
                     }}
                 />
@@ -96,7 +96,7 @@ function ForgotPassNewPass(){
                 {!isPassStrong && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>Password length must be atleast 8 with 1 uppercase and lowercase character aswell as 1 number and symbol</Typography> }
                 </CardContent>
                 <CardActions>
-                <Button size="small" onClick={handleSubmit}>Submit Code</Button>
+                <Button size="small" onClick={handleSubmit} sx={{maxWidth: 200, bgcolor: "white", borderRadius: '4px'}}>Submit Code</Button>
                 </CardActions>
 
             </Card>

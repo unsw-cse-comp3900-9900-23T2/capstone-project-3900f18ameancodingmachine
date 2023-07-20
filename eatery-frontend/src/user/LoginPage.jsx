@@ -58,37 +58,38 @@ export default function LoginForm(){
   }
 
  return (
-  <Container maxWidth="md">
-    <Card sx={{ minWidth: 275 }}>
-      <CardContent>
-        <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
-          Log In
-        </Typography>
-        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          Email Address
-        </Typography>
-        <TextField required id="register-email" label="email" value={email} onChange={(event) => {
-            setEmail(event.target.value);
-          }}
-        />
-        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          Password
-        </Typography>
-        <TextField required type="password" id="register-password" label="Password" value={password} onChange={(event) => {
-            setPassword(event.target.value);
-          }}
-        />
-        {logInFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>Incorrect Email or Password</Typography> }
-      </CardContent>
-      <CardActions onClick={handleSubmit}>
-        <Button size="small">Log In</Button>
-      </CardActions>
-      
-      <CardActions>
-        <Button size="small" onClick={passRecovery}>Forgot Password?</Button>
-      </CardActions>
+  <Container maxWidth="md" sx={{bgcolor: "white"}}>
+      <Card sx={{ maxWidth: 500, m: 10, border: "10px inset #61dafb", bgcolor: "#F5F5F5"}}>
+        <CardContent>
+          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+            Log In
+          </Typography>
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            Email Address
+          </Typography>
+          <TextField sx={{bgcolor: "white"}} fullWidth required id="register-email" label="email" value={email} onChange={(event) => {
+              setEmail(event.target.value);
+            }}
+          />
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            Password
+          </Typography>
+          <TextField sx={{bgcolor: "white"}} fullWidth required type="password" id="register-password" label="Password" value={password} onChange={(event) => {
+              setPassword(event.target.value);
+            }}
+          />
+          {logInFail && <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>Incorrect Email or Password</Typography> }
+        </CardContent>
 
-    </Card>
+        <CardActions >
+          <Button size="small" sx={{maxWidth: 150, bgcolor: "white", borderRadius: '4px'}} onClick={handleSubmit}>Log In</Button>
+        </CardActions>
+        
+        <CardActions>
+          <Button size="small" sx={{maxWidth: 200, bgcolor: "white", borderRadius: '4px'}} onClick={passRecovery}>Forgot Password?</Button>
+        </CardActions>
+
+      </Card>
   </Container>
  );
 }
