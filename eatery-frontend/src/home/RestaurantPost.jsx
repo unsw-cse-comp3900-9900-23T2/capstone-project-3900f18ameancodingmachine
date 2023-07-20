@@ -34,6 +34,12 @@ export default function RestaurantPost(props) {
    *  Function to subscribe user
    */
   async function userSubscribe() {
+
+    if (!userId) {
+      alert("need to sign in first")
+      return 
+    }
+    
     try {
       await axios.put('api/user/subscribe', {
         userId: userId,
