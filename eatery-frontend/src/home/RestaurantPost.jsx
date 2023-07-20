@@ -95,7 +95,7 @@ export default function RestaurantPost(props) {
         <CardActions>
           <Button size="small">Share</Button>
           <Button size="small">Learn More</Button>
-          {isSubscribed ? <Button size="small" onClick={userUnSubscribe}>Unsub</Button> : <Button size="small" onClick={userSubscribe}>Sub</Button>}
+          {userId && (isSubscribed ? <Button size="small" onClick={userUnSubscribe}>Unsub</Button> : <Button size="small" onClick={userSubscribe}>Sub</Button>)}
         </CardActions>
       </Card>
     </Container>
