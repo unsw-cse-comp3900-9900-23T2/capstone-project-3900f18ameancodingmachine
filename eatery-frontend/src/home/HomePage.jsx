@@ -1,4 +1,5 @@
 import { useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Container from '@mui/material/Container';
 
@@ -11,6 +12,7 @@ import { UserContext } from '../App.jsx';
 export default function HomePage() {
   // Null: not logged in, true: user, false: restaurant
   const { userContext, setUserContext } = useContext(UserContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function checkCookies() {
@@ -33,7 +35,8 @@ export default function HomePage() {
           console.log("set to true")
           setUserContext(true);
         } else { // not loggedIn
-          setUserContext(null)
+          setUserContext(null);
+          navigate("/");
           console.log("Not logged in");
         }
       }
@@ -45,7 +48,7 @@ export default function HomePage() {
     // Defaults to User Home Page if not logged in
     <Container maxWidth="lg">
       {userContext === false  && <RestaurantHomePage/>}
-      {userContext !== false && <UserHomePage/>}
+      {userContext === true && <UserHomePage/>}
     </Container>
   );
 }
