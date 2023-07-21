@@ -171,7 +171,7 @@ export default function UserHomePage() {
   function handleOnClickBrowse(){
     //location, cuisine, dietary
     //const url = "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
-    const url = "/browse/"+search+"/"+location+"/"+cuisine+"/"+dietary;
+    const url = "/browse/"+search+"/"+location+"/"+cuisine.name+"/"+dietary;
     navigate(url);
 
   };
