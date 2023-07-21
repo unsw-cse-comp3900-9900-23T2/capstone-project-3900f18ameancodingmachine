@@ -64,6 +64,7 @@ export default function Browse(){
     const {state} = useLocation();
     const search = state.search;
     const location = state.location;
+    const distance = state.distance;
     const cuisine = state.cuisine;
     const dietary = state.dietary;
     

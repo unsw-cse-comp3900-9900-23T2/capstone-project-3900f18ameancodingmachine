@@ -112,6 +112,7 @@ export default function UserHomePage() {
   const [newRestaurants, setNewRestaurants] = useState([])
 
   const [location, setLocation] = useState(null);
+  const [maxDistance, setMaxDistance] = useState(null);
   const [cuisine, setCuisine] = useState(null);
   const [dietary, setDietary] = useState(null);
   const [search, setSearch] = useState(null);
@@ -173,7 +174,7 @@ export default function UserHomePage() {
     //const url = "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
 
     const cuisineName = (cuisine != null) ? cuisine.name : 'null';
-    navigate("/browse", {state: { search: search, location: location, cuisine: cuisineName, dietary: dietary}} );
+    navigate("/browse", {state: { search: search, location: location, cuisine: cuisineName, dietary: dietary, distance: maxDistance}} );
 
   };
 
@@ -249,11 +250,15 @@ export default function UserHomePage() {
                   )}
                 />
               </Grid>
+              <Grid xs={4}>
+                <TextField onChange={(event, newValue) => {setMaxDistance(newValue)}} label="Distance" />
+              </Grid>
               <Grid xs={2}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker />
                 </LocalizationProvider>
               </Grid>
+              
             </Grid>
           </Grid>
         </CardContent>
