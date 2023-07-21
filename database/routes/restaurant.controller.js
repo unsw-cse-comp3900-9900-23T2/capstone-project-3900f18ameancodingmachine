@@ -88,7 +88,7 @@ export async function createEatery (req, res) {
     }
 }
 
-//use google's distance matrix API
+//use google's distance matrix API to obtain distance in km
 async function getDistanceBetweenAddresses(address1, address2) {
     try {
       const response = await axios.get(
@@ -114,25 +114,23 @@ async function getDistanceBetweenAddresses(address1, address2) {
 export async function getSearchResults(req, res) {
     try {
         const body = req.params
-        let cuisineMatch = []
-        let dietMatch = []
-        //
-        if (body.cuisine) {
-            cuisineMatch = (await getEateriesByCuisine(body.cuisine)).results;
-        }
-        //
-        if (body.diet) {
-            dietMatch = (await getEateriesByDiet(body.diet)).results;
-        }
-        let intersection = []
+        
+        let cuisineMatch = (await getEateriesByCuisine(body.cuisine)).results
+        let dietMatch = (await getEateriesByDiet(body.diet)).results
+        let stringMatch = (await getEateriesBySearchString(body.searchString))    
 
-        if (cuisineMatch.length >= 0 && dietMatch.length >= 0) {
-            intersection = cuisineMatch.filter(element => dietMatch.find(element2 => element2.id === element.id))
-        } else {
-            intersection = cuisineMatch.length >= dietMatch.length ? cuisineMatch : dietMatch
+        const intersection = cuisineMatch.filter(
+            cuisineElement => {
+                const cuisineId = cuisineElement.id;
+                return dietMatch.some(dietElement => dietElement.id === cuisineId)
+                    && stringMatch.some(stringElement => stringElement.id === cuisineId)
+            }
+        )
+        let result = intersection
+        //address only works if distance is also provided
+        if (body.address && body.distance) {   
+            result = intersection.filter(async element => await getDistanceBetweenAddresses((element.street + ', ' + element.suburb + ', ' + element.region), body.address) <= body.distance)
         }
-
-        const result = intersection.filter(async element => await getDistanceBetweenAddresses((element.street + ', ' + element.suburb + ', ' + element.region), body.address) <= body.distance)
         return res.status(200).json({
             success: 1,
             results: result

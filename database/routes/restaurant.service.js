@@ -34,8 +34,12 @@ export async function updateExistingDescription (data) {
 
 //////////for search//////////////
 export async function getEateriesBySearchString (string) {
-    const query = 'select * from restaurantInfo where diet regexp ?'
-    const values = [string]
+    const query = 'select * from restaurantInfo where name regexp ?'
+    const values = [string];
+    if (!string) {
+        query = 'select * from restaurantInfo';
+        values = [];
+    }
     const [result] = await poolPromise.execute(query, values)
 
     return {
@@ -47,6 +51,10 @@ export async function getEateriesBySearchString (string) {
 export async function getEateriesByDiet (diet) {
     const query = 'select * from restaurantInfo where diet = ?'
     const values = [diet]
+    if (!diet) {
+        query = 'select * from restaurantInfo';
+        values = [];
+    }
     const [result] = await poolPromise.execute(query, values)
 
     return {
@@ -58,6 +66,10 @@ export async function getEateriesByDiet (diet) {
 export async function getEateriesByCuisine (cuisine) {
     const query = 'select * from restaurantInfo where cuisine = ?'
     const values = [cuisine]
+    if (!cuisine) {
+        query = 'select * from restaurantInfo';
+        values = [];
+    }
     const [result] = await poolPromise.execute(query, values)
 
     return {
@@ -65,6 +77,7 @@ export async function getEateriesByCuisine (cuisine) {
         results: result
     }
 }
+//////////////////
 
 export async function getAllEateryVouchers (Id) {
     const query = 'select * from Voucher where offeredBy = ?'
