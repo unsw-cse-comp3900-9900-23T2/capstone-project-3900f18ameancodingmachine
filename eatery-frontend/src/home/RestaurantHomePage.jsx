@@ -294,8 +294,8 @@ export default function RestaurantHomePage() {
         </CardActions>
         
         <CardActions>
-          <Button size="large" onClick={() => {viewVouchers(setVouchers)}}>View Created Vouchers</Button>
-          <Button size="large" onClick={() => {setVouchers([])}}>Hide Vouchers</Button>
+          { vouchers.length == 0 && <Button size="large" onClick={() => {viewVouchers(setVouchers)}}>View Created Vouchers</Button> }
+          { vouchers.length > 0 && <Button size="large" onClick={() => {setVouchers([])}}>Hide Vouchers</Button> }
         </CardActions>
 
         <CardContent>
