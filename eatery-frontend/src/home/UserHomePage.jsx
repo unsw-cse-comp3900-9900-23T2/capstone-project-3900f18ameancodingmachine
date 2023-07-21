@@ -114,6 +114,7 @@ export default function UserHomePage() {
   const [location, setLocation] = useState(null);
   const [cuisine, setCuisine] = useState(null);
   const [dietary, setDietary] = useState(null);
+  const [search, setSearch] = useState(null);
 
   const navigate = useNavigate();
 
@@ -170,7 +171,7 @@ export default function UserHomePage() {
   function handleOnClickBrowse(){
     //location, cuisine, dietary
     //const url = "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
-    const url = "/browse/"+location+"/"+cuisine+"/"+dietary;
+    const url = "/browse/"+search+"/"+location+"/"+cuisine+"/"+dietary;
     navigate(url);
 
   };
@@ -191,6 +192,9 @@ export default function UserHomePage() {
                   id="restaurant-search"
                   freeSolo
                   options={["maccas", "kfc", "Dominos"]}
+                  onChange={(event, newValue) => {
+                    setSearch(newValue);
+                  }}
                   renderInput={(params) => <TextField {...params} label="Restaurant Search" />}
                 />
               </Grid>

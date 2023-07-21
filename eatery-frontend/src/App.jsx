@@ -31,7 +31,7 @@ export default function App() {
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/create-restaurant" element={<RestaurantRegistrationPage />} />
           {/*<Route path="/browse?location=:location&cuisine=:cuisine&dietary=:dietary" element={<Browse/>}/>*/}
-          <Route path="/browse/:location/:cuisine/:dietary" element={<Browse/>}/>
+          <Route path="/browse/:search/:location/:cuisine/:dietary" element={<Browse/>}/>
 
         </Routes>
       </UserContext.Provider>
