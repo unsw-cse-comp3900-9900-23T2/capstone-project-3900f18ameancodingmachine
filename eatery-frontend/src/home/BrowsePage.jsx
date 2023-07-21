@@ -41,7 +41,7 @@ const getUserSubscribers = async() => {
  *
  */
 function loadResults(search, location, cuisine, dietary) {
-    //alert("loadResults: This should load entries from database based on\n"+search+" "+location+" "+cuisine+" "+dietary)
+    alert("loadResults: This should load entries from database based on\n"+search+" "+location+" "+cuisine+" "+dietary);
     //Temporary data
     return([
         {name: "TempName0", cuisine: "TempCuisine0", location: "TempLocation0"},
@@ -61,10 +61,11 @@ function loadResults(search, location, cuisine, dietary) {
 export default function Browse(){
 
     //Grab the variables from url for use later
-    const {search} = useParams();
-    const {location} = useParams();
-    const {cuisine} = useParams();
-    const {dietary} = useParams();
+    const {state} = useLocation();
+    const search = state.search;
+    const location = state.location;
+    const cuisine = state.cuisine;
+    const dietary = state.dietary;
     
     const results = loadResults(search, location, cuisine, dietary)
 
