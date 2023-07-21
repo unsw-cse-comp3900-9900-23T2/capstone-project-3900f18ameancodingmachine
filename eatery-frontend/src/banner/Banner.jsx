@@ -43,7 +43,7 @@ export default function Banner() {
             aria-label="menu"
             sx={{ mr: 2 }}
             component={NavLink}
-            to="/"
+            to="/home"
           >
             <HomeOutlinedIcon />
           </IconButton>
