@@ -23,7 +23,8 @@ import {
     showSubscribedEateries,
     getEateryFiltered,
     forgottenPasswordReset,
-    createUserDietary
+    createUserDietary,
+    deleteSubscribedTo
 } from './user.controller.js'
 import express from 'express'
 import { checkToken } from '../auth/tokenvalid.js'
@@ -59,6 +60,7 @@ router.post('/hour', createBusinessHour)
 router.post('/posts', createEateryPosts)
 router.post('/reviews', createUserReviews)
 router.put('/subscribe', createSubscribedTo)
+router.put('/unsubscribe', deleteSubscribedTo)
 
 router.get('/post/:id', getPostById)
 router.get('/review/:id', getReviewById)

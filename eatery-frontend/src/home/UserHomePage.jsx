@@ -1,4 +1,5 @@
 import { useState, useContext, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
@@ -43,48 +44,34 @@ const n = 4 // change the number depending on the requirements
 const getCuisine = await axios.get('api/user/eatery/cuisines')
 const cuisines = getCuisine.data.results
 const getEateries = await axios.get('api/user/eatery/all')
-console.log(getEateries)
+
 const eateries = getEateries.data.results
 // top n eateries account that is recently created
 // since eatery id is auto increment, sort by id in descending order
 const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
 let loginId
+let userId
 
 const getUserSubscribers = async() => {
   try {
-    let result = await axios.get('api/user/')
-    let data = result.data;
-    const decrypt = jwt_decode(data.token)
-    const loginId = decrypt.result.id;
-    
-    result = await axios.get(`api/user/login/${loginId}`)
-    const userId = result.data.data[0].id
-
-    result = await axios.get(`api/user/subscribe/${userId}`)
+    const result = await axios.get(`api/user/subscribe/${userId}`)
     let subscribedEateries = result.data.data
-    subscribedEateries = subscribedEateries.map(eatery => ({name: eatery.name, cuisine: eatery.cuisine || "not added", location: eatery.suburb}))
+    subscribedEateries = subscribedEateries.map(eatery => ({
+      key: eatery.restaurantId, 
+      user:userId, 
+      id: eatery.restaurantId, 
+      name: eatery.name, 
+      cuisine: eatery.cuisine || "not added", 
+      location: eatery.suburb
+    }))
     return subscribedEateries
   } catch (error) {
     console.log(error)
-    return [
-      {name: "TempName0", cuisine: "TempCuisine0", location: "TempLocation0"},
-      {name: "TempName1", cuisine: "TempCuisine1", location: "TempLocation1"},
-      {name: "TempName2", cuisine: "TempCuisine2", location: "TempLocation2"},
-      {name: "TempName3", cuisine: "TempCuisine3", location: "TempLocation3"},
-      {name: "TempName4", cuisine: "TempCuisine4", location: "TempLocation4"},
-      {name: "TempName5", cuisine: "TempCuisine5", location: "TempLocation5"},
-      {name: "TempName6", cuisine: "TempCuisine6", location: "TempLocation6"},
-      {name: "TempName7", cuisine: "TempCuisine7", location: "TempLocation7"},
-      {name: "TempName8", cuisine: "TempCuisine8", location: "TempLocation8"},
-      {name: "TempName9", cuisine: "TempCuisine9", location: "TempLocation9"},
-      {name: "TempName10", cuisine: "TempCuisine8", location: "TempLocation8"},
-      {name: "TempName11", cuisine: "TempCuisine9", location: "TempLocation9"}
-    ]
   }
 }
 
 let eateriesSubscribed = []
-
+let latestEateriesArr = []
 /*
  * TODO: Stub for loadSubscriptions button
  *  curSubs is a local array which will return the results of the function
@@ -105,9 +92,9 @@ let eateriesSubscribed = []
  *        loadSubscriptions(curSubs, 4, 2) => ERROR (Not sure exactly how this error should be handled)
  * 
  */
-async function loadSubscriptions(setCurrentSubs, index, count) {
+function loadSubscriptions(setCurrentSubs, index, count) {
   let fullyLoadedData = eateriesSubscribed
-  
+  console.log(fullyLoadedData)
   if (count === 0) {
     setCurrentSubs(fullyLoadedData);
     return;
@@ -115,6 +102,22 @@ async function loadSubscriptions(setCurrentSubs, index, count) {
   setCurrentSubs(fullyLoadedData.slice(index, index+count));
   return;
   
+}
+
+async function getLatestEateries()  {
+  const getEateries = await axios.get('api/user/eatery/all')
+  const eateries = getEateries.data.results
+  let newEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
+
+  newEateries = newEateries.map(eatery => ({
+    key: eatery.id, 
+    user: userId || null, 
+    id: eatery.id, 
+    name: eatery.name, 
+    cuisine: eatery.cuisine || "not added", 
+    location: eatery.suburb
+  }))
+  return newEateries
 }
 
 export default function UserHomePage() {
@@ -126,20 +129,28 @@ export default function UserHomePage() {
   const [currentSubsIndex, setCurrentSubsIndex] = useState(0);
   const [currentSubsCount, setCurrentSubsCount] = useState(3);
 
+  const [newRestaurants, setNewRestaurants] = useState([])
+
   const [location, setLocation] = useState(null);
+  const [maxDistance, setMaxDistance] = useState(null);
   const [cuisine, setCuisine] = useState(null);
   const [dietary, setDietary] = useState(null);
+  const [search, setSearch] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     /* check whether user has a token
     if user has a token, user is logged in */
-    async function checkLogin() {
+    async function loading() {
       try {
         const result = await axios.get('api/user/'); // use checkToken as middleware to verify token
         let data = result.data;
         if (data.success !== 0) {
           const decrypt = jwt_decode(data.token)
           loginId = decrypt.result.id;
+          const getUserId = await axios.get(`api/user/login/${loginId}`)
+          userId = getUserId.data.data[0].id
           eateriesSubscribed = await getUserSubscribers()
           setUserContext(true)
           console.log("is logged in")
@@ -148,9 +159,12 @@ export default function UserHomePage() {
         // error when checking token using checktoken
         setUserContext(null);
         console.log("Not logged in")
-      } 
+      }
+      
+      latestEateriesArr = await getLatestEateries()
+      setNewRestaurants(latestEateriesArr)
     }
-    checkLogin()
+    loading()
   }, [setUserContext])
 
   useEffect(() => {
@@ -175,6 +189,15 @@ export default function UserHomePage() {
     loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
   };
 
+  function handleOnClickBrowse(){
+    //location, cuisine, dietary
+    //const url = "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
+
+    const cuisineName = (cuisine != null) ? cuisine.name : 'null';
+    navigate("/browse", {state: { search: search, location: location, cuisine: cuisineName, dietary: dietary, distance: maxDistance}} );
+
+  };
+
 
   //TODO: have to remove the api code
   return (
@@ -191,11 +214,14 @@ export default function UserHomePage() {
                   id="restaurant-search"
                   freeSolo
                   options={["maccas", "kfc", "Dominos"]}
+                  onChange={(event, newValue) => {
+                    setSearch(newValue);
+                  }}
                   renderInput={(params) => <TextField {...params} label="Restaurant Search" />}
                 />
               </Grid>
               <Grid xs={2}>
-                <Button variant="contained" onClick={() => {}}>Browse</Button>
+                <Button variant="contained" onClick={handleOnClickBrowse}>Browse</Button>
               </Grid>
               <Grid xs={2}>
                 <Button variant="contained" onClick={() => {}}>Random</Button>
@@ -235,11 +261,15 @@ export default function UserHomePage() {
                   )}
                 />
               </Grid>
+              <Grid xs={4}>
+                <TextField onChange={(event, newValue) => {setMaxDistance(newValue)}} label="Distance" />
+              </Grid>
               <Grid xs={2}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker />
                 </LocalizationProvider>
               </Grid>
+              
             </Grid>
           </Grid>
         </CardContent>
@@ -258,7 +288,7 @@ export default function UserHomePage() {
             {currentSubsIndex !== 0 ? <Button variant="contained" onClick={handleOnClickLeftSubscriptions} sx={{minHeight: 295}}>&lt;</Button> : <Button variant="contained" sx={{visibility:'hidden'}} >&lt;</Button>}
             {currentSubs.map(currentSub => {
               return (     
-                <SubscriptionGridItem name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
+                <SubscriptionGridItem key={currentSub.id} user={userId} id={currentSub.id} name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
               );
             })}
             {currentSubs.length === 3 && <Button variant="contained" onClick={handleOnClickRightSubscriptions}>&gt;</Button>}
@@ -285,8 +315,7 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              {/* region is used instead of location, might change later */}
-              {latestEateries.map((restaurant) => <RestaurantGridItem key={restaurant.id} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.suburb || restaurant.region}/>)}
+              {newRestaurants.map((restaurant) => <RestaurantGridItem key={restaurant.id} id={restaurant.id} user={userId} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.suburb || restaurant.region}/>)}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
@@ -308,7 +337,7 @@ export default function UserHomePage() {
 function RestaurantGridItem(props) {
   return (
     <Grid xs={4} spacing={2}>
-      <RestaurantPost key={props.id} name={props.name} cuisine={props.cuisine} location={props.location} />
+      <RestaurantPost key={props.id} id={props.id} user={props.user} name={props.name} cuisine={props.cuisine} location={props.location} />
     </Grid>
   );
 }
@@ -316,7 +345,7 @@ function RestaurantGridItem(props) {
 function SubscriptionGridItem(props) {
   return (
     <Grid xs={3.33} spacing={2}>
-      <RestaurantPost key={props.id} name={props.name} cuisine={props.cuisine} location={props.location} />
+      <RestaurantPost key={props.id} id={props.id} user={props.user} name={props.name} cuisine={props.cuisine} location={props.location} />
     </Grid>
   );
 }

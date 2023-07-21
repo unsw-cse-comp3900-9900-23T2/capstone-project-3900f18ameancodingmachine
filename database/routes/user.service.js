@@ -234,6 +234,16 @@ export async function insertSubscribedTo (data) {
     }
 }
 
+export async function removeSubscribedTo (data) {
+    const query = `delete from SubscribedTo where userId = ? and restaurantId = ?`
+    const value = [data.userId, data.restaurantId]
+    const [results] = await poolPromise.execute(query, value)
+    return {
+        success: 1,
+        data: results
+    }
+}
+
 // used for password recovery
 export async function resetPassword (data) {
     const query = 'update LoginInfo set password = ? where login = ?'

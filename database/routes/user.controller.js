@@ -21,7 +21,8 @@ import {
     getEateryByFilter,
     findSubscribedEateriesFromUserId,
     resetPassword,
-    getAllDietaries
+    getAllDietaries,
+    removeSubscribedTo
 } from './user.service.js'
 import crypto from 'crypto'
 import pkg from 'jsonwebtoken'
@@ -129,6 +130,24 @@ export async function createSubscribedTo (req, res) {
             success: 0,
             message: 'Database connection error'
         })
+    }
+}
+
+export async function deleteSubscribedTo (req, res) {
+    try {
+        try {
+            const body = req.body
+            const result = await removeSubscribedTo(body)
+            return res.status(200).json(result)
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({
+                success: 0,
+                message: 'Database connection error'
+            })
+        }
+    } catch (error) {
+        
     }
 }
 
