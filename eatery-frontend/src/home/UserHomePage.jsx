@@ -19,6 +19,7 @@ import RestaurantPost from './RestaurantPost'
 import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 
+<<<<<<< HEAD
 import {LoadScript, Autocomplete as MapAutoComplete } from "@react-google-maps/api";
 
 const LocationAutocomplete = ({ apiKey, onPlaceChanged }) => {
@@ -40,17 +41,13 @@ const LocationAutocomplete = ({ apiKey, onPlaceChanged }) => {
 };
 
 // get all of the restaurant and the cuisines from the database
+=======
+>>>>>>> main
 const n = 4 // change the number depending on the requirements
-const getCuisine = await axios.get('api/user/eatery/cuisines')
-const cuisines = getCuisine.data.results
-const getEateries = await axios.get('api/user/eatery/all')
 
-const eateries = getEateries.data.results
-// top n eateries account that is recently created
-// since eatery id is auto increment, sort by id in descending order
-const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
 let loginId
 let userId
+let eateriesSubscribed = []
 
 const getUserSubscribers = async() => {
   try {
@@ -70,8 +67,6 @@ const getUserSubscribers = async() => {
   }
 }
 
-let eateriesSubscribed = []
-let latestEateriesArr = []
 /*
  * TODO: Stub for loadSubscriptions button
  *  curSubs is a local array which will return the results of the function
@@ -106,7 +101,13 @@ function loadSubscriptions(setCurrentSubs, index, count) {
 
 async function getLatestEateries()  {
   const getEateries = await axios.get('api/user/eatery/all')
-  const eateries = getEateries.data.results
+  let eateries = getEateries.data.results
+  eateries = eateries.filter((eatery, index) => {
+    // filter duplicate value based on their id on whether it matches
+    // the array index
+    return eateries.findIndex((e) => e.id === eatery.id) === index;
+  })
+  console.log(eateries)
   let newEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
 
   newEateries = newEateries.map(eatery => ({
@@ -130,6 +131,7 @@ export default function UserHomePage() {
   const [currentSubsCount, setCurrentSubsCount] = useState(3);
 
   const [newRestaurants, setNewRestaurants] = useState([])
+  const [cuisineList, setCuisineList] = useState([])
 
   const [location, setLocation] = useState(null);
   const [maxDistance, setMaxDistance] = useState(null);
@@ -160,8 +162,11 @@ export default function UserHomePage() {
         setUserContext(null);
         console.log("Not logged in")
       }
-      
-      latestEateriesArr = await getLatestEateries()
+
+      const getCuisine = await axios.get('api/user/eatery/cuisines')
+      const cuisines = getCuisine.data.results
+      setCuisineList(cuisines)
+      let latestEateriesArr = await getLatestEateries()
       setNewRestaurants(latestEateriesArr)
     }
     loading()
@@ -238,7 +243,7 @@ export default function UserHomePage() {
                 <Autocomplete
                   id="cuisine-dropdown"
                   value={cuisine}
-                  options={cuisines}
+                  options={cuisineList}
                   getOptionLabel={(option) => option.name}
                   onChange={(event, newValue) => {
                     setCuisine(newValue);
@@ -285,10 +290,10 @@ export default function UserHomePage() {
           <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
             My Subscriptions
           </Typography>
-          <Grid sx={{alignSelf: 'center'}} container spacing={2}>
+          <Grid sx={{alignSelf: 'center', minHeight: 350}} container spacing={2}>
             {currentSubsIndex !== 0 ? <Button variant="contained" onClick={handleOnClickLeftSubscriptions} sx={{minHeight: 295}}>&lt;</Button> : <Button variant="contained" sx={{visibility:'hidden'}} >&lt;</Button>}
             {currentSubs.map(currentSub => {
-              return (     
+              return ( 
                 <SubscriptionGridItem key={currentSub.id} user={userId} id={currentSub.id} name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
               );
             })}
@@ -316,7 +321,7 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              {newRestaurants.map((restaurant) => <RestaurantGridItem key={restaurant.id} id={restaurant.id} user={userId} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.suburb || restaurant.region}/>)}
+              {newRestaurants.map((restaurant) => <RestaurantGridItem key={restaurant.id} id={restaurant.id} user={userId} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.location || "unknown"}/>)}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
