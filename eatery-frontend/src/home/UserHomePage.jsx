@@ -1,4 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'
 
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
@@ -112,8 +113,12 @@ export default function UserHomePage() {
   const [newRestaurants, setNewRestaurants] = useState([])
 
   const [location, setLocation] = useState(null);
+  const [maxDistance, setMaxDistance] = useState(null);
   const [cuisine, setCuisine] = useState(null);
   const [dietary, setDietary] = useState(null);
+  const [search, setSearch] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     /* check whether user has a token
@@ -165,6 +170,15 @@ export default function UserHomePage() {
     loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
   };
 
+  function handleOnClickBrowse(){
+    //location, cuisine, dietary
+    //const url = "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
+
+    const cuisineName = (cuisine != null) ? cuisine.name : 'null';
+    navigate("/browse", {state: { search: search, location: location, cuisine: cuisineName, dietary: dietary, distance: maxDistance}} );
+
+  };
+
 
 
   return (
@@ -181,11 +195,14 @@ export default function UserHomePage() {
                   id="restaurant-search"
                   freeSolo
                   options={["maccas", "kfc", "Dominos"]}
+                  onChange={(event, newValue) => {
+                    setSearch(newValue);
+                  }}
                   renderInput={(params) => <TextField {...params} label="Restaurant Search" />}
                 />
               </Grid>
               <Grid xs={2}>
-                <Button variant="contained" onClick={() => {}}>Browse</Button>
+                <Button variant="contained" onClick={handleOnClickBrowse}>Browse</Button>
               </Grid>
               <Grid xs={2}>
                 <Button variant="contained" onClick={() => {}}>Random</Button>
@@ -234,11 +251,15 @@ export default function UserHomePage() {
                   )}
                 />
               </Grid>
+              <Grid xs={4}>
+                <TextField onChange={(event, newValue) => {setMaxDistance(newValue)}} label="Distance" />
+              </Grid>
               <Grid xs={2}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker />
                 </LocalizationProvider>
               </Grid>
+              
             </Grid>
           </Grid>
         </CardContent>
