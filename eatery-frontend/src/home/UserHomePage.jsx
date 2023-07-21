@@ -252,11 +252,11 @@ export default function UserHomePage() {
           <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
             My Subscriptions
           </Typography>
-          <Grid sx={{alignSelf: 'center'}} container spacing={2}>
+          <Grid sx={{alignSelf: 'center', minHeight: 350}} container spacing={2}>
             {currentSubsIndex !== 0 ? <Button variant="contained" onClick={handleOnClickLeftSubscriptions} sx={{minHeight: 295}}>&lt;</Button> : <Button variant="contained" sx={{visibility:'hidden'}} >&lt;</Button>}
             {currentSubs.map(currentSub => {
-              return (     
-                <SubscriptionGridItem key={currentSub.id} user={userId} id={currentSub.id} name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
+              return ( 
+                !currentSub.isSubscribed ? <SubscriptionGridItem key={currentSub.id} user={userId} id={currentSub.id} name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/> : null
               );
             })}
             {currentSubs.length === 3 && <Button variant="contained" onClick={handleOnClickRightSubscriptions}>&gt;</Button>}
