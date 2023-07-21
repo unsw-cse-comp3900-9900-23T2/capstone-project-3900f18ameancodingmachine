@@ -113,11 +113,15 @@ async function getDistanceBetweenAddresses(address1, address2) {
 //search functionality
 export async function getSearchResults(req, res) {
     try {
-        const body = req.params
-        
-        let cuisineMatch = (await getEateriesByCuisine(body.cuisine)).results
-        let dietMatch = (await getEateriesByDiet(body.diet)).results
-        let stringMatch = (await getEateriesBySearchString(body.searchString))    
+        const string = req.query.string == "empty" ? req.query.string : null;
+        const cuisine = req.query.cuisine == "empty" ? req.query.cuisine : null;
+        const diet = req.query.diet == "empty" ? req.query.diet : null;
+        const address = req.query.address == "empty" ? req.query.address : null;
+        const distance = req.query.distance == "empty" ? req.query.distance : null;
+
+        let cuisineMatch = (await getEateriesByCuisine(cuisine)).results
+        let dietMatch = (await getEateriesByDiet(diet)).results
+        let stringMatch = (await getEateriesBySearchString(string)).results   
 
         const intersection = cuisineMatch.filter(
             cuisineElement => {
@@ -129,7 +133,7 @@ export async function getSearchResults(req, res) {
         let result = intersection
         //address only works if distance is also provided
         if (body.address && body.distance) {   
-            result = intersection.filter(async element => await getDistanceBetweenAddresses((element.street + ', ' + element.suburb + ', ' + element.region), body.address) <= body.distance)
+            result = intersection.filter(async element => await getDistanceBetweenAddresses((element.street + ', ' + element.suburb + ', ' + element.region), address) <= distance)
         }
         return res.status(200).json({
             success: 1,
