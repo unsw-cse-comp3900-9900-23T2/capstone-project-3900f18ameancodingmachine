@@ -29,3 +29,7 @@ week 7
 - made filter implementation (backend) based on restaurant name, cuisine, location as well as 
   dietary restrictions
 - plan to make a dietary routers for restaurant and user
+
+week 8
+- making subscriber implementation
+- implement backend for viewing user subscribed eateries 
