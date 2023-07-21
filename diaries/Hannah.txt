@@ -11,3 +11,22 @@ Week Three
   or redundant user stories to add/remove. I then wrote up the descriptions of the story boards and split the overview storyboard into sections based on the functionality categories.
 
 Week Four
+  We had a planning meeting. Set up Material UI front-end framework for visual elements.
+  Integrated framework with existing login and home page skeleton. Structured front-end
+  into separate folders for each main piece of functionality.
+
+Week 5
+
+Week 6
+  Implemented user home page and top navigation banner. Implemented navigation routes and
+  navigation elements on pages. Set up initial registration page structure.
+
+Week 7
+  Completed login/logout and register front-end routing and functionality, fixed some known bugs.
+  Added user context to keep login information synced across pages. Initial design for restaurant 
+  posts.
+  
+Week 8
+  Implemented view/hide vouchers functionality. Continued work on improving the styling of pages.
+  Redesigned routing pages to what was decided by team. Fixed navigation elements.
+
