@@ -24,7 +24,6 @@ const n = 4 // change the number depending on the requirements
 let loginId
 let userId
 let eateriesSubscribed = []
-let latestEateriesArr = []
 
 const getUserSubscribers = async() => {
   try {
@@ -143,7 +142,7 @@ export default function UserHomePage() {
       const getCuisine = await axios.get('api/user/eatery/cuisines')
       const cuisines = getCuisine.data.results
       setCuisineList(cuisines)
-      latestEateriesArr = await getLatestEateries()
+      let latestEateriesArr = await getLatestEateries()
       setNewRestaurants(latestEateriesArr)
     }
     loading()
