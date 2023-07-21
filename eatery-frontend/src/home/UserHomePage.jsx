@@ -256,7 +256,7 @@ export default function UserHomePage() {
             {currentSubsIndex !== 0 ? <Button variant="contained" onClick={handleOnClickLeftSubscriptions} sx={{minHeight: 295}}>&lt;</Button> : <Button variant="contained" sx={{visibility:'hidden'}} >&lt;</Button>}
             {currentSubs.map(currentSub => {
               return ( 
-                !currentSub.isSubscribed ? <SubscriptionGridItem key={currentSub.id} user={userId} id={currentSub.id} name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/> : null
+                <SubscriptionGridItem key={currentSub.id} user={userId} id={currentSub.id} name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
               );
             })}
             {currentSubs.length === 3 && <Button variant="contained" onClick={handleOnClickRightSubscriptions}>&gt;</Button>}
