@@ -19,13 +19,12 @@ import RestaurantPost from './RestaurantPost'
 import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 
-// get all of the restaurant and the cuisines from the database
 const n = 4 // change the number depending on the requirements
-const getCuisine = await axios.get('api/user/eatery/cuisines')
-const cuisines = getCuisine.data.results
 
 let loginId
 let userId
+let eateriesSubscribed = []
+let latestEateriesArr = []
 
 const getUserSubscribers = async() => {
   try {
@@ -45,8 +44,6 @@ const getUserSubscribers = async() => {
   }
 }
 
-let eateriesSubscribed = []
-let latestEateriesArr = []
 /*
  * TODO: Stub for loadSubscriptions button
  *  curSubs is a local array which will return the results of the function
@@ -111,6 +108,7 @@ export default function UserHomePage() {
   const [currentSubsCount, setCurrentSubsCount] = useState(3);
 
   const [newRestaurants, setNewRestaurants] = useState([])
+  const [cuisineList, setCuisineList] = useState([])
 
   const [location, setLocation] = useState(null);
   const [maxDistance, setMaxDistance] = useState(null);
@@ -141,7 +139,10 @@ export default function UserHomePage() {
         setUserContext(null);
         console.log("Not logged in")
       }
-      
+
+      const getCuisine = await axios.get('api/user/eatery/cuisines')
+      const cuisines = getCuisine.data.results
+      setCuisineList(cuisines)
       latestEateriesArr = await getLatestEateries()
       setNewRestaurants(latestEateriesArr)
     }
@@ -227,7 +228,7 @@ export default function UserHomePage() {
                 <Autocomplete
                   id="cuisine-dropdown"
                   value={cuisine}
-                  options={cuisines}
+                  options={cuisineList}
                   getOptionLabel={(option) => option.name}
                   onChange={(event, newValue) => {
                     setCuisine(newValue);
