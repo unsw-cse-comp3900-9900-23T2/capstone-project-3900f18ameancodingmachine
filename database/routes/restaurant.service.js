@@ -34,8 +34,8 @@ export async function updateExistingDescription (data) {
 
 //////////for search//////////////
 export async function getEateriesBySearchString (string) {
-    const query = 'select * from restaurantInfo where name regexp ?'
-    const values = [string];
+    let query = 'select * from restaurantInfo where name regexp ?'
+    let values = [string];
     if (!string) {
         query = 'select * from restaurantInfo';
         values = [];
@@ -49,8 +49,8 @@ export async function getEateriesBySearchString (string) {
 }
 
 export async function getEateriesByDiet (diet) {
-    const query = 'select * from restaurantInfo where diet = ?'
-    const values = [diet]
+    let query = 'select * from restaurantInfo where diet = ?'
+    let values = [diet]
     if (!diet) {
         query = 'select * from restaurantInfo';
         values = [];
@@ -64,8 +64,8 @@ export async function getEateriesByDiet (diet) {
 }
 
 export async function getEateriesByCuisine (cuisine) {
-    const query = 'select * from restaurantInfo where cuisine = ?'
-    const values = [cuisine]
+    let query = 'select * from restaurantInfo where cuisine = ?'
+    let values = [cuisine]
     if (!cuisine) {
         query = 'select * from restaurantInfo';
         values = [];

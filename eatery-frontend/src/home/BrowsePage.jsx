@@ -42,15 +42,14 @@ const getUserSubscribers = async() => {
  */
 async function loadResults(string, address, cuisine, diet, distance) {
   try {
-    const params = {};
-
-    params.string = string != null ? string : "empty";
-    params.cuisine = cuisine != null  ? cuisine : "empty";;
-    params.diet = diet != null ? diet : "empty";
-    params.address = address != null ? address : "empty";
-    params.distance = distance != null ? distance : "empty";
-
-    const { data } = await axios.get(`api/user/searcher`, { params });
+    const { data } = await axios.get(`api/user/user/browser`, { params: {
+      string,
+      address,
+      cuisine,
+      diet,
+      distance,
+    }});
+    console.log(data)
     if (data.success) {
       const display = data.results.map(element => ({
         name: element.name,
@@ -68,12 +67,12 @@ async function loadResults(string, address, cuisine, diet, distance) {
 }
 
 export default function Browse() {
-  const { state } = useLocation();
-  const search = state.search;
-  const location = state.location;
-  const distance = state.distance;
-  const cuisine = state.cuisine;
-  const dietary = state.dietary;
+  //FIX
+  const search = null;
+  const location = null;
+  const distance = null;
+  const cuisine = null;
+  const dietary = null;
 
   const [results, setResults] = useState([]);
 

@@ -68,7 +68,7 @@ router.get('/cuisine/:id', getCuisineById)
 router.get('/eatery/cuisines', getCuisines)
 router.get('/eatery/:id', getEateryById)
 router.get('/subscribe/:id', showSubscribedEateries)
-router.get('/searcher', getSearchResults)
+router.get('/user/browser', getSearchResults)
 
 router.post('/voucher', createVoucher)
 router.put('/eatery/description', updateDescription)

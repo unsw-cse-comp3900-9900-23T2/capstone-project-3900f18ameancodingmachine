@@ -194,7 +194,8 @@ export default function UserHomePage() {
     //const url = "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
 
     const cuisineName = (cuisine != null) ? cuisine.name : 'null';
-    navigate("/browse", {state: { search: search, location: location, cuisine: cuisineName, dietary: dietary, distance: maxDistance}} );
+    //FIX
+    navigate("/browse");
 
   };
 
