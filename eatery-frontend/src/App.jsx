@@ -23,12 +23,13 @@ export default function App() {
       }}>
         <Banner />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/register" element={<RegistrationPage />} />
           <Route path="/Recovery" element={<ForgotPassPage/>} />
           <Route path="/RecoveryCodeEntry" element={<ForgotPassCodeEntry/>} />
           <Route path="/RecoveryNewPass" element={<ForgotPassNewPass/>} />
-          <Route path="/register" element={<RegistrationPage />} />
           <Route path="/create-restaurant" element={<RestaurantRegistrationPage />} />
           <Route path="/browse" element={<Browse/>}/>
 

@@ -48,7 +48,7 @@ export default function LoginForm(){
      */
     if (await checkCredentials(email, password)){
       console.log("success");
-      navigate("/");
+      navigate("/home");
     };
     setLogInFail(true);
   }
