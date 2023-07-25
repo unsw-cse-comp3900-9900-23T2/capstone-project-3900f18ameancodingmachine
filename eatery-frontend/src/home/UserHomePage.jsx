@@ -19,7 +19,6 @@ import RestaurantPost from './RestaurantPost'
 import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 
-<<<<<<< HEAD
 import {LoadScript, Autocomplete as MapAutoComplete } from "@react-google-maps/api";
 
 const LocationAutocomplete = ({ apiKey, onPlaceChanged }) => {
@@ -41,8 +40,6 @@ const LocationAutocomplete = ({ apiKey, onPlaceChanged }) => {
 };
 
 // get all of the restaurant and the cuisines from the database
-=======
->>>>>>> main
 const n = 4 // change the number depending on the requirements
 
 let loginId
@@ -197,10 +194,8 @@ export default function UserHomePage() {
   function handleOnClickBrowse(){
     //location, cuisine, dietary
     //const url = "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
-
-    const cuisineName = (cuisine != null) ? cuisine.name : 'null';
     //FIX
-    navigate("/browse");
+    navigate("/browse", {state: { search: search, location: location, cuisine: cuisine, dietary: dietary, distance: maxDistance}});
 
   };
 

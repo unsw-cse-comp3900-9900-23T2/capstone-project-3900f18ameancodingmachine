@@ -68,11 +68,12 @@ async function loadResults(string, address, cuisine, diet, distance) {
 
 export default function Browse() {
   //FIX
-  const search = null;
-  const location = null;
-  const distance = null;
-  const cuisine = null;
-  const dietary = null;
+  const { state } = useLocation();
+  const search = state.search;
+  const location = state.location;
+  const distance = state.distance;
+  const cuisine = state.cuisine;
+  const dietary = state.dietary;
 
   const [results, setResults] = useState([]);
 
