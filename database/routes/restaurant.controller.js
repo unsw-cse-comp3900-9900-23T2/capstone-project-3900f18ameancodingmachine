@@ -126,8 +126,11 @@ export async function getSearchResults(req, res) {
         const intersection = cuisineMatch.filter(
             cuisineElement => {
                 const cuisineId = cuisineElement.id;
-                return dietMatch.some(dietElement => dietElement.id === cuisineId)
-                    && stringMatch.some(stringElement => stringElement.id === cuisineId)
+                //an eatery may have multiple cuisine and diet types
+                const cuisineName = cuisineElement.cuisine;
+                const cuisineDiet = cuisineElement.diet;
+                return dietMatch.some(dietElement => dietElement.id === cuisineId && dietElement.cuisine === cuisineName && dietElement.diet === cuisineDiet)
+                    && stringMatch.some(stringElement => stringElement.id === cuisineId && stringElement.cuisine === cuisineName && stringElement.diet === cuisineDiet)
             }
         )
         let result = intersection
