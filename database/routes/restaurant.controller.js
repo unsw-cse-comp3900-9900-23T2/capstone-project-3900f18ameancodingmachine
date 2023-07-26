@@ -113,11 +113,11 @@ async function getDistanceBetweenAddresses(address1, address2) {
 //search functionality
 export async function getSearchResults(req, res) {
     try {
-        const string = req.query.string || null;
-        const cuisine = req.query.cuisine || null;
-        const diet = req.query.diet || null;
-        const address = req.query.address || null;
-        const distance = req.query.distance || null;
+        const string = req.query.string
+        const cuisine = req.query.cuisine
+        const diet = req.query.diet
+        const address = req.query.address
+        const distance = req.query.distance
 
         let cuisineMatch = (await getEateriesByCuisine(cuisine)).results
         let dietMatch = (await getEateriesByDiet(diet)).results

@@ -200,7 +200,7 @@ export default function UserHomePage() {
   };
 
 
-  //TODO: have to remove the api code
+  //TODO: have to hide the google api code
   return (
     <Container maxWidth="lg">
       <Card sx={{ minWidth: 275 }}>

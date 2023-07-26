@@ -49,7 +49,6 @@ async function loadResults(string, address, cuisine, diet, distance) {
       diet,
       distance,
     }});
-    console.log(data)
     if (data.success) {
       const display = data.results.map(element => ({
         name: element.name,
