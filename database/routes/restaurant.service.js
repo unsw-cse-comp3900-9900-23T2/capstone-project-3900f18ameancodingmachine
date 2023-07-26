@@ -8,6 +8,8 @@ import { poolPromise } from '../db-config/db_connection.js'
  * @param {date} data.startOffer    coupon starting offer
  * @param {date} data.endOffer      coupon ending offer
  * @param {int} data.count          number of coupon generated
+ * @param {string} data.code        code of coupon generated
+ * @returns {object}    if successful object with success 1, otherwise 0
  */
 export async function createNewVoucher(data) {
     const query = `insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)`
@@ -20,6 +22,13 @@ export async function createNewVoucher(data) {
     }
 }
 
+/**
+ * update the description associated with an eatery account
+ * @param {object} data
+ * @param {string} data.description   new description
+ * @param {string} data.restaurantId  restaurantId
+ * @returns {object}    if successful object with success 1, otherwise 0
+ */
 export async function updateExistingDescription (data) {
     console.log(data)
     const query = 'update EateryAccount set description = ? where id = ?'
@@ -32,6 +41,11 @@ export async function updateExistingDescription (data) {
     }
 }
 
+/**
+ * get all vouchers associated with an eatery
+ * @param {string} id   eatery id
+ * @returns {object}    if successful object with success 1, otherwise 0
+ */
 export async function getAllEateryVouchers (Id) {
     const query = 'select * from Voucher where offeredBy = ?'
     const value = [Id]
@@ -42,6 +56,10 @@ export async function getAllEateryVouchers (Id) {
     }
 }
 
+/**
+ * gets information about each existing cuisine type
+ * @returns {object}    if successful object with success 1, otherwise 0
+ */
 export async function getAllCuisines () {
     const query = 'select * from Cuisines'
     const [result] = await poolPromise.execute(query)
@@ -51,6 +69,10 @@ export async function getAllCuisines () {
     }
 }
 
+/**
+ * gets infromation about each existing eatery 
+ * @returns {object}    if successful object with success 1, otherwise 0
+ */
 export async function getAllEateries () {
     const query = 'select * from restaurantInfo'
     const [result] = await poolPromise.execute(query)
@@ -60,7 +82,17 @@ export async function getAllEateries () {
     }
 }
 
-// create new eatery account
+/**
+ * create new and unique eatery account
+ * @param {object} data
+ * @param {string} data.name        name of eatery
+ * @param {string} data.addressId   address id of the 
+ * @param {string} data.phone       phone number of the eatery 
+ * @param {string} data.email       the eatery email
+ * @param {string} data.url         website of the eatery
+ * @param {string} data.loginId     login id for the eatery
+ * @returns {object}                if successful object with success 1, otherwise 0
+ */
 export async function createEateryAccount (data) {
     const findQuery = 'select * from EateryAccount where name = ? and address = ? and phone = ? and email = ? and url = ?'
     const firstvalues = [data.name, data.addressId, data.phone, data.email, data.url]
