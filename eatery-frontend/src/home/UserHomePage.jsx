@@ -1,5 +1,5 @@
-import { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'
+import { useState, useContext, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
@@ -19,6 +19,27 @@ import RestaurantPost from './RestaurantPost'
 import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 
+import {LoadScript, Autocomplete as MapAutoComplete } from "@react-google-maps/api";
+
+const LocationAutocomplete = ({ apiKey, onPlaceChanged }) => {
+  const autocompleteRef = useRef(null);
+
+  return (
+    <MapAutoComplete
+      onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+      onPlaceChanged={() => {
+        if (autocompleteRef.current !== null) {
+          const place = autocompleteRef.current.getPlace();
+          onPlaceChanged(place);
+        }
+      }}
+    >
+      <input type="text" placeholder="Enter a location" />
+    </MapAutoComplete>
+  );
+};
+
+// get all of the restaurant and the cuisines from the database
 const n = 4 // change the number depending on the requirements
 
 let loginId
@@ -97,6 +118,8 @@ async function getLatestEateries()  {
   return newEateries
 }
 
+const googleMapsLibraries = ["places"];
+
 export default function UserHomePage() {
   // Null: not logged in, true: user, false: restaurant
   const { userContext, setUserContext } = useContext(UserContext);
@@ -173,14 +196,13 @@ export default function UserHomePage() {
   function handleOnClickBrowse(){
     //location, cuisine, dietary
     //const url = "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
-
-    const cuisineName = (cuisine != null) ? cuisine.name : 'null';
-    navigate("/browse", {state: { search: search, location: location, cuisine: cuisineName, dietary: dietary, distance: maxDistance}} );
+    //FIX
+    navigate("/browse", {state: { search: search, location: location, cuisine: cuisine, dietary: dietary, distance: maxDistance}});
 
   };
 
 
-
+  //TODO: have to hide the google api code
   return (
     <Container maxWidth="lg">
       <Card sx={{ minWidth: 275 }}>
@@ -210,18 +232,9 @@ export default function UserHomePage() {
             </Grid>
             <Grid container xs={12} spacing={2}>
               <Grid xs={4}>
-                <Autocomplete
-                  id="location-dropdown"
-                  value={location}
-                  options={["sydney", "melbourne", "adelaide"]}
-                  getOptionLabel={(option) => option.title}
-                  onChange={(event, newValue) => {
-                    setLocation(newValue);
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Location" />
-                  )}
-                />
+                <LoadScript googleMapsApiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"} libraries={googleMapsLibraries}>
+                  <LocationAutocomplete apiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"} onPlaceChanged={setLocation} />
+                </LoadScript>
               </Grid>
               <Grid xs={4}>
                 <Autocomplete

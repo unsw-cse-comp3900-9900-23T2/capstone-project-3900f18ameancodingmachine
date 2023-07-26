@@ -41,6 +41,53 @@ export async function updateExistingDescription (data) {
     }
 }
 
+//////////for search//////////////
+export async function getEateriesBySearchString (string) {
+    let query = 'select * from restaurantInfo where name regexp ?'
+    let values = [string];
+    if (!string) {
+        query = 'select * from restaurantInfo';
+        values = [];
+    }
+    const [result] = await poolPromise.execute(query, values)
+
+    return {
+        success: 1,
+        results: result
+    }
+}
+
+export async function getEateriesByDiet (diet) {
+    let query = 'select * from restaurantInfo where diet = ?'
+    let values = [diet]
+    if (!diet) {
+        query = 'select * from restaurantInfo';
+        values = [];
+    }
+    const [result] = await poolPromise.execute(query, values)
+
+    return {
+        success: 1,
+        results: result
+    }
+}
+
+export async function getEateriesByCuisine (cuisine) {
+    let query = 'select * from restaurantInfo where cuisine = ?'
+    let values = [cuisine]
+    if (!cuisine) {
+        query = 'select * from restaurantInfo';
+        values = [];
+    }
+    const [result] = await poolPromise.execute(query, values)
+
+    return {
+        success: 1,
+        results: result
+    }
+}
+//////////////////
+
 /**
  * get all vouchers associated with an eatery
  * @param {string} id   eatery id
