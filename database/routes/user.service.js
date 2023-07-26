@@ -1,4 +1,4 @@
-import { poolPromise } from '../db-config/db_connection.js'
+import { pool, poolPromise } from '../db-config/db_connection.js'
 
 export async function createLogin (data) {
     // insert login details
@@ -364,6 +364,15 @@ export async function createNewUserDietary (data) {
 export async function getAllDietaries () {
     const query = 'select * from DietaryRestrictions'
     const [result] = await poolPromise.execute(query)
+    return {
+        success: 1,
+        results: result
+    }
+}
+
+export async function storeUserProfileImg (data) {
+    const query = `insert into userProfileImages(userId, image_path) values (?, ?)`
+    const [result] = await poolPromise.execute(query, [data.userId, data.path])
     return {
         success: 1,
         results: result

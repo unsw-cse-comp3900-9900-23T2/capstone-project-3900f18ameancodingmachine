@@ -24,11 +24,24 @@ import {
     getEateryFiltered,
     forgottenPasswordReset,
     createUserDietary,
-    deleteSubscribedTo
+    deleteSubscribedTo,
+    storeUserProfileImgController
 } from './user.controller.js'
+
+import { 
+    createVoucher, 
+    getCuisines, 
+    getEateries, 
+    updateDescription, 
+    createEatery, 
+    createEateryDietary, 
+    getEateryVouchers, 
+    getSearchResults, 
+    storeEateryProfileImgController 
+} from './restaurant.controller.js'
+
 import express from 'express'
 import { checkToken } from '../auth/tokenvalid.js'
-import { createVoucher, getCuisines, getEateries, updateDescription, createEatery, createEateryDietary, getEateryVouchers, getSearchResults } from './restaurant.controller.js'
 import { passwordRecovery } from '../nodemailer/config.js'
 import { verfiyResetCode } from '../nodemailer/pass_reset.js'
 
@@ -61,6 +74,10 @@ router.post('/posts', createEateryPosts)
 router.post('/reviews', createUserReviews)
 router.put('/subscribe', createSubscribedTo)
 router.put('/unsubscribe', deleteSubscribedTo)
+
+// store images
+router.put('/store-image', storeUserProfileImgController)
+router.put('/eatery/store-image', storeEateryProfileImgController)
 
 router.get('/post/:id', getPostById)
 router.get('/review/:id', getReviewById)

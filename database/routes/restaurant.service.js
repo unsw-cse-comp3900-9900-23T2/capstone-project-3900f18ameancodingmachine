@@ -184,13 +184,20 @@ export async function createRestaurantDietary (data) {
         const values1 = [data.restriction]
         const result1 = await poolPromise.execute(insertQuery1, values1)
         dietId = result1[0].insertId
-        console.log('insert result')
-        console.log(result1)
     }
-    console.log(dietId)
+    
     const insertQuery = 'insert into provideDietary(restaurantId, dietId) values (?, ?)'
     const insertValues = [data.id, dietId]
     const [result] = await poolPromise.execute(insertQuery, insertValues)
+    return {
+        success: 1,
+        results: result
+    }
+}
+
+export async function storeEateryProfileImg (data) {
+    const query = `insert into restaurantProfileImages(restaurantId, image_path) values (?, ?)`
+    const [result] = await poolPromise.execute(query, [data.restaurantId, data.path])
     return {
         success: 1,
         results: result

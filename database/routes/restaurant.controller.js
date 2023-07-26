@@ -201,12 +201,25 @@ export async function createEateryDietary (req, res) {
         const result = await createRestaurantDietary(body)
         return res.status(200).json(result)
     } catch (err) {
+        // duplicate record error is 1062
         if (err.errno === 1062) {
             return res.status(409).json({
                 success: 0,
                 message: 'Entered duplicate record'
             })
         }
+        return res.status(500).json({
+            success: 0,
+            message: 'Database connection error'
+        })
+    }
+}
+
+export async function storeEateryProfileImgController (req, res) {
+    try {
+        const result = await storeEateryProfileImg(req.body)
+        return res.status(200).json(result)
+    } catch (error) {
         return res.status(500).json({
             success: 0,
             message: 'Database connection error'

@@ -483,6 +483,18 @@ export function getToken (req, res) {
     }
 }
 
+export async function storeUserProfileImgController (req, res) {
+    try {
+        const result = await storeUserProfileImg(req.body)
+        return res.status(200).json(result)
+    } catch (error) {
+        return res.status(500).json({
+            success: 0,
+            message: 'connection error'
+        })
+    }
+}
+
 // Used to hash the password for security
 function getHashOf (text) {
     return crypto.createHash('sha256').update(text).digest('hex')
