@@ -118,6 +118,8 @@ async function getLatestEateries()  {
   return newEateries
 }
 
+const googleMapsLibraries = ["places"];
+
 export default function UserHomePage() {
   // Null: not logged in, true: user, false: restaurant
   const { userContext, setUserContext } = useContext(UserContext);
@@ -230,7 +232,7 @@ export default function UserHomePage() {
             </Grid>
             <Grid container xs={12} spacing={2}>
               <Grid xs={4}>
-                <LoadScript googleMapsApiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"} libraries={["places"]}>
+                <LoadScript googleMapsApiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"} libraries={googleMapsLibraries}>
                   <LocationAutocomplete apiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"} onPlaceChanged={setLocation} />
                 </LoadScript>
               </Grid>
