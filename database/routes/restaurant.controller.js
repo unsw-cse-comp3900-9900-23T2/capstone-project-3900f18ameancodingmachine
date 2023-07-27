@@ -244,6 +244,9 @@ export async function storeEateryProfileImgController (req, res) {
 export async function getEateryProfileImgPathController (req, res) {
     try {
         const result = await getEateryProfileImgPath(req.params.id)
+        if (result.success === 0) {
+            return res.status(409).json(result)
+        }
         return res.status(200).json(result)
     } catch (error) {
         console.log(error)

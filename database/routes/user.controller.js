@@ -501,6 +501,11 @@ export async function storeUserProfileImgController (req, res) {
 export async function getUserProfileImgPathController (req, res) {
     try {
         const result = await getUserProfileImgPath(req.params.id)
+        
+        if (result.success == 0) {
+            return res.status(409).json(result)
+        }
+
         return res.status(200).json(result)
     } catch (error) {
         console.log(error)

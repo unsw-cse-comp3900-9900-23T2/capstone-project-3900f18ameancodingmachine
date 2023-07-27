@@ -208,6 +208,14 @@ export async function storeEateryProfileImg (path, restaurantId) {
 export async function getEateryProfileImgPath (restaurantId) {
     const query =  `select imagePath from restaurantProfileImages where restaurantId = ?`
     const [result] = await poolPromise.execute(query, [restaurantId])
+
+    if (result.length == 0) {
+        return {
+            success: 0,
+            message: "no image found"
+        }
+    }
+    
     return  {
         success: 1,
         results: result[0].imagePath

@@ -382,6 +382,14 @@ export async function storeUserProfileImg (path, userId) {
 export async function getUserProfileImgPath (userId) {
     const query = `select imagePath from userProfileImages where userId = ?`
     const [result] = await poolPromise.execute(query, [userId])
+
+    if (result.length == 0) {
+        return {
+            success: 0,
+            message: "no image found"
+        }
+    }
+    
     return {
         success: 1,
         results: result[0].imagePath

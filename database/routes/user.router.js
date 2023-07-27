@@ -42,30 +42,13 @@ import {
     getEateryProfileImgPathController
 } from './restaurant.controller.js'
 
+import upload  from '../img-config/config.js'
 import express from 'express'
-import multer from 'multer'
-import path from 'path'
 import { checkToken } from '../auth/tokenvalid.js'
 import { passwordRecovery } from '../nodemailer/config.js'
 import { verfiyResetCode } from '../nodemailer/pass_reset.js'
 
 const router = express.Router()
-
-/**
- * image is stored in public/uploads file on the database directory
-*/
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'public/uploads')
-    },
-    filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
-    }
-})
-
-// middleware to handle multipart/form-data
-const upload = multer({ storage: storage })
 
 // if a route requires an authenticated user with access to a token
 // use the checktoken as the middlewear function like so
