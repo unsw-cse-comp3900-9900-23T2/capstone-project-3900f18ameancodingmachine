@@ -195,14 +195,12 @@ export async function createRestaurantDietary (data) {
     }
 }
 
-export async function storeEateryProfileImg (data) {
-
-    const file = req.file;
-    // insert path and restaurantId into query
+// insert eatery profile image path into the database
+export async function storeEateryProfileImg (path, restaurantId) {
     const query = `insert into restaurantProfileImages(restaurantId, image_path) values (?, ?)`
-    const [result] = await poolPromise.execute(query, [data.restaurantId, data.path])
+    await poolPromise.execute(query, [restaurantId, path])
     return {
         success: 1,
-        results: result
+        message: "Image uploaded successfully"
     }
 }

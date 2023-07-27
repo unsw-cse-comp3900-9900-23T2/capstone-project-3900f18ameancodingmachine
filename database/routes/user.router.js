@@ -91,7 +91,7 @@ router.put('/subscribe', createSubscribedTo)
 router.put('/unsubscribe', deleteSubscribedTo)
 
 // store images
-router.post('/profile-image', upload.single("user-avatar"), storeUserProfileImgController)
+router.post('/image/profile', upload.single("user-avatar"), storeUserProfileImgController)
 router.post('/eatery/image/profile', upload.single("eatery-avatar"), storeEateryProfileImgController)
 
 router.get('/post/:id', getPostById)

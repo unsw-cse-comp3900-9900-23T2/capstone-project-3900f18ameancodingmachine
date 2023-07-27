@@ -21,6 +21,7 @@ import {
     getEateryByFilter,
     findSubscribedEateriesFromUserId,
     resetPassword,
+    storeUserProfileImg,
     getAllDietaries,
     removeSubscribedTo
 } from './user.service.js'
@@ -485,9 +486,10 @@ export function getToken (req, res) {
 
 export async function storeUserProfileImgController (req, res) {
     try {
-        const result = await storeUserProfileImg(req.body)
+        const result = await storeUserProfileImg(req.file.path, req.body.userId)
         return res.status(200).json(result)
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: 0,
             message: 'connection error'
