@@ -1,4 +1,5 @@
 import { poolPromise } from '../db-config/db_connection.js'
+import fs, { unlink } from 'fs';
 
 /**
  * insert new voucher details into the database
@@ -195,9 +196,30 @@ export async function createRestaurantDietary (data) {
     }
 }
 
-// insert eatery profile image path into the database
+// store and update the image path of the eatery
 export async function storeEateryProfileImg (path, restaurantId) {
-    const query = `insert into restaurantProfileImages(restaurantId, imagePath) values (?, ?)`
+    // find existing image path
+    let query = `select imagePath from restaurantProfileImages where restaurantId = ?`
+    let [result] = await poolPromise.execute(query, [restaurantId])
+
+    if (result.length !== 0) {
+        // delete the existing image
+        fs.unlink(result[0].imagePath, (err) => {
+            if (err) {
+                console.log("file does not exist")
+            }
+        })
+        
+        // update image path
+        query = `update restaurantProfileImages set imagePath = ? where restaurantId = ?`
+        await poolPromise.execute(query, [path, restaurantId])
+        return {
+            success: 1,
+            message: "Image updated successfully"
+        }
+    }
+    
+    query = `insert into restaurantProfileImages(restaurantId, imagePath) values (?, ?)`
     await poolPromise.execute(query, [restaurantId, path])
     return {
         success: 1,
@@ -215,7 +237,7 @@ export async function getEateryProfileImgPath (restaurantId) {
             message: "no image found"
         }
     }
-    
+
     return  {
         success: 1,
         results: result[0].imagePath

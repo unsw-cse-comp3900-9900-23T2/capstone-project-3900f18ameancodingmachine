@@ -1,4 +1,5 @@
 import { pool, poolPromise } from '../db-config/db_connection.js'
+import fs from 'fs'
 
 export async function createLogin (data) {
     // insert login details
@@ -370,8 +371,30 @@ export async function getAllDietaries () {
     }
 }
 
+// store and update image path for the user
 export async function storeUserProfileImg (path, userId) {
-    const query = `insert into userProfileImages(userId, imagePath) values (?, ?)`
+    // find existing image path
+    let query = `select imagePath from userProfileImages where userId = ?`
+    let [result] = await poolPromise.execute(query, [userId])
+
+    if (result.length !== 0) {
+        // delete current profile image
+        fs.unlink(result[0].imagePath, (err) => {
+            if (err) {
+                console.log("file does not exist")
+            }
+        })
+
+        // insert new path
+        query = `update userProfileImages set imagePath = ? where userId = ?`
+        await poolPromise.execute(query, [path, userId])
+        return {
+            success: 1,
+            message: "Image updated successfully"
+        }
+    }
+
+    query = `insert into userProfileImages(userId, imagePath) values (?, ?)`
     await poolPromise.execute(query, [userId, path])
     return {
         success: 1,
@@ -389,7 +412,7 @@ export async function getUserProfileImgPath (userId) {
             message: "no image found"
         }
     }
-    
+
     return {
         success: 1,
         results: result[0].imagePath
