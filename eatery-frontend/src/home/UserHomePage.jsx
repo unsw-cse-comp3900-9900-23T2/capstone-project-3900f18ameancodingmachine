@@ -1,4 +1,5 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
@@ -18,18 +19,32 @@ import RestaurantPost from './RestaurantPost'
 import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 
+import {LoadScript, Autocomplete as MapAutoComplete } from "@react-google-maps/api";
+
+const LocationAutocomplete = ({ apiKey, onPlaceChanged }) => {
+  const autocompleteRef = useRef(null);
+
+  return (
+    <MapAutoComplete
+      onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+      onPlaceChanged={() => {
+        if (autocompleteRef.current !== null) {
+          const place = autocompleteRef.current.getPlace();
+          onPlaceChanged(place);
+        }
+      }}
+    >
+      <input type="text" placeholder="Enter a location" />
+    </MapAutoComplete>
+  );
+};
+
 // get all of the restaurant and the cuisines from the database
 const n = 4 // change the number depending on the requirements
-const getCuisine = await axios.get('api/user/eatery/cuisines')
-const cuisines = getCuisine.data.results
-const getEateries = await axios.get('api/user/eatery/all')
 
-const eateries = getEateries.data.results
-// top n eateries account that is recently created
-// since eatery id is auto increment, sort by id in descending order
-const latestEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
 let loginId
 let userId
+let eateriesSubscribed = []
 
 const getUserSubscribers = async() => {
   try {
@@ -49,8 +64,6 @@ const getUserSubscribers = async() => {
   }
 }
 
-let eateriesSubscribed = []
-let latestEateriesArr = []
 /*
  * TODO: Stub for loadSubscriptions button
  *  curSubs is a local array which will return the results of the function
@@ -85,7 +98,13 @@ function loadSubscriptions(setCurrentSubs, index, count) {
 
 async function getLatestEateries()  {
   const getEateries = await axios.get('api/user/eatery/all')
-  const eateries = getEateries.data.results
+  let eateries = getEateries.data.results
+  eateries = eateries.filter((eatery, index) => {
+    // filter duplicate value based on their id on whether it matches
+    // the array index
+    return eateries.findIndex((e) => e.id === eatery.id) === index;
+  })
+  console.log(eateries)
   let newEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
 
   newEateries = newEateries.map(eatery => ({
@@ -99,6 +118,8 @@ async function getLatestEateries()  {
   return newEateries
 }
 
+const googleMapsLibraries = ["places"];
+
 export default function UserHomePage() {
   // Null: not logged in, true: user, false: restaurant
   const { userContext, setUserContext } = useContext(UserContext);
@@ -109,10 +130,15 @@ export default function UserHomePage() {
   const [currentSubsCount, setCurrentSubsCount] = useState(3);
 
   const [newRestaurants, setNewRestaurants] = useState([])
+  const [cuisineList, setCuisineList] = useState([])
 
   const [location, setLocation] = useState(null);
+  const [maxDistance, setMaxDistance] = useState(null);
   const [cuisine, setCuisine] = useState(null);
   const [dietary, setDietary] = useState(null);
+  const [search, setSearch] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     /* check whether user has a token
@@ -135,8 +161,11 @@ export default function UserHomePage() {
         setUserContext(null);
         console.log("Not logged in")
       }
-      
-      latestEateriesArr = await getLatestEateries()
+
+      const getCuisine = await axios.get('api/user/eatery/cuisines')
+      const cuisines = getCuisine.data.results
+      setCuisineList(cuisines)
+      let latestEateriesArr = await getLatestEateries()
       setNewRestaurants(latestEateriesArr)
     }
     loading()
@@ -164,8 +193,16 @@ export default function UserHomePage() {
     loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
   };
 
+  function handleOnClickBrowse(){
+    //location, cuisine, dietary
+    //const url = "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
+    //FIX
+    navigate("/browse", {state: { search: search, location: location, cuisine: cuisine, dietary: dietary, distance: maxDistance}});
+
+  };
 
 
+  //TODO: have to hide the google api code
   return (
     <Container maxWidth="lg">
       <Card sx={{ minWidth: 275 }}>
@@ -180,11 +217,14 @@ export default function UserHomePage() {
                   id="restaurant-search"
                   freeSolo
                   options={["maccas", "kfc", "Dominos"]}
+                  onChange={(event, newValue) => {
+                    setSearch(newValue);
+                  }}
                   renderInput={(params) => <TextField {...params} label="Restaurant Search" />}
                 />
               </Grid>
               <Grid xs={2}>
-                <Button variant="contained" onClick={() => {}}>Browse</Button>
+                <Button variant="contained" onClick={handleOnClickBrowse}>Browse</Button>
               </Grid>
               <Grid xs={2}>
                 <Button variant="contained" onClick={() => {}}>Random</Button>
@@ -192,24 +232,15 @@ export default function UserHomePage() {
             </Grid>
             <Grid container xs={12} spacing={2}>
               <Grid xs={4}>
-                <Autocomplete
-                  id="location-dropdown"
-                  value={location}
-                  options={["sydney", "melbourne", "adelaide"]}
-                  getOptionLabel={(option) => option.title}
-                  onChange={(event, newValue) => {
-                    setLocation(newValue);
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Location" />
-                  )}
-                />
+                <LoadScript googleMapsApiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"} libraries={googleMapsLibraries}>
+                  <LocationAutocomplete apiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"} onPlaceChanged={setLocation} />
+                </LoadScript>
               </Grid>
               <Grid xs={4}>
                 <Autocomplete
                   id="cuisine-dropdown"
                   value={cuisine}
-                  options={cuisines}
+                  options={cuisineList}
                   getOptionLabel={(option) => option.name}
                   onChange={(event, newValue) => {
                     setCuisine(newValue);
@@ -233,11 +264,15 @@ export default function UserHomePage() {
                   )}
                 />
               </Grid>
+              <Grid xs={4}>
+                <TextField onChange={(event, newValue) => {setMaxDistance(newValue)}} label="Distance" />
+              </Grid>
               <Grid xs={2}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker />
                 </LocalizationProvider>
               </Grid>
+              
             </Grid>
           </Grid>
         </CardContent>
@@ -283,7 +318,7 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              {newRestaurants.map((restaurant) => <RestaurantGridItem key={restaurant.id} id={restaurant.id} user={userId} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.suburb || restaurant.region}/>)}
+              {newRestaurants.map((restaurant) => <RestaurantGridItem key={restaurant.id} id={restaurant.id} user={userId} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.location || "unknown"}/>)}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>

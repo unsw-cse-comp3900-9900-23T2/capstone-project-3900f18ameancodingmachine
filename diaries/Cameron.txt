@@ -57,3 +57,8 @@ Sunday 23-07
 Week 8
 - Implemented frontend of subscriptions, only issue is that the whole page needs to be refreshed
 - Implemented frontend of browse page
+
+Week 9
+Tuesday 26-07
+- Had meeting discussing how we will proceed
+- Implemented basic profile page for restaurant

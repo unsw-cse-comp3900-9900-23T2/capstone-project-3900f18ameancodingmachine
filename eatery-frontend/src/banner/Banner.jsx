@@ -8,19 +8,20 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { UserContext } from '../App.jsx';
 
 import axios from 'axios';
-import { NavLink } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 
-async function logOut(setUserContext) {
+async function logOut(setUserContext, navigate) {
   try {
-    const result = await axios.put('api/user/logout')
+    const result = await axios.put('api/user/logout');
     let data = result.data;
     console.log(data.message);
     if (data.success) {
       console.log('reset to null');
       setUserContext(null); // Reset user context
+      navigate('/');
     }
     // reload page to re-render
-    window.location.reload(false)
+    // window.location.reload(false)
   } catch (err) {
     console.log(err.response)
   }
@@ -29,6 +30,7 @@ async function logOut(setUserContext) {
 export default function Banner() {
   // Null: not logged in, true: user, false: restaurant
   const { userContext, setUserContext } = useContext(UserContext);
+  const navigate = useNavigate();
 
   return (
     <AppBar position="static">
@@ -41,12 +43,12 @@ export default function Banner() {
             aria-label="menu"
             sx={{ mr: 2 }}
             component={NavLink}
-            to="/"
+            to="/home"
           >
             <HomeOutlinedIcon />
           </IconButton>
           {userContext !== null && <Button color="inherit" onClick={() => {
-            logOut(setUserContext);
+            logOut(setUserContext, navigate);
           }}>
               Logout
             </Button>}

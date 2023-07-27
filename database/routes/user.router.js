@@ -28,7 +28,7 @@ import {
 } from './user.controller.js'
 import express from 'express'
 import { checkToken } from '../auth/tokenvalid.js'
-import { createVoucher, getCuisines, getEateries, updateDescription, createEatery, createEateryDietary, getEateryVouchers } from './restaurant.controller.js'
+import { createVoucher, getCuisines, getEateries, updateDescription, createEatery, createEateryDietary, getEateryVouchers, getSearchResults } from './restaurant.controller.js'
 import { passwordRecovery } from '../nodemailer/config.js'
 import { verfiyResetCode } from '../nodemailer/pass_reset.js'
 
@@ -68,6 +68,7 @@ router.get('/cuisine/:id', getCuisineById)
 router.get('/eatery/cuisines', getCuisines)
 router.get('/eatery/:id', getEateryById)
 router.get('/subscribe/:id', showSubscribedEateries)
+router.get('/user/browser', getSearchResults)
 
 router.post('/voucher', createVoucher)
 router.put('/eatery/description', updateDescription)
