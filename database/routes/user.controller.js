@@ -23,7 +23,8 @@ import {
     resetPassword,
     storeUserProfileImg,
     getAllDietaries,
-    removeSubscribedTo
+    removeSubscribedTo,
+    getUserProfileImgPath
 } from './user.service.js'
 import crypto from 'crypto'
 import pkg from 'jsonwebtoken'
@@ -487,6 +488,19 @@ export function getToken (req, res) {
 export async function storeUserProfileImgController (req, res) {
     try {
         const result = await storeUserProfileImg(req.file.path, req.body.userId)
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: 'connection error'
+        })
+    }
+}
+
+export async function getUserProfileImgPathController (req, res) {
+    try {
+        const result = await getUserProfileImgPath(req.params.id)
         return res.status(200).json(result)
     } catch (error) {
         console.log(error)

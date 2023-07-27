@@ -4,7 +4,8 @@ import {
     getEateriesByCuisine, 
     createNewVoucher, 
     getAllCuisines, 
-    getAllEateries, 
+    getAllEateries,
+    getEateryProfileImgPath, 
     updateExistingDescription, 
     createEateryAccount, 
     createRestaurantDietary, 
@@ -228,14 +229,21 @@ export async function createEateryDietary (req, res) {
 }
 
 export async function storeEateryProfileImgController (req, res) {
-    // console.log(req.file)
-    // console.log(req.body)
-    // return res.status(200).json({
-    //     success: 1,
-    //     result: req.file
-    // })
     try {
         const result = await storeEateryProfileImg(req.file.path, req.body.restaurantId)
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: 'Database connection error'
+        })
+    }
+}
+
+export async function getEateryProfileImgPathController (req, res) {
+    try {
+        const result = await getEateryProfileImgPath(req.params.id)
         return res.status(200).json(result)
     } catch (error) {
         console.log(error)

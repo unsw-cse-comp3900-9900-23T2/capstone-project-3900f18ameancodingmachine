@@ -25,7 +25,8 @@ import {
     forgottenPasswordReset,
     createUserDietary,
     deleteSubscribedTo,
-    storeUserProfileImgController
+    storeUserProfileImgController,
+    getUserProfileImgPathController
 } from './user.controller.js'
 
 import { 
@@ -37,7 +38,8 @@ import {
     createEateryDietary, 
     getEateryVouchers, 
     getSearchResults, 
-    storeEateryProfileImgController 
+    storeEateryProfileImgController, 
+    getEateryProfileImgPathController
 } from './restaurant.controller.js'
 
 import express from 'express'
@@ -49,6 +51,9 @@ import { verfiyResetCode } from '../nodemailer/pass_reset.js'
 
 const router = express.Router()
 
+/**
+ * image is stored in public/uploads file on the database directory
+*/
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, 'public/uploads')
@@ -90,9 +95,11 @@ router.post('/reviews', createUserReviews)
 router.put('/subscribe', createSubscribedTo)
 router.put('/unsubscribe', deleteSubscribedTo)
 
-// store images
+// image-related router
 router.post('/image/profile', upload.single("user-avatar"), storeUserProfileImgController)
 router.post('/eatery/image/profile', upload.single("eatery-avatar"), storeEateryProfileImgController)
+router.get('/eatery/image/profile/:id', getEateryProfileImgPathController)
+router.get('/image/profile/:id', getUserProfileImgPathController)
 
 router.get('/post/:id', getPostById)
 router.get('/review/:id', getReviewById)

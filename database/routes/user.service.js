@@ -371,11 +371,20 @@ export async function getAllDietaries () {
 }
 
 export async function storeUserProfileImg (path, userId) {
-    const query = `insert into userProfileImages(userId, image_path) values (?, ?)`
+    const query = `insert into userProfileImages(userId, imagePath) values (?, ?)`
     await poolPromise.execute(query, [userId, path])
     return {
         success: 1,
         message: "Image upload successfully"
+    }
+}
+
+export async function getUserProfileImgPath (userId) {
+    const query = `select imagePath from userProfileImages where userId = ?`
+    const [result] = await poolPromise.execute(query, [userId])
+    return {
+        success: 1,
+        results: result[0].imagePath
     }
 }
 
