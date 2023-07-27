@@ -267,8 +267,8 @@ export async function findSubscribedEateriesFromUserId (id) {
                         postcode, 
                         phone, 
                         email, 
-                        url, 
-                        cuisine
+                        url,
+                        image
                     from userSubscription 
                     where userId = ?`
     const value = [id]
