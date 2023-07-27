@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -21,10 +21,6 @@ export default function RestaurantPost(props) {
   const userId = props.user
   const mainKey = `subscribe`
   const uid = mainKey.concat('', userId, restaurantId)
-
-  // localStorage.removeItem(uid)
-  // console.log(props)
-  // console.log(localStorage.getItem(uid))
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
     const subscribedState = localStorage.getItem(uid)
@@ -84,7 +80,7 @@ export default function RestaurantPost(props) {
         <CardMedia
           sx={{ height: 140 }}
           component="img"
-          image={paella} // TODO get actual image
+          image={props.image || paella} // TODO get actual image
           title="Paella"
         />
         <CardContent>

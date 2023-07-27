@@ -1,5 +1,6 @@
 import { poolPromise } from '../db-config/db_connection.js'
 import fs from 'fs'
+import path from 'path'
 
 /**
  * insert new voucher details into the database
@@ -197,10 +198,12 @@ export async function createRestaurantDietary (data) {
 }
 
 // store and update the image path of the eatery
-export async function storeEateryProfileImg (path, restaurantId) {
+export async function storeEateryProfileImg (imgPath, restaurantId) {
     // find existing image path
     let query = 'select imagePath from restaurantProfileImages where restaurantId = ?'
     const [result] = await poolPromise.execute(query, [restaurantId])
+
+    const relativePath = path.relative('public', imgPath)
 
     if (result.length !== 0) {
         // delete the existing image
@@ -212,7 +215,7 @@ export async function storeEateryProfileImg (path, restaurantId) {
 
         // update image path
         query = 'update restaurantProfileImages set imagePath = ? where restaurantId = ?'
-        await poolPromise.execute(query, [path, restaurantId])
+        await poolPromise.execute(query, [relativePath, restaurantId])
         return {
             success: 1,
             message: 'Image updated successfully'
@@ -220,7 +223,7 @@ export async function storeEateryProfileImg (path, restaurantId) {
     }
 
     query = 'insert into restaurantProfileImages(restaurantId, imagePath) values (?, ?)'
-    await poolPromise.execute(query, [restaurantId, path])
+    await poolPromise.execute(query, [restaurantId, relativePath])
     return {
         success: 1,
         message: 'Image uploaded successfully'
@@ -238,8 +241,10 @@ export async function getEateryProfileImgPath (restaurantId) {
         }
     }
 
+    const imgPath = result[0].imagePath
+    const relativePath = path.relative('public', imgPath)
     return {
         success: 1,
-        results: result[0].imagePath
+        results: relativePath
     }
 }
