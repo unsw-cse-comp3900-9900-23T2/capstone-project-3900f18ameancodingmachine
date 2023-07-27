@@ -35,9 +35,9 @@ select
     ea.url,
     up.imagePath as image 
 from        SubscribedTo st
-left join        EateryAccount ea on (ea.id = st.restaurantId)
-left join        Address a on (a.id = ea.address)
-left join       restaurantProfileImages up on (up.restaurantId = ea.id)
+left join   EateryAccount ea on (ea.id = st.restaurantId)
+left join   Address a on (a.id = ea.address)
+left join   restaurantProfileImages up on (up.restaurantId = ea.id)
 ;
 
 -- see user reviews
