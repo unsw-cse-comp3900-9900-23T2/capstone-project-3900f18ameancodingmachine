@@ -216,13 +216,18 @@ export async function createEateryDietary (req, res) {
 }
 
 export async function storeEateryProfileImgController (req, res) {
-    try {
-        const result = await storeEateryProfileImg(req.body)
-        return res.status(200).json(result)
-    } catch (error) {
-        return res.status(500).json({
-            success: 0,
-            message: 'Database connection error'
-        })
-    }
+    console.log(req.file)
+    return res.status(200).json({
+        success: 1,
+        result: req.file
+    })
+    // try {
+    //     const result = await storeEateryProfileImg(req.body)
+    //     return res.status(200).json(result)
+    // } catch (error) {
+    //     return res.status(500).json({
+    //         success: 0,
+    //         message: 'Database connection error'
+    //     })
+    // }
 }
