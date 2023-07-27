@@ -10,6 +10,7 @@ import RegistrationPage from './user/RegistrationPage';
 import RestaurantRegistrationPage from './restaurant/RestaurantRegistrationPage';
 import Browse from './home/BrowsePage';
 import RestaurantProfile from './restaurant/RestaurantProfile';
+import UserProfile from './user/UserProfile';
 
 export const UserContext = createContext(null);
 
@@ -34,7 +35,7 @@ export default function App() {
           <Route path="/create-restaurant" element={<RestaurantRegistrationPage />} />
           <Route path="/browse" element={<Browse/>}/>
           <Route path="/RestaurantProfile/:Restaurant_ID" element={<RestaurantProfile/>}/>
-
+          <Route path="/user-profile" element={<UserProfile />} />
 
         </Routes>
       </UserContext.Provider>
