@@ -149,7 +149,7 @@ export async function deleteSubscribedTo (req, res) {
             })
         }
     } catch (error) {
-        
+
     }
 }
 
@@ -501,8 +501,8 @@ export async function storeUserProfileImgController (req, res) {
 export async function getUserProfileImgPathController (req, res) {
     try {
         const result = await getUserProfileImgPath(req.params.id)
-        
-        if (result.success == 0) {
+
+        if (result.success === 0) {
             return res.status(409).json(result)
         }
 

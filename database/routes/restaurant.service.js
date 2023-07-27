@@ -1,5 +1,5 @@
 import { poolPromise } from '../db-config/db_connection.js'
-import fs, { unlink } from 'fs';
+import fs from 'fs'
 
 /**
  * insert new voucher details into the database
@@ -12,8 +12,8 @@ import fs, { unlink } from 'fs';
  * @param {string} data.code        code of coupon generated
  * @returns {object}    if successful object with success 1, otherwise 0
  */
-export async function createNewVoucher(data) {
-    const query = `insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)`
+export async function createNewVoucher (data) {
+    const query = 'insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)'
     const values = [data.offeredBy, data.discount, data.startOffer, data.endOffer, data.count, data.code]
     const result = await poolPromise.execute(query, values)
 
@@ -42,13 +42,13 @@ export async function updateExistingDescription (data) {
     }
 }
 
-//////////for search//////////////
+/// ///////for search//////////////
 export async function getEateriesBySearchString (string) {
     let query = 'select * from restaurantInfo where name regexp ?'
-    let values = [string];
+    let values = [string]
     if (!string) {
-        query = 'select * from restaurantInfo';
-        values = [];
+        query = 'select * from restaurantInfo'
+        values = []
     }
     const [result] = await poolPromise.execute(query, values)
 
@@ -62,8 +62,8 @@ export async function getEateriesByDiet (diet) {
     let query = 'select * from restaurantInfo where diet = ?'
     let values = [diet]
     if (!diet) {
-        query = 'select * from restaurantInfo';
-        values = [];
+        query = 'select * from restaurantInfo'
+        values = []
     }
     const [result] = await poolPromise.execute(query, values)
 
@@ -77,8 +77,8 @@ export async function getEateriesByCuisine (cuisine) {
     let query = 'select * from restaurantInfo where cuisine = ?'
     let values = [cuisine]
     if (!cuisine) {
-        query = 'select * from restaurantInfo';
-        values = [];
+        query = 'select * from restaurantInfo'
+        values = []
     }
     const [result] = await poolPromise.execute(query, values)
 
@@ -87,7 +87,7 @@ export async function getEateriesByCuisine (cuisine) {
         results: result
     }
 }
-//////////////////
+/// ///////////////
 
 /**
  * get all vouchers associated with an eatery
@@ -118,7 +118,7 @@ export async function getAllCuisines () {
 }
 
 /**
- * gets infromation about each existing eatery 
+ * gets infromation about each existing eatery
  * @returns {object}    if successful object with success 1, otherwise 0
  */
 export async function getAllEateries () {
@@ -134,8 +134,8 @@ export async function getAllEateries () {
  * create new and unique eatery account
  * @param {object} data
  * @param {string} data.name        name of eatery
- * @param {string} data.addressId   address id of the 
- * @param {string} data.phone       phone number of the eatery 
+ * @param {string} data.addressId   address id of the
+ * @param {string} data.phone       phone number of the eatery
  * @param {string} data.email       the eatery email
  * @param {string} data.url         website of the eatery
  * @param {string} data.loginId     login id for the eatery
@@ -186,7 +186,7 @@ export async function createRestaurantDietary (data) {
         const result1 = await poolPromise.execute(insertQuery1, values1)
         dietId = result1[0].insertId
     }
-    
+
     const insertQuery = 'insert into provideDietary(restaurantId, dietId) values (?, ?)'
     const insertValues = [data.id, dietId]
     const [result] = await poolPromise.execute(insertQuery, insertValues)
@@ -199,46 +199,46 @@ export async function createRestaurantDietary (data) {
 // store and update the image path of the eatery
 export async function storeEateryProfileImg (path, restaurantId) {
     // find existing image path
-    let query = `select imagePath from restaurantProfileImages where restaurantId = ?`
-    let [result] = await poolPromise.execute(query, [restaurantId])
+    let query = 'select imagePath from restaurantProfileImages where restaurantId = ?'
+    const [result] = await poolPromise.execute(query, [restaurantId])
 
     if (result.length !== 0) {
         // delete the existing image
         fs.unlink(result[0].imagePath, (err) => {
             if (err) {
-                console.log("file does not exist")
+                console.log('file does not exist')
             }
         })
-        
+
         // update image path
-        query = `update restaurantProfileImages set imagePath = ? where restaurantId = ?`
+        query = 'update restaurantProfileImages set imagePath = ? where restaurantId = ?'
         await poolPromise.execute(query, [path, restaurantId])
         return {
             success: 1,
-            message: "Image updated successfully"
+            message: 'Image updated successfully'
         }
     }
-    
-    query = `insert into restaurantProfileImages(restaurantId, imagePath) values (?, ?)`
+
+    query = 'insert into restaurantProfileImages(restaurantId, imagePath) values (?, ?)'
     await poolPromise.execute(query, [restaurantId, path])
     return {
         success: 1,
-        message: "Image uploaded successfully"
+        message: 'Image uploaded successfully'
     }
 }
 
 export async function getEateryProfileImgPath (restaurantId) {
-    const query =  `select imagePath from restaurantProfileImages where restaurantId = ?`
+    const query = 'select imagePath from restaurantProfileImages where restaurantId = ?'
     const [result] = await poolPromise.execute(query, [restaurantId])
 
-    if (result.length == 0) {
+    if (result.length === 0) {
         return {
             success: 0,
-            message: "no image found"
+            message: 'no image found'
         }
     }
 
-    return  {
+    return {
         success: 1,
         results: result[0].imagePath
     }

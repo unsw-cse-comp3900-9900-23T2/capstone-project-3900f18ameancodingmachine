@@ -1,4 +1,4 @@
-import { pool, poolPromise } from '../db-config/db_connection.js'
+import { poolPromise } from '../db-config/db_connection.js'
 import fs from 'fs'
 
 export async function createLogin (data) {
@@ -236,7 +236,7 @@ export async function insertSubscribedTo (data) {
 }
 
 export async function removeSubscribedTo (data) {
-    const query = `delete from SubscribedTo where userId = ? and restaurantId = ?`
+    const query = 'delete from SubscribedTo where userId = ? and restaurantId = ?'
     const value = [data.userId, data.restaurantId]
     const [results] = await poolPromise.execute(query, value)
     return {
@@ -257,10 +257,19 @@ export async function resetPassword (data) {
 }
 
 export async function findSubscribedEateriesFromUserId (id) {
-    const query = 'select \
-    restaurantId, name, street, \
-    suburb, region, postcode, phone, email, url, cuisine \
-    from userSubscription where userId = ?'
+    const query = `select 
+                        restaurantId, 
+                        name, 
+                        street, 
+                        suburb, 
+                        region, 
+                        postcode, 
+                        phone, 
+                        email, 
+                        url, 
+                        cuisine
+                    from userSubscription 
+                    where userId = ?`
     const value = [id]
     const [results] = await poolPromise.execute(query, value)
     return {
@@ -374,42 +383,42 @@ export async function getAllDietaries () {
 // store and update image path for the user
 export async function storeUserProfileImg (path, userId) {
     // find existing image path
-    let query = `select imagePath from userProfileImages where userId = ?`
-    let [result] = await poolPromise.execute(query, [userId])
+    let query = 'select imagePath from userProfileImages where userId = ?'
+    const [result] = await poolPromise.execute(query, [userId])
 
     if (result.length !== 0) {
         // delete current profile image
         fs.unlink(result[0].imagePath, (err) => {
             if (err) {
-                console.log("file does not exist")
+                console.log('file does not exist')
             }
         })
 
         // insert new path
-        query = `update userProfileImages set imagePath = ? where userId = ?`
+        query = 'update userProfileImages set imagePath = ? where userId = ?'
         await poolPromise.execute(query, [path, userId])
         return {
             success: 1,
-            message: "Image updated successfully"
+            message: 'Image updated successfully'
         }
     }
 
-    query = `insert into userProfileImages(userId, imagePath) values (?, ?)`
+    query = 'insert into userProfileImages(userId, imagePath) values (?, ?)'
     await poolPromise.execute(query, [userId, path])
     return {
         success: 1,
-        message: "Image upload successfully"
+        message: 'Image upload successfully'
     }
 }
 
 export async function getUserProfileImgPath (userId) {
-    const query = `select imagePath from userProfileImages where userId = ?`
+    const query = 'select imagePath from userProfileImages where userId = ?'
     const [result] = await poolPromise.execute(query, [userId])
 
-    if (result.length == 0) {
+    if (result.length === 0) {
         return {
             success: 0,
-            message: "no image found"
+            message: 'no image found'
         }
     }
 
