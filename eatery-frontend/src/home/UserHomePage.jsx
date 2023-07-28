@@ -44,7 +44,7 @@ const n = 4 // change the number depending on the requirements
 
 let loginId
 let userId
-let eateriesSubscribed = []
+
 
 const getUserSubscribers = async() => {
   try {
@@ -85,8 +85,9 @@ const getUserSubscribers = async() => {
  *        loadSubscriptions(curSubs, 4, 2) => ERROR (Not sure exactly how this error should be handled)
  * 
  */
-function loadSubscriptions(setCurrentSubs, index, count) {
-  let fullyLoadedData = eateriesSubscribed
+
+function loadSubscriptions(allSubs, setCurrentSubs, index, count) {
+  let fullyLoadedData = allSubs
   console.log(fullyLoadedData)
   if (count === 0) {
     setCurrentSubs(fullyLoadedData);
@@ -140,6 +141,8 @@ export default function UserHomePage() {
   const [dietary, setDietary] = useState(null);
   const [search, setSearch] = useState(null);
 
+  const [test, setTest] = useState(false);
+  const [allSubs, setAllSubs] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -154,7 +157,7 @@ export default function UserHomePage() {
           loginId = decrypt.result.id;
           const getUserId = await axios.get(`api/user/login/${loginId}`)
           userId = getUserId.data.data[0].id
-          eateriesSubscribed = await getUserSubscribers()
+          setAllSubs(await getUserSubscribers())
           setUserContext(true)
           console.log("is logged in")
         }
@@ -177,22 +180,26 @@ export default function UserHomePage() {
     /*
      *  Whenever the currentSubsIndex is toggled, load subscriptions with current index
      */
-    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
+    loadSubscriptions(allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount);
   }, [currentSubsIndex]);
 
+  useEffect(() => {
+    loadSubscriptions(allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount);
+  }, [allSubs])
+
   function handleOnClickViewSubscriptions(){
-    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
+    loadSubscriptions(allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount);
     setViewSubscriptions(true);
   };
 
   function handleOnClickRightSubscriptions(){
     setCurrentSubsIndex((prevIndex) => prevIndex + 3);
-    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
+    loadSubscriptions(allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount);
   };
 
   function handleOnClickLeftSubscriptions(){
     setCurrentSubsIndex((prevIndex) => Math.max(prevIndex - 3, 0))
-    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
+    loadSubscriptions(allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount);
   };
 
   function handleOnClickBrowse(){
@@ -293,7 +300,7 @@ export default function UserHomePage() {
             {currentSubsIndex !== 0 ? <Button variant="contained" onClick={handleOnClickLeftSubscriptions} sx={{minHeight: 295}}>&lt;</Button> : <Button variant="contained" sx={{visibility:'hidden'}} >&lt;</Button>}
             {currentSubs.map(currentSub => {
               return ( 
-                <SubscriptionGridItem key={currentSub.id} user={userId} id={currentSub.id} name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location} image={currentSub.image}/>
+                <SubscriptionGridItem test={setTest} allSubs={allSubs} setAllSubs={setAllSubs} rpost={currentSub} user={userId} />
               );
             })}
             {currentSubs.length === 3 && <Button variant="contained" onClick={handleOnClickRightSubscriptions}>&gt;</Button>}
@@ -309,18 +316,18 @@ export default function UserHomePage() {
                 Current Offers
               </Typography>
             </Grid>
+            
             <Grid container xs={12} spacing={2}>
-              <RestaurantGridItem name="Dominos" cuisine="italian" location="sydney"/>
-              <RestaurantGridItem name="Malay Chinese" cuisine="Malaysian" location="sydney"/>
-              <RestaurantGridItem name="Atom Thai" cuisine="thai" location="parrammatta"/>
+              
             </Grid>
+            
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
                 New Restaurants
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              {newRestaurants.map((restaurant) => <RestaurantGridItem key={restaurant.id} id={restaurant.id} user={userId} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.location || "unknown"} image={restaurant.image}/>)}
+              {newRestaurants.map((restaurant) => <RestaurantGridItem test={setTest} allSubs={allSubs} setAllSubs={setAllSubs} rpost={restaurant} user={userId} />)}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
@@ -328,9 +335,7 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              <RestaurantGridItem name="Dominos" cuisine="italian" location="sydney"/>
-              <RestaurantGridItem name="Malay Chinese" cuisine="Malaysian" location="sydney"/>
-              <RestaurantGridItem name="Atom Thai" cuisine="thai" location="parrammatta"/>
+              
             </Grid>
           </Grid>
         </CardContent>
@@ -342,7 +347,7 @@ export default function UserHomePage() {
 function RestaurantGridItem(props) {
   return (
     <Grid xs={4} spacing={2}>
-      <RestaurantPost key={props.id} id={props.id} user={props.user} name={props.name} cuisine={props.cuisine} location={props.location} image={props.image} />
+      <RestaurantPost test={props.test} allSubs={props.allSubs} setAllSubs={props.setAllSubs} rpost={props.rpost} user={props.user}/>
     </Grid>
   );
 }
@@ -350,7 +355,7 @@ function RestaurantGridItem(props) {
 function SubscriptionGridItem(props) {
   return (
     <Grid xs={3.33} spacing={2}>
-      <RestaurantPost key={props.id} id={props.id} user={props.user} name={props.name} cuisine={props.cuisine} location={props.location} image={props.image} />
+      <RestaurantPost test={props.test} allSubs={props.allSubs} setAllSubs={props.setAllSubs} rpost={props.rpost} user={props.user} />
     </Grid>
   );
 }
