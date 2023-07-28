@@ -133,14 +133,14 @@ create table BusinessHour (
 create table userProfileImages (
     id          integer auto_increment,
     userId      integer references UserAccount(id),
-    image_path   text,
+    imagePath   text,
     primary key (id)
 );
 
 create table restaurantProfileImages (
     id  integer auto_increment,
     restaurantId integer references EateryAccount(id),
-    image_path text,
+    imagePath text,
     primary key (id)
 );
 
