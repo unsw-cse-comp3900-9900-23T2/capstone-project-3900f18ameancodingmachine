@@ -91,41 +91,103 @@ export default function UserProfile() {
                 />
               </Box>
             </Grid>
-            <Grid container spacing={2} xs={12}>
-              <Grid xs={6}>
-                <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
-                  First
-                </Typography>
-              </Grid>
-              <Grid xs={6}>
-                <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
-                  {userData.first}
-                </Typography>
-              </Grid>
-              <Grid xs={6}>
-                <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
-                  Last
-                </Typography>
-              </Grid>
-              <Grid xs={6}>
-                <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
-                  {userData.last}
-                </Typography>
-              </Grid>
-              <Grid xs={6}>
-                <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
-                  Address
-                </Typography>
-              </Grid>
-              <Grid xs={6}>
-                <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
-                  {userData.address}
-                </Typography>
-              </Grid>
+            <Grid xs={12}>
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Button variant="outlined" onClick={() => {}}>Update Image</Button>
+              </Box>
             </Grid>
             <Grid container spacing={2} xs={12}>
+              <Grid xs={3}></Grid>
+              <Grid xs={3}>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Typography sx={{ fontSize: 18, fontWeight: 'bold' }} color="text.primary" gutterBottom>
+                    First
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid xs={3}>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
+                    {userData.first}
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid xs={3}></Grid>
+              <Grid xs={3}></Grid>
+              <Grid xs={3}>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Typography sx={{ fontSize: 18, fontWeight: 'bold' }} color="text.primary" gutterBottom>
+                    Last
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid xs={3}>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
+                    {userData.last}
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid xs={3}></Grid>
+              <Grid xs={3}></Grid>
+              <Grid xs={3}>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Typography sx={{ fontSize: 18, fontWeight: 'bold' }} color="text.primary" gutterBottom>
+                    Address
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid xs={3}>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
+                    {userData.address}
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid xs={3}></Grid>
+            </Grid>
+            <Grid xs={12}>
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Button variant="outlined" onClick={() => {}}>Edit</Button>
+              </Box>
+            </Grid>
+            <Grid xs={12}></Grid>
+            <Grid container spacing={2} xs={12}>
+              <Grid xs={12}></Grid> 
               <Grid container spacing={2} xs={12}>
-                <Typography sx={{ fontSize: 20 }} color="text.primary" gutterBottom>
+                <Typography sx={{ fontSize: 20, fontWeight: 'bold' }} color="text.primary" gutterBottom>
                   Posts from your subscriptions
                 </Typography>
               </Grid>
@@ -140,9 +202,6 @@ export default function UserProfile() {
             </Grid>
           </Grid>
         </CardContent>
-        <CardActions>
-          <Button variant="contained" onClick={() => {}}>Edit</Button>
-        </CardActions>
       </Card>
     </Container>
   );
