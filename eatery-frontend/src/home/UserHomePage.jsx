@@ -56,7 +56,8 @@ const getUserSubscribers = async() => {
       id: eatery.restaurantId, 
       name: eatery.name, 
       cuisine: eatery.cuisine || "not added", 
-      location: eatery.suburb
+      location: eatery.suburb,
+      image: eatery.image
     }))
     return subscribedEateries
   } catch (error) {
@@ -113,7 +114,8 @@ async function getLatestEateries()  {
     id: eatery.id, 
     name: eatery.name, 
     cuisine: eatery.cuisine || "not added", 
-    location: eatery.suburb
+    location: eatery.suburb,
+    image: eatery.image
   }))
   return newEateries
 }
@@ -291,7 +293,7 @@ export default function UserHomePage() {
             {currentSubsIndex !== 0 ? <Button variant="contained" onClick={handleOnClickLeftSubscriptions} sx={{minHeight: 295}}>&lt;</Button> : <Button variant="contained" sx={{visibility:'hidden'}} >&lt;</Button>}
             {currentSubs.map(currentSub => {
               return ( 
-                <SubscriptionGridItem key={currentSub.id} user={userId} id={currentSub.id} name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location}/>
+                <SubscriptionGridItem key={currentSub.id} user={userId} id={currentSub.id} name={currentSub.name} cuisine={currentSub.cuisine} location={currentSub.location} image={currentSub.image}/>
               );
             })}
             {currentSubs.length === 3 && <Button variant="contained" onClick={handleOnClickRightSubscriptions}>&gt;</Button>}
@@ -318,7 +320,7 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              {newRestaurants.map((restaurant) => <RestaurantGridItem key={restaurant.id} id={restaurant.id} user={userId} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.location || "unknown"}/>)}
+              {newRestaurants.map((restaurant) => <RestaurantGridItem key={restaurant.id} id={restaurant.id} user={userId} name={restaurant.name} cuisine={restaurant.cuisine || "unknown"} location={restaurant.location || "unknown"} image={restaurant.image}/>)}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
@@ -340,7 +342,7 @@ export default function UserHomePage() {
 function RestaurantGridItem(props) {
   return (
     <Grid xs={4} spacing={2}>
-      <RestaurantPost key={props.id} id={props.id} user={props.user} name={props.name} cuisine={props.cuisine} location={props.location} />
+      <RestaurantPost key={props.id} id={props.id} user={props.user} name={props.name} cuisine={props.cuisine} location={props.location} image={props.image} />
     </Grid>
   );
 }
@@ -348,7 +350,7 @@ function RestaurantGridItem(props) {
 function SubscriptionGridItem(props) {
   return (
     <Grid xs={3.33} spacing={2}>
-      <RestaurantPost key={props.id} id={props.id} user={props.user} name={props.name} cuisine={props.cuisine} location={props.location} />
+      <RestaurantPost key={props.id} id={props.id} user={props.user} name={props.name} cuisine={props.cuisine} location={props.location} image={props.image} />
     </Grid>
   );
 }
