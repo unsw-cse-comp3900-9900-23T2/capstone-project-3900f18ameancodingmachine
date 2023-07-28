@@ -16,13 +16,19 @@ import { UserContext } from '../App.jsx';
 import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 
-import profile_pic from '../profile.png'
+import profile_pic from '../profile.png';
+import RestaurantPost from '../home/RestaurantPost';
+
+function getRestaurantPosts() {
+  // TODO get from backend
+}
 
 export default function UserProfile() {
   // Null: not logged in, true: user, false: restaurant
   const { userContext, setUserContext } = useContext(UserContext);
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
+  const [restaurantPosts, setRestaurantPosts] = useState([1,2]);
 
   let loginId, userId;
 
@@ -98,9 +104,39 @@ export default function UserProfile() {
               </Grid>
               <Grid xs={6}>
                 <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
+                  Last
+                </Typography>
+              </Grid>
+              <Grid xs={6}>
+                <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
                   {userData.last}
                 </Typography>
               </Grid>
+              <Grid xs={6}>
+                <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
+                  Address
+                </Typography>
+              </Grid>
+              <Grid xs={6}>
+                <Typography sx={{ fontSize: 18 }} color="text.primary" gutterBottom>
+                  {userData.address}
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} xs={12}>
+              <Grid container spacing={2} xs={12}>
+                <Typography sx={{ fontSize: 20 }} color="text.primary" gutterBottom>
+                  Posts from your subscriptions
+                </Typography>
+              </Grid>
+              {
+                restaurantPosts.map((post) => 
+                  <Grid xs={6}>
+                    {/* TODO */}
+                    <RestaurantPost key={"id"} id={"id"} user={"userId"} name={"name"} cuisine={"cuisine"} location={"location"}/>
+                  </Grid>
+                )
+              }
             </Grid>
           </Grid>
         </CardContent>
