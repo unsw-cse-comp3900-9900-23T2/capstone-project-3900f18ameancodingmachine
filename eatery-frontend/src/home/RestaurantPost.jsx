@@ -18,11 +18,9 @@ export default function RestaurantPost(props) {
   // to preserve the state on whether the user has subscribed or not
   // store the state in key-value pair where key -> subscribe(userId)(restaurantId)
   let restaurantPost = props.rpost
-  console.log(`restaurantPost: ${restaurantPost}`);
   const restaurantId = restaurantPost.id
   const userId = props.user
   const mainKey = `subscribe`
-  const testFunc = props.test;
   const uid = mainKey.concat('', userId, restaurantId)
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
@@ -74,8 +72,7 @@ export default function RestaurantPost(props) {
       console.log("unsubscribed")
       setIsSubscribed(false)
       props.setAllSubs(props.allSubs.filter((restaurant) => restaurant.id !== restaurantId))
-      //props.setAllSubs(previousState => previousState.filter((restaurant) => restaurant.id != restaurantId))
-      //window.location.reload(false)
+
     } catch (error) {
       console.log(error) 
     }

@@ -141,7 +141,6 @@ export default function UserHomePage() {
   const [dietary, setDietary] = useState(null);
   const [search, setSearch] = useState(null);
 
-  const [test, setTest] = useState(false);
   const [allSubs, setAllSubs] = useState([]);
   const navigate = useNavigate();
 
@@ -181,11 +180,7 @@ export default function UserHomePage() {
      *  Whenever the currentSubsIndex is toggled, load subscriptions with current index
      */
     loadSubscriptions(allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount);
-  }, [currentSubsIndex]);
-
-  useEffect(() => {
-    loadSubscriptions(allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount);
-  }, [allSubs])
+  }, [currentSubsIndex, allSubs]);
 
   function handleOnClickViewSubscriptions(){
     loadSubscriptions(allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount);
@@ -300,7 +295,7 @@ export default function UserHomePage() {
             {currentSubsIndex !== 0 ? <Button variant="contained" onClick={handleOnClickLeftSubscriptions} sx={{minHeight: 295}}>&lt;</Button> : <Button variant="contained" sx={{visibility:'hidden'}} >&lt;</Button>}
             {currentSubs.map(currentSub => {
               return ( 
-                <SubscriptionGridItem test={setTest} allSubs={allSubs} setAllSubs={setAllSubs} rpost={currentSub} user={userId} />
+                <SubscriptionGridItem allSubs={allSubs} setAllSubs={setAllSubs} rpost={currentSub} user={userId} />
               );
             })}
             {currentSubs.length === 3 && <Button variant="contained" onClick={handleOnClickRightSubscriptions}>&gt;</Button>}
@@ -318,7 +313,7 @@ export default function UserHomePage() {
             </Grid>
             
             <Grid container xs={12} spacing={2}>
-              
+              {newRestaurants.map((restaurant) => <RestaurantGridItem allSubs={allSubs} setAllSubs={setAllSubs} rpost={restaurant} user={userId} />)}
             </Grid>
             
             <Grid xs={12} spacing={2}>
@@ -327,7 +322,7 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              {newRestaurants.map((restaurant) => <RestaurantGridItem test={setTest} allSubs={allSubs} setAllSubs={setAllSubs} rpost={restaurant} user={userId} />)}
+              {newRestaurants.map((restaurant) => <RestaurantGridItem allSubs={allSubs} setAllSubs={setAllSubs} rpost={restaurant} user={userId} />)}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
@@ -335,7 +330,7 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              
+            {newRestaurants.map((restaurant) => <RestaurantGridItem allSubs={allSubs} setAllSubs={setAllSubs} rpost={restaurant} user={userId} />)}
             </Grid>
           </Grid>
         </CardContent>
@@ -347,7 +342,7 @@ export default function UserHomePage() {
 function RestaurantGridItem(props) {
   return (
     <Grid xs={4} spacing={2}>
-      <RestaurantPost test={props.test} allSubs={props.allSubs} setAllSubs={props.setAllSubs} rpost={props.rpost} user={props.user}/>
+      <RestaurantPost allSubs={props.allSubs} setAllSubs={props.setAllSubs} rpost={props.rpost} user={props.user}/>
     </Grid>
   );
 }
@@ -355,7 +350,7 @@ function RestaurantGridItem(props) {
 function SubscriptionGridItem(props) {
   return (
     <Grid xs={3.33} spacing={2}>
-      <RestaurantPost test={props.test} allSubs={props.allSubs} setAllSubs={props.setAllSubs} rpost={props.rpost} user={props.user} />
+      <RestaurantPost allSubs={props.allSubs} setAllSubs={props.setAllSubs} rpost={props.rpost} user={props.user} />
     </Grid>
   );
 }
