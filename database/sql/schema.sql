@@ -130,3 +130,17 @@ create table BusinessHour (
     primary key (id)
 );
 
+create table userProfileImages (
+    id          integer auto_increment,
+    userId      integer references UserAccount(id),
+    imagePath   text,
+    primary key (id)
+);
+
+create table restaurantProfileImages (
+    id  integer auto_increment,
+    restaurantId integer references EateryAccount(id),
+    imagePath text,
+    primary key (id)
+);
+
