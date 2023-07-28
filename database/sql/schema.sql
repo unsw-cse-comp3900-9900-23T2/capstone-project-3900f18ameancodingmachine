@@ -73,6 +73,7 @@ create table Posts (
     postedBy    integer references RestaurantOwners(id),
     title       text,
     content     text,
+    likes       integer default 0,
     primary key (id)
 );
 
@@ -138,9 +139,18 @@ create table userProfileImages (
 );
 
 create table restaurantProfileImages (
-    id  integer auto_increment,
-    restaurantId integer references EateryAccount(id),
-    imagePath text,
+    id              integer auto_increment,
+    restaurantId    integer references EateryAccount(id),
+    imagePath       text,
     primary key (id)
+);
+
+create table PostComments (
+    id          integer auto_increment,
+    userId      integer,
+    postId      integer,
+    primary key (id),
+    FOREIGN KEY (userId) REFERENCES UserAccount(id),
+    FOREIGN KEY (postId) REFERENCES Posts(id) 
 );
 
