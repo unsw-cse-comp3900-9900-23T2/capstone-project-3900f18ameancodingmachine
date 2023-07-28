@@ -1,6 +1,8 @@
 import * as React from 'react';
 
 import { useState, useEffect } from 'react';
+import { NavLink } from "react-router-dom";
+
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -98,7 +100,7 @@ export default function RestaurantPost(props) {
         </CardContent>
         <CardActions>
           <Button size="small">Share</Button>
-          <Button size="small">Learn More</Button>
+          <Button size="small" component={NavLink} to={`/RestaurantProfile/${restaurantId}`}>Learn More</Button>
           {userId && (isSubscribed ? <Button size="small" onClick={userUnSubscribe}>Unsub</Button> : <Button size="small" onClick={userSubscribe}>Sub</Button>)}
         </CardActions>
       </Card>
