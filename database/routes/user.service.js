@@ -433,6 +433,15 @@ export async function getUserProfileImgPath (userId) {
     }
 }
 
+export async function postNewComment (userId, postId, comment) {
+    const query = `insert into PostComments(userId, postId, comment) values (?, ?, ?)`
+    const [result] = await poolPromise.execute(query, [userId, postId, comment])
+    return {
+        success: 1,
+        message: "comment added"
+    }
+}
+
 /**
  * find restaurant based on restaurant name, cuisine, location (suburb)
  * as well as dietary restrictions

@@ -203,6 +203,7 @@ export async function storeEateryProfileImg (imgPath, restaurantId) {
     let query = 'select imagePath from restaurantProfileImages where restaurantId = ?'
     const [result] = await poolPromise.execute(query, [restaurantId])
 
+    // remove public from path -> path stored becomes upload/(image name)
     const relativePath = path.relative('public', imgPath)
 
     if (result.length !== 0) {

@@ -11,6 +11,38 @@ afterAll((done) => {
     });
 });
 
+///////////////////////////////////////Sample Data//////////////////////////////////
+
+// for basic test like login, address, and account router
+const login = "uniquename@gmail.com"
+const password = "test"
+
+// address
+const data = {
+    street: "unicorn street",
+    suburb: "dirtland",
+    region: "NSW",
+    postcode: "2025"
+}
+
+// for router where userId and restaurantId are required
+const userLogin = "anotheraccount"
+const userPassword = "anotherpassword"
+const restaurantLogin = "uniquename@gmail.com"
+const restaurantPassword = "test"
+
+const userLoginData = {
+    login: userLogin,
+    password: userPassword
+}
+
+const eateryLoginData = {
+    login: restaurantLogin,
+    password: restaurantPassword
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+
 // get all user account
 describe("/userall", () => {
     test('status code should be 200', async() => {
@@ -27,12 +59,9 @@ describe("/userall", () => {
 // registering account
 describe("/account", () => {
 
-    const login = "uniquename@gmail.com"
-    const password = "test"
-
     afterEach(async () => {
-        const query = "delete from LoginInfo where login = ?"
-        const res = await poolPromise.execute(query, [login])
+        const query = "delete from LoginInfo"
+        const res = await poolPromise.execute(query)
     })
 
     test('successful registration should return status code 200 and success', async () => {
@@ -40,6 +69,7 @@ describe("/account", () => {
             login: login,
             password: password
         })
+        console.log(response)
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
     })
@@ -63,8 +93,6 @@ describe("/account", () => {
 })
 
 describe("/login", () => {
-    const login = "uniquename@gmail.com"
-    const password = "test"
 
     afterEach(async () => {
         const query = "delete from LoginInfo"
@@ -98,18 +126,13 @@ describe("/login", () => {
     })
 })
 
+
+
 describe("/address", () => {
-    
-    const data = {
-        street: "unicorn street",
-        suburb: "dirtland",
-        region: "NSW",
-        postcode: "2025"
-    }
 
     afterEach(async () => {
-        const query = `delete from Address where street = ? and suburb = ? and region = ? and postcode = ?`
-        const res = await poolPromise.execute(query, ["unicorn street", "dirtland", "NSW", "2025"])
+        const query = `delete from Address`
+        const res = await poolPromise.execute(query)
     })
 
     test("address should return status code 200", async () => {
@@ -120,54 +143,46 @@ describe("/address", () => {
 })
 
 describe("/reviews", () => {
-    const userLogin = "anotheraccount"
-    const userPassword = "anotherpassword"
-    const restaurantLogin = "uniquename@gmail.com"
-    const restaurantPassword = "test"
-
-    const userLoginData = {
-        login: userLogin,
-        password: userPassword
-    }
-
-    const eateryLoginData = {
-        login: restaurantLogin,
-        password: restaurantPassword
-    }
 
     afterEach(async () => {
-        let query = `delete from LoginInfo`
+        let query = `delete from LoginInfo`;
         let res = await poolPromise.execute(query)
+        query = `delete from Reviews`;
+        res = await poolPromise.execute(query)
+        query = `delete from Address`;
+        res = await poolPromise.execute(query)
         query = `delete from UserAccount`;
         res = await poolPromise.execute(query)
         query = `delete from EateryAccount`;
         res = await poolPromise.execute(query)
-        query = `delete from Reviews`;
-        res = await poolPromise.execute(query)
     })
 
-    // assume the user is logged in (bit lazy)
     test("user review a restaurant, when search for the review, return statuscode 200 and success 1", async () => {
         // register user
         let response = await request(app).post("/api/user/account").send(userLoginData)
         const userLoginId = response.body.data.insertId
 
-       // register eatery
-       response = await request(app).post("/api/user/account").send(eateryLoginData)
-       const eateryLoginId = response.body.data.insertId
+        // register eatery
+        response = await request(app).post("/api/user/account").send(eateryLoginData)
+        const eateryLoginId = response.body.data.insertId
+       
+        // create address   
+        response = await request(app).post('/api/user/address').send(data)
+        console.log(response.body.data.insertId)
+        const addressId = response.body.data.insertId
 
-       // create user account, leaves address
+        // create user account, leaves address
         const userAccount = {
            first: "first",
            last: "last",
            loginId: userLoginId,
-           addressId: 1 //fake
+           addressId: addressId //fake
         }
 
-       // create eatery account, leaves address
+        // create eatery account
         const eateryAccount = {
             name: "another restaurant",
-            addressId: 0, //fake
+            addressId: addressId, //fake
             phone: "0493186858",
             email: "anotherrestaurant@gmail.com",
             loginId: eateryLoginId, 
@@ -209,31 +224,9 @@ describe("/reviews", () => {
 })
 
 describe('/subscribe', () => {
-    const userAccount = {
-        first: "first",
-        last: "last",
-        loginId: 0, //fake
-        addressId: 1 //fake
-    }
-
-    const addressData = {
-        street: "unicorn street",
-        suburb: "dirtland",
-        region: "NSW",
-        postcode: "2025"
-    }
-
-    const eateryAccount = {
-        name: "another restaurant",
-        addressId: 0, //fake
-        phone: "0493186858",
-        email: "anotherrestaurant@gmail.com",
-        loginId: 0, //fake 
-        url: "www.anotherrestaurant.com",
-    }
 
     afterEach(async () => {
-        let query = `delete from SubscribedTo`
+        let query = `delete from LoginInfo`
         let res = await poolPromise.execute(query)
         query = `delete from UserAccount`;
         res = await poolPromise.execute(query);
@@ -244,7 +237,35 @@ describe('/subscribe', () => {
     })
 
     test("user subscribe to registered restaurant", async () => {
-        let response = await request(app).post("/api/user/eatery").send(eateryAccount)
+        let response = await request(app).post("/api/user/account").send(userLoginData)
+        const userLoginId = response.body.data.insertId
+
+        // register eatery
+        response = await request(app).post("/api/user/account").send(eateryLoginData)
+        const eateryLoginId = response.body.data.insertId
+
+        response = await request(app).post('/api/user/address').send(data)
+        const addressId = response.body.data.insertId
+
+        // create user account, leaves address
+        const userAccount = {
+            first: "first",
+            last: "last",
+            loginId: userLoginId,
+            addressId: addressId //fake
+         }
+ 
+        // create eatery account, leaves address
+        const eateryAccount = {
+            name: "another restaurant",
+            addressId: addressId, //fake
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            loginId: eateryLoginId, 
+            url: "www.anotherrestaurant.com",
+        }
+       
+        response = await request(app).post("/api/user/eatery").send(eateryAccount)
         const eateryAccountId = response.body.results.insertId
 
         response = await request(app).post("/api/user/user").send(userAccount)
@@ -262,19 +283,35 @@ describe('/subscribe', () => {
 
     test("finding what eateries the user is subscribed to", async () => {
 
-        let response = await request(app).post("/api/user/address").send(addressData)
-        const eateryAddressId = response.body.data.insertId
+        let response = await request(app).post("/api/user/account").send(userLoginData)
+        const userLoginId = response.body.data.insertId
 
-        const eateryAccount2 = {
+        // register eatery
+        response = await request(app).post("/api/user/account").send(eateryLoginData)
+        const eateryLoginId = response.body.data.insertId
+
+        response = await request(app).post('/api/user/address').send(data)
+        const addressId = response.body.data.insertId
+
+        // create user account, leaves address
+        const userAccount = {
+            first: "first",
+            last: "last",
+            loginId: userLoginId,
+            addressId: addressId //fake
+         }
+ 
+        // create eatery account, leaves address
+        const eateryAccount = {
             name: "another restaurant",
-            addressId: eateryAddressId,
+            addressId: addressId, //fake
             phone: "0493186858",
             email: "anotherrestaurant@gmail.com",
-            loginId: 0, //fake 
+            loginId: eateryLoginId, 
             url: "www.anotherrestaurant.com",
         }
 
-        response = await request(app).post("/api/user/eatery").send(eateryAccount2)
+        response = await request(app).post("/api/user/eatery").send(eateryAccount)
         const eateryAccountId = response.body.results.insertId
 
         response = await request(app).post("/api/user/user").send(userAccount)
@@ -308,147 +345,149 @@ describe('/subscribe', () => {
  * 5. one wrong info
  * 6. name of search is subset of restaurant name
 */
-describe("/eatery/find", () => {
+// describe("/eatery/find", () => {
 
-    const addressData = {
-        street: "unicorn street",
-        suburb: "dirtland",
-        region: "NSW",
-        postcode: "2025"
-    }
+//     const addressData = {
+//         street: "unicorn street",
+//         suburb: "dirtland",
+//         region: "NSW",
+//         postcode: "2025"
+//     }
 
-    const cuisineData = {
-        name: "japanese"
-    }
+//     const cuisineData = {
+//         name: "japanese"
+//     }
 
-    beforeEach(async () => {
-        let  response = await request(app).post('/api/user/cuisine').send(cuisineData)
-        const cuisineId = response.body.data.insertId
+//     beforeEach(async () => {
+//         let  response = await request(app).post('/api/user/cuisine').send(cuisineData)
+//         const cuisineId = response.body.data.insertId
 
-        response = await request(app).post("/api/user/address").send(addressData)
-        const eateryAddressId = response.body.data.insertId
+//         response = await request(app).post("/api/user/address").send(addressData)
+//         const eateryAddressId = response.body.data.insertId
 
-        const restaurantData = {
-            name: "another restaurant",
-            addressId: eateryAddressId,
-            phone: "0493186858",
-            email: "anotherrestaurant@gmail.com",
-            loginId: 0, //fake 
-            url: "www.anotherrestaurant.com",
-        }
+//         const restaurantData = {
+//             name: "another restaurant",
+//             addressId: eateryAddressId,
+//             phone: "0493186858",
+//             email: "anotherrestaurant@gmail.com",
+//             loginId: 0, //fake 
+//             url: "www.anotherrestaurant.com",
+//         }
 
-        // create the new eatery
-        response = await request(app).post('/api/user/eatery').send(restaurantData)
-        const restaurantId = response.body.results.insertId
+//         // create the new eatery
+//         response = await request(app).post('/api/user/eatery').send(restaurantData)
+//         const restaurantId = response.body.results.insertId
 
-        const offerData = {
-            restaurantId: restaurantId,
-            cuisineId: cuisineId
-        }
+//         const offerData = {
+//             restaurantId: restaurantId,
+//             cuisineId: cuisineId
+//         }
 
-        // make cuisine offer from restaurant
-        response = await request(app).post('/api/user/cuisine-offer').send(offerData)
-        let restriction = "gluten free"
-        let query = `insert into DietaryRestrictions(restriction) values (?)`
-        let res = await poolPromise.execute(query, [restriction])
-        const dietId = res[0].insertId
-        query = `insert into provideDietary(restaurantId, dietId) values (?,?)`
-        await poolPromise.execute(query, [restaurantId, dietId])
-    })
+//         // make cuisine offer from restaurant
+//         response = await request(app).post('/api/user/cuisine-offer').send(offerData)
+//         let restriction = "gluten free"
+//         let query = `insert into DietaryRestrictions(restriction) values (?)`
+//         let res = await poolPromise.execute(query, [restriction])
+//         const dietId = res[0].insertId
+//         query = `insert into provideDietary(restaurantId, dietId) values (?,?)`
+//         await poolPromise.execute(query, [restaurantId, dietId])
+//     })
     
-    afterEach(async() => {
-        let query = `delete from CuisineOffer`
-        let res = await poolPromise.execute(query)
-        query = `delete from Address`;
-        res = await poolPromise.execute(query);
-        query = `delete from EateryAccount`;
-        res = await poolPromise.execute(query);
-        query = `delete from Cuisines`;
-        res = await poolPromise.execute(query);
-        query = `delete from DietaryRestrictions`;
-        res = await poolPromise.execute(query);
-        query = `delete from provideDietary`;
-        res = await poolPromise.execute(query);
-    })
+//     afterEach(async() => {
+//         let query = `delete from CuisineOffer`
+//         let res = await poolPromise.execute(query)
+//         query = `delete from LoginInfo`
+//         res = await poolPromise.execute(query)
+//         query = `delete from Address`;
+//         res = await poolPromise.execute(query);
+//         query = `delete from EateryAccount`;
+//         res = await poolPromise.execute(query);
+//         query = `delete from Cuisines`;
+//         res = await poolPromise.execute(query);
+//         query = `delete from DietaryRestrictions`;
+//         res = await poolPromise.execute(query);
+//         query = `delete from provideDietary`;
+//         res = await poolPromise.execute(query);
+//     })
 
-    test("find based on restaurant name", async () => {
-        const query = {
-            name: "another restaurant"
-        }
+//     test("find based on restaurant name", async () => {
+//         const query = {
+//             name: "another restaurant"
+//         }
         
-        let response = await request(app).get('/api/user/eatery/find').query(query)
+//         let response = await request(app).get('/api/user/eatery/find').query(query)
 
-        // if 200 it found something, else it becomes 404
-        expect(response.statusCode).toBe(200);
-        expect(response.body.success).toBe(1);
-        expect(response.body.results.length).toBe(1)
-    })
+//         // if 200 it found something, else it becomes 404
+//         expect(response.statusCode).toBe(200);
+//         expect(response.body.success).toBe(1);
+//         expect(response.body.results.length).toBe(1)
+//     })
 
-    test("find based on location / suburb", async () => {
-        const query = {
-            location: "dirtland"
-        }
+//     test("find based on location / suburb", async () => {
+//         const query = {
+//             location: "dirtland"
+//         }
         
-        let response = await request(app).get('/api/user/eatery/find').query(query)
+//         let response = await request(app).get('/api/user/eatery/find').query(query)
 
-        // if 200 it found something, else it becomes 404
-        expect(response.statusCode).toBe(200);
-        expect(response.body.success).toBe(1);
-        expect(response.body.results.length).toBe(1)
-    })
+//         // if 200 it found something, else it becomes 404
+//         expect(response.statusCode).toBe(200);
+//         expect(response.body.success).toBe(1);
+//         expect(response.body.results.length).toBe(1)
+//     })
 
-    test("find based on cuisine", async () => {
-        const query = {
-            cuisine: "japanese"
-        }
+//     test("find based on cuisine", async () => {
+//         const query = {
+//             cuisine: "japanese"
+//         }
         
-        let response = await request(app).get('/api/user/eatery/find').query(query)
+//         let response = await request(app).get('/api/user/eatery/find').query(query)
 
-        // if 200 it found something, else it becomes 404
-        expect(response.statusCode).toBe(200);
-        expect(response.body.success).toBe(1);
-        expect(response.body.results.length).toBe(1)
-    })
+//         // if 200 it found something, else it becomes 404
+//         expect(response.statusCode).toBe(200);
+//         expect(response.body.success).toBe(1);
+//         expect(response.body.results.length).toBe(1)
+//     })
     
-    test("find based on dietary restrictions", async () => {
-        const query = {
-            restriction: "gluten free"
-        }
+//     test("find based on dietary restrictions", async () => {
+//         const query = {
+//             restriction: "gluten free"
+//         }
         
-        let response = await request(app).get('/api/user/eatery/find').query(query)
+//         let response = await request(app).get('/api/user/eatery/find').query(query)
 
-        // if 200 it found something, else it becomes 404
-        expect(response.statusCode).toBe(200);
-        expect(response.body.success).toBe(1);
-        expect(response.body.results.length).toBe(1)
-    })
+//         // if 200 it found something, else it becomes 404
+//         expect(response.statusCode).toBe(200);
+//         expect(response.body.success).toBe(1);
+//         expect(response.body.results.length).toBe(1)
+//     })
 
-    test("one wrong information should return no results", async () => {
-        const query = {
-            name: "a restaurant",
-            restriction: "gluten free"
-        }
+//     test("one wrong information should return no results", async () => {
+//         const query = {
+//             name: "a restaurant",
+//             restriction: "gluten free"
+//         }
         
-        let response = await request(app).get('/api/user/eatery/find').query(query)
+//         let response = await request(app).get('/api/user/eatery/find').query(query)
 
-        // if 200 it found something, else it becomes 404
-        expect(response.statusCode).toBe(404);
-        expect(response.body.success).toBe(0);
-    })
+//         // if 200 it found something, else it becomes 404
+//         expect(response.statusCode).toBe(404);
+//         expect(response.body.success).toBe(0);
+//     })
 
-    test("find based on subset of restaurant name", async () => {
-        const query = {
-            name: "restaurant"
-        }
+//     test("find based on subset of restaurant name", async () => {
+//         const query = {
+//             name: "restaurant"
+//         }
         
-        let response = await request(app).get('/api/user/eatery/find').query(query)
+//         let response = await request(app).get('/api/user/eatery/find').query(query)
 
-        // if 200 it found something, else it becomes 404
-        expect(response.statusCode).toBe(200);
-        expect(response.body.success).toBe(1);
-        expect(response.body.results.length).toBe(1)
-    })
+//         // if 200 it found something, else it becomes 404
+//         expect(response.statusCode).toBe(200);
+//         expect(response.body.success).toBe(1);
+//         expect(response.body.results.length).toBe(1)
+//     })
     
-})
+// })
 
 

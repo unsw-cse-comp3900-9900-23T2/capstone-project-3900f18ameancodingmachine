@@ -8,27 +8,6 @@ create table LoginInfo (
     primary key (id)
 );
 
-create table UserAccount (
-    id          integer auto_increment,
-    first       text not null,
-    last        text not null,
-    login       integer not null references LoginInfo(id),
-    address     integer references Address(id),
-    primary key (id)
-);
-
-create table EateryAccount (
-    id              integer auto_increment,
-    name            text not null,
-    address         integer references Address(id),
-    phone           integer not null,
-    email           text,
-    login           integer not null references LoginInfo(id),
-    url             text,
-    description     text,
-    primary key (id) 
-);
-
 create table Address (
     id          integer auto_increment,
     street      text not null,
@@ -38,39 +17,67 @@ create table Address (
     primary key (id)
 );
 
+create table UserAccount (
+    id          integer auto_increment,
+    first       text not null,
+    last        text not null,
+    login       integer not null,
+    address     integer,
+    primary key (id),
+    foreign key (login) references LoginInfo(id) on delete cascade,
+    foreign key (address) references Address(id) on delete cascade 
+);
+
+create table EateryAccount (
+    id              integer auto_increment,
+    name            text not null,
+    address         integer,
+    phone           integer not null,
+    email           text,
+    login           integer,
+    url             text,
+    description     text,
+    primary key (id),
+    foreign key (address) references Address(id) on delete cascade ,
+    foreign key (login) references LoginInfo(id) on delete cascade 
+);
+
 create table RestaurantOwners (
     id          integer auto_increment,
     first       text not null,
     last        text not null,
-    ownerOf     integer references EateryAccount(id),
-    primary key (id)
+    ownerOf     integer,
+    primary key (id),
+    foreign key (ownerOf) references EateryAccount(id) on delete cascade 
 );
 
 create table SubscribedTo (
     userId          integer,
     restaurantId    integer,
     primary key (userId, restaurantId),
-    FOREIGN KEY (userId) REFERENCES UserAccount(id),
-    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id)
+    FOREIGN KEY (userId) REFERENCES UserAccount(id) on delete cascade ,
+    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id) on delete cascade 
 );
 
 create table Reviews (
     id              integer auto_increment,
     userId          integer references UserAccount(id),
     restaurantId    integer references EateryAccount(id),
-    -- may need to set range later on
     rating          integer, 
     comment         text,
-    primary key (id)
+    primary key (id),
+    foreign key (userId) references UserAccount(id) on delete cascade ,
+    foreign key (restaurantId) references EateryAccount(id) on delete cascade 
 );
 
 create table Posts (
     id          integer auto_increment,
-    postedBy    integer references RestaurantOwners(id),
+    postedBy    integer,
     title       text,
     content     text,
     likes       integer default 0,
-    primary key (id)
+    primary key (id),
+    foreign key (postedBy) references EateryAccount(id) on delete cascade 
 );
 
 create table Cuisines (
@@ -82,18 +89,21 @@ create table Cuisines (
 create table CuisineOffer (
     restaurantId    integer references EateryAccount(id),
     cuisineId       integer references Cuisines(id),
-    primary key (restaurantId, cuisineId)
+    primary key (restaurantId, cuisineId),
+    foreign key (restaurantId) references EateryAccount(id) on delete cascade ,
+    foreign key (cuisineId) references Cuisines(id) on delete cascade 
 );
 
 create table Voucher (
     id              integer auto_increment,
     offeredBy       integer references EateryAccount(id),
-    discount        decimal(3,2), -- 25.25%, 32.50%, etc
+    discount        decimal(5,2), -- 25.25%, 32.50%, etc
     startOffer      datetime, -- 2022-04-22 10:34:23:55
     endOffer        datetime, 
     count           integer,
     code            text, 
-    primary key (id)
+    primary key (id),
+    foreign key (offeredBy) references EateryAccount(id) on delete cascade 
 );
 
 create table DietaryRestrictions (
@@ -106,16 +116,16 @@ create table userDietary (
     userId      integer,
     dietId      integer,
     primary key (userId, dietId),
-    FOREIGN KEY (userId) REFERENCES UserAccount(id),
-    FOREIGN KEY (dietId) REFERENCES DietaryRestrictions(id)
+    FOREIGN KEY (userId) REFERENCES UserAccount(id) on delete cascade ,
+    FOREIGN KEY (dietId) REFERENCES DietaryRestrictions(id) on delete cascade 
 );
 
 create table provideDietary (
     restaurantId    integer,
     dietId          integer,
     primary key (restaurantId, dietId),
-    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id),
-    FOREIGN KEY (dietId) REFERENCES DietaryRestrictions(id)
+    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id) on delete cascade ,
+    FOREIGN KEY (dietId) REFERENCES DietaryRestrictions(id) on delete cascade 
 );
 
 create table BusinessHour (
@@ -124,30 +134,34 @@ create table BusinessHour (
     day             text,
     open            text,
     close           text,
-    primary key (id)
+    primary key (id),
+    foreign key (restaurantId) references EateryAccount(id) on delete cascade 
 );
 
 create table userProfileImages (
     id          integer auto_increment,
     userId      integer references UserAccount(id),
     imagePath   text,
-    primary key (id)
+    primary key (id),
+    foreign key (userId) references UserAccount(id) on delete cascade 
 );
 
 create table restaurantProfileImages (
     id              integer auto_increment,
-    restaurantId    integer references EateryAccount(id),
+    restaurantId    integer,
     imagePath       text,
-    primary key (id)
+    primary key (id),
+    foreign key (restaurantId) references EateryAccount(id) on delete cascade 
 );
 
 create table PostComments (
     id          integer auto_increment,
     userId      integer,
     postId      integer,
+    comment     text,
     primary key (id),
-    FOREIGN KEY (userId) REFERENCES UserAccount(id),
-    FOREIGN KEY (postId) REFERENCES Posts(id) 
+    FOREIGN KEY (userId) REFERENCES UserAccount(id) on delete cascade ,
+    FOREIGN KEY (postId) REFERENCES Posts(id) on delete cascade  
 );
 
 -- view related to user account
