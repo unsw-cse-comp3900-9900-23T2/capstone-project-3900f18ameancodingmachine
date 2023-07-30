@@ -55,7 +55,6 @@ const n = 4; // change the number depending on the requirements
 
 let loginId;
 let userId;
-let eateriesSubscribed = [];
 
 /**
  * @return {List} user subscribers
@@ -103,12 +102,13 @@ const getUserSubscribers = async () => {
  *        loadSubscriptions(curSubs, 4, 2) => ERROR
  *        (Not sure exactly how this error should be handled)
  *
+ * @param {*} allSubs
  * @param {*} setCurrentSubs
  * @param {*} index
  * @param {*} count
- */
-function loadSubscriptions(setCurrentSubs, index, count) {
-  const fullyLoadedData = eateriesSubscribed;
+*/
+function loadSubscriptions(allSubs, setCurrentSubs, index, count) {
+  const fullyLoadedData = allSubs;
   console.log(fullyLoadedData);
   if (count === 0) {
     setCurrentSubs(fullyLoadedData);
@@ -139,7 +139,7 @@ async function getLatestEateries() {
     name: eatery.name,
     cuisine: eatery.cuisine || 'not added',
     location: eatery.suburb,
-    image: eatery.image
+    image: eatery.image,
   }));
   return newEateries;
 }
@@ -167,6 +167,7 @@ export default function UserHomePage() {
   const [dietary, setDietary] = useState(null);
   const [search, setSearch] = useState(null);
 
+  const [allSubs, setAllSubs] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -209,14 +210,18 @@ export default function UserHomePage() {
      * Whenever the currentSubsIndex is toggled,
      * load subscriptions with current index
      */
-    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
-  }, [currentSubsIndex]);
+    loadSubscriptions(
+        allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount,
+    );
+  }, [currentSubsIndex, allSubs]);
 
   /**
-   * handle view subscriptions
+   *
    */
   function handleOnClickViewSubscriptions() {
-    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
+    loadSubscriptions(
+        allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount,
+    );
     setViewSubscriptions(true);
   }
 
@@ -225,16 +230,39 @@ export default function UserHomePage() {
    */
   function handleOnClickRightSubscriptions() {
     setCurrentSubsIndex((prevIndex) => prevIndex + 3);
-    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
-  }
+    loadSubscriptions(
+        allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount,
+    );
+  };
 
   /**
-   * handle left subscriptions
+   *
    */
   function handleOnClickLeftSubscriptions() {
     setCurrentSubsIndex((prevIndex) => Math.max(prevIndex - 3, 0));
-    loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
-  }
+    loadSubscriptions(
+        allSubs, setCurrentSubs, currentSubsIndex, currentSubsCount,
+    );
+  };
+
+  /**
+   *
+   */
+  function handleOnClickBrowse() {
+    // location, cuisine, dietary
+    // const url =
+    // "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
+    // FIX
+    navigate('/browse', {
+      state: {
+        search: search,
+        location: location,
+        cuisine: cuisine,
+        dietary: dietary,
+        distance: maxDistance,
+      },
+    });
+  };
 
   /**
    * handle browse click
@@ -376,12 +404,16 @@ export default function UserHomePage() {
           )}
         </CardActions>
         {
-        viewSubscriptions === true &&
-        <CardContent sx={{bgcolor: '#FAFAFA', border: "10px groove #61dafb"}}>
-          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+          viewSubscriptions === true &&
+        <CardContent sx={{bgcolor: '#FAFAFA', border: '10px groove #61dafb'}}>
+          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
             My Subscriptions
           </Typography>
-          <Grid sx={{alignSelf: 'center', minHeight: 350}} container spacing={2}>
+          <Grid
+            sx={{alignSelf: 'center', minHeight: 350}}
+            container
+            spacing={2}
+          >
             {currentSubsIndex !== 0 ?
               <Button
                 variant="contained"
@@ -389,24 +421,25 @@ export default function UserHomePage() {
                 sx={{minHeight: 295}}>
                   &lt;
               </Button> :
-              <Button variant="contained" sx={{visibility:'hidden'}} >
+              <Button variant="contained" sx={{visibility: 'hidden'}} >
                 &lt;
               </Button>}
-            {currentSubs.map(currentSub => {
-              return ( 
+            {currentSubs.map((currentSub) => {
+              return (
                 <SubscriptionGridItem
-                  key={currentSub.id}
+                  key={'key'}
+                  allSubs={allSubs}
+                  setAllSubs={setAllSubs}
+                  rpost={currentSub}
                   user={userId}
-                  id={currentSub.id}
-                  name={currentSub.name}
-                  cuisine={currentSub.cuisine}
-                  location={currentSub.location}
-                  image={currentSub.image}
                 />
               );
             })}
             {currentSubs.length === 3 &&
-              <Button variant="contained" onClick={handleOnClickRightSubscriptions}>
+              <Button
+                variant="contained"
+                onClick={handleOnClickRightSubscriptions}
+              >
                 &gt;
               </Button>
             }
@@ -424,23 +457,18 @@ export default function UserHomePage() {
                 Current Offers
               </Typography>
             </Grid>
+
             <Grid container xs={12} spacing={2}>
-              <RestaurantGridItem
-                name="Dominos"
-                cuisine="italian"
-                location="sydney"
-              />
-              <RestaurantGridItem
-                name="Malay Chinese"
-                cuisine="Malaysian"
-                location="sydney"
-              />
-              <RestaurantGridItem
-                name="Atom Thai"
-                cuisine="thai"
-                location="parrammatta"
-              />
+              {newRestaurants.map((restaurant) =>
+                <RestaurantGridItem
+                  key={'key'}
+                  allSubs={allSubs}
+                  setAllSubs={setAllSubs}
+                  rpost={restaurant}
+                  user={userId}
+                />)}
             </Grid>
+
             <Grid xs={12} spacing={2}>
               <Typography
                 sx={{fontSize: 30}}
@@ -451,17 +479,14 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              {newRestaurants.map((restaurant) => (
+              {newRestaurants.map((restaurant) =>
                 <RestaurantGridItem
-                  key={restaurant.id}
-                  id={restaurant.id}
+                  key={'key'}
+                  allSubs={allSubs}
+                  setAllSubs={setAllSubs}
+                  rpost={restaurant}
                   user={userId}
-                  name={restaurant.name}
-                  cuisine={restaurant.cuisine || 'unknown'}
-                  location={restaurant.location || 'unknown'}
-                  image={restaurant.image}
-                />
-              ))}
+                />)}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography
@@ -473,21 +498,15 @@ export default function UserHomePage() {
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              <RestaurantGridItem
-                name="Dominos"
-                cuisine="italian"
-                location="sydney"
-              />
-              <RestaurantGridItem
-                name="Malay Chinese"
-                cuisine="Malaysian"
-                location="sydney"
-              />
-              <RestaurantGridItem
-                name="Atom Thai"
-                cuisine="thai"
-                location="parrammatta"
-              />
+              {newRestaurants.map((restaurant) =>
+                <RestaurantGridItem
+                  key={'key'}
+                  allSubs={allSubs}
+                  setAllSubs={setAllSubs}
+                  rpost={restaurant}
+                  user={userId}
+                />)
+              }
             </Grid>
           </Grid>
         </CardContent>
@@ -505,13 +524,10 @@ function RestaurantGridItem(props) {
   return (
     <Grid xs={4} spacing={2}>
       <RestaurantPost
-        key={props.id}
-        id={props.id}
+        allSubs={props.allSubs}
+        setAllSubs={props.setAllSubs}
+        rpost={props.rpost}
         user={props.user}
-        name={props.name}
-        cuisine={props.cuisine}
-        location={props.location}
-        image={props.image}
       />
     </Grid>
   );
@@ -526,13 +542,10 @@ function SubscriptionGridItem(props) {
   return (
     <Grid xs={3.33} spacing={2}>
       <RestaurantPost
-        key={props.id}
-        id={props.id}
+        allSubs={props.allSubs}
+        setAllSubs={props.setAllSubs}
+        rpost={props.rpost}
         user={props.user}
-        name={props.name}
-        cuisine={props.cuisine}
-        location={props.location}
-        image={props.image}
       />
     </Grid>
   );
