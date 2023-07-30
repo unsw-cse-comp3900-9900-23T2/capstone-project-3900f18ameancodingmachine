@@ -225,27 +225,22 @@ describe("/reviews", () => {
 
 describe('/subscribe', () => {
 
-    afterEach(async () => {
-        let query = `delete from LoginInfo`
-        let res = await poolPromise.execute(query)
-        query = `delete from UserAccount`;
-        res = await poolPromise.execute(query);
-        query = `delete from EateryAccount`;
-        res = await poolPromise.execute(query);
-        query = `delete from Address`;
-        res = await poolPromise.execute(query);
-    })
+    let userLoginId;
+    let eateryLoginId;
+    let addressId;
+    let eateryAccountId;
+    let userAccountId;
 
-    test("user subscribe to registered restaurant", async () => {
+    beforeEach(async () => {
         let response = await request(app).post("/api/user/account").send(userLoginData)
-        const userLoginId = response.body.data.insertId
+        userLoginId = response.body.data.insertId
 
         // register eatery
         response = await request(app).post("/api/user/account").send(eateryLoginData)
-        const eateryLoginId = response.body.data.insertId
+        eateryLoginId = response.body.data.insertId
 
         response = await request(app).post('/api/user/address').send(data)
-        const addressId = response.body.data.insertId
+        addressId = response.body.data.insertId
 
         // create user account, leaves address
         const userAccount = {
@@ -266,63 +261,42 @@ describe('/subscribe', () => {
         }
        
         response = await request(app).post("/api/user/eatery").send(eateryAccount)
-        const eateryAccountId = response.body.results.insertId
+        eateryAccountId = response.body.results.insertId
 
         response = await request(app).post("/api/user/user").send(userAccount)
-        const userAccountId = response.body.data.insertId
+        userAccountId = response.body.data.insertId
+    })
 
+    afterEach(async () => {
+        let query = `delete from LoginInfo`
+        let res = await poolPromise.execute(query)
+        query = `delete from UserAccount`;
+        res = await poolPromise.execute(query);
+        query = `delete from EateryAccount`;
+        res = await poolPromise.execute(query);
+        query = `delete from Address`;
+        res = await poolPromise.execute(query);
+    })
+
+    test("user subscribe to registered restaurant", async () => {
         const subscribeData = {
             userId: userAccountId,
             restaurantId: eateryAccountId
         }
 
-        response = await request(app).put("/api/user/subscribe").send(subscribeData)
+        let response = await request(app).put("/api/user/subscribe").send(subscribeData)
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
     })
 
     test("finding what eateries the user is subscribed to", async () => {
 
-        let response = await request(app).post("/api/user/account").send(userLoginData)
-        const userLoginId = response.body.data.insertId
-
-        // register eatery
-        response = await request(app).post("/api/user/account").send(eateryLoginData)
-        const eateryLoginId = response.body.data.insertId
-
-        response = await request(app).post('/api/user/address').send(data)
-        const addressId = response.body.data.insertId
-
-        // create user account, leaves address
-        const userAccount = {
-            first: "first",
-            last: "last",
-            loginId: userLoginId,
-            addressId: addressId //fake
-         }
- 
-        // create eatery account, leaves address
-        const eateryAccount = {
-            name: "another restaurant",
-            addressId: addressId, //fake
-            phone: "0493186858",
-            email: "anotherrestaurant@gmail.com",
-            loginId: eateryLoginId, 
-            url: "www.anotherrestaurant.com",
-        }
-
-        response = await request(app).post("/api/user/eatery").send(eateryAccount)
-        const eateryAccountId = response.body.results.insertId
-
-        response = await request(app).post("/api/user/user").send(userAccount)
-        const userAccountId = response.body.data.insertId
-
         const subscribeData = {
             userId: userAccountId,
             restaurantId: eateryAccountId
         }
 
-        response = await request(app).put("/api/user/subscribe").send(subscribeData)
+        let response = await request(app).put("/api/user/subscribe").send(subscribeData)
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
 
@@ -331,6 +305,154 @@ describe('/subscribe', () => {
 
         response = await request(app).get(`/api/user/subscribe/${userAccountId}`)
         // console.log(response)
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+    })
+})
+
+describe('/posts', () => {
+    let eateryLoginId;
+    let addressId;
+    let restaurantId;
+    let eateryAccount;
+
+    beforeEach(async () => {
+        let response = await request(app).post("/api/user/account").send(eateryLoginData)
+        eateryLoginId = response.body.data.insertId
+       
+        // create address   
+        response = await request(app).post('/api/user/address').send(data)
+        addressId = response.body.data.insertId
+
+        // create eatery account
+        eateryAccount = {
+            name: "another restaurant",
+            addressId: addressId, //fake
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            loginId: eateryLoginId, 
+            url: "www.anotherrestaurant.com",
+        }
+
+        response = await request(app).post("/api/user/eatery").send(eateryAccount);
+        restaurantId = response.body.results.insertId
+    })
+
+    afterEach(async () => {
+        let query = `delete from LoginInfo`
+        let res = await poolPromise.execute(query)
+        query = `delete from Posts`
+        res = await poolPromise.execute(query)
+    })
+
+    test('create post will have statuscode 200 and success of 1', async () => {
+        const postData = {
+            postedBy: restaurantId,
+            title: "first post",
+            content: "this is the first post"
+        }
+
+        const response = await request(app).post('/api/user/posts').send(postData)
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+    })
+
+
+})
+
+describe('/comment', () => {
+    let userLoginId;
+    let eateryLoginId;
+    let addressId;
+    let restaurantId;
+    let userId;
+    let eateryAccount;
+    let postId;
+
+    beforeEach(async () => {
+        let response = await request(app).post("/api/user/account").send(eateryLoginData)
+        eateryLoginId = response.body.data.insertId
+
+        response = await request(app).post("/api/user/account").send(userLoginData)
+        userLoginId = response.body.data.insertId
+       
+        // create address   
+        response = await request(app).post('/api/user/address').send(data)
+        addressId = response.body.data.insertId
+
+        // create eatery account
+        eateryAccount = {
+            name: "another restaurant",
+            addressId: addressId, //fake
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            loginId: eateryLoginId, 
+            url: "www.anotherrestaurant.com",
+        }
+
+        // create user account
+        const userAccount = {
+            first: "first",
+            last: "last",
+            loginId: userLoginId,
+            addressId: addressId //fake
+         }
+
+        response = await request(app).post("/api/user/eatery").send(eateryAccount);
+        restaurantId = response.body.results.insertId
+
+        response = await request(app).post("/api/user/user").send(userAccount)
+        userId = response.body.data.insertId
+
+        const postData = {
+            postedBy: restaurantId,
+            title: "first post",
+            content: "this is the first post"
+        }
+
+        response = await request(app).post('/api/user/posts').send(postData)
+        postId = response.body.data.insertId
+    })
+
+    afterEach(async () => {
+        let query = `delete from LoginInfo`
+        let res = await poolPromise.execute(query)
+        query = `delete from Posts`
+        res = await poolPromise.execute(query)
+        query = `delete from PostComments`
+        res = await poolPromise.execute(query)
+    })
+
+    test('write comment will return statuscode 200 and success of 1', async () => {
+        const commentData = {
+            userId: userId,
+            postId: postId,
+            comment: "first comment"
+        }
+
+        const response = await request(app).post("/api/user/user/comment").send(commentData);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+    })
+
+    test('user can write multiple comments', async () => {
+        const commentData = {
+            userId: userId,
+            postId: postId,
+            comment: "first comment"
+        }
+
+        let response = await request(app).post("/api/user/user/comment").send(commentData);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+
+        const commentData2 = {
+            userId: userId,
+            postId: postId,
+            comment: "second comment"
+        }
+
+        response = await request(app).post("/api/user/user/comment").send(commentData2);
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
     })

@@ -57,7 +57,6 @@ describe("/eatery", () => {
        
         // create address   
         response = await request(app).post('/api/user/address').send(data)
-        console.log(response.body.data.insertId)
         const addressId = response.body.data.insertId
 
         // create eatery account
@@ -82,7 +81,6 @@ describe("/eatery", () => {
        
         // create address   
         response = await request(app).post('/api/user/address').send(data)
-        console.log(response.body.data.insertId)
         const addressId = response.body.data.insertId
 
         // create eatery account
@@ -319,8 +317,6 @@ describe('/voucher', () => {
             code: 'ABCD'
         }
 
-        console.log(voucherData)
-
         const response = await request(app).post('/api/user/voucher').send(voucherData);
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
@@ -374,46 +370,59 @@ describe("/eatery/description", () => {
     })
 })
 
-// describe("/eatery/all", () => {
-//     const restaurantData = {
-//         name: "another restaurant",
-//         addressId: 0, //fake
-//         phone: "0493186858",
-//         email: "anotherrestaurant@gmail.com",
-//         loginId: 0, //fake
-//         url: "www.anotherrestaurant.com",
-//     }
+describe("/eatery/all", () => {
+    
+    let eateryLoginId;
+    let addressId;
+    let restaurantId;
+    let eateryAccount;
 
-//     afterEach(async () => {
-//         let query = `delete from EateryAccount`
-//         let res = await poolPromise.execute(query)
-//     })
+    beforeEach(async () => {
+        let response = await request(app).post("/api/user/account").send(eateryLoginData)
+        eateryLoginId = response.body.data.insertId
+       
+        // create address   
+        response = await request(app).post('/api/user/address').send(data)
+        addressId = response.body.data.insertId
 
-//     test("getting all eateries should just return statuscode 200 and success of 1", async () => {
-//         let response = await request(app).post('/api/user/eatery').send(restaurantData)
-//         const restaurantId = response.body.results.insertId
-//         response = await request(app).get("/api/user/eatery/all").send({
-//             restaurantId: restaurantId,
-//             description: "hello there"
-//         })
+        // create eatery account
+        eateryAccount = {
+            name: "another restaurant",
+            addressId: addressId, //fake
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            loginId: eateryLoginId, 
+            url: "www.anotherrestaurant.com",
+        }
 
-//         expect(response.statusCode).toBe(200)
-//         expect(response.body.success).toBe(1)
-//     })
+        response = await request(app).post("/api/user/eatery").send(eateryAccount);
+        restaurantId = response.body.results.insertId
+    })
 
-//     test("input 1 restaurant return only 1 restaurant", async () => {
-//         let response = await request(app).post('/api/user/eatery').send(restaurantData)
-//         const restaurantId = response.body.results.insertId
+    afterEach(async () => {
+        let query = `delete from LoginInfo`
+        await poolPromise.execute(query)
+    })
 
-//         response = await request(app).get("/api/user/eatery/all").send({
-//             restaurantId: restaurantId,
-//             description: "hello there"
-//         })
+    test("getting all eateries should just return statuscode 200 and success of 1", async () => {
+        let response = await request(app).get("/api/user/eatery/all").send({
+            restaurantId: restaurantId
+        })
 
-//         expect(response.body.results.length).toBe(1)
-//     })
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+    })
 
-// })
+    test("input 1 restaurant return only 1 restaurant", async () => {
+
+        let response = await request(app).get("/api/user/eatery/all").send({
+            restaurantId: restaurantId
+        })
+
+        expect(response.body.results.length).toBe(1)
+    })
+
+})
 
 // test cases:
 // 1. search based on name
