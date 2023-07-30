@@ -8,6 +8,7 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
+import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
@@ -207,7 +208,7 @@ export default function UserHomePage() {
   //TODO: have to hide the google api code
   return (
     <Container maxWidth="lg">
-      <Card sx={{ minWidth: 275 }}>
+      <Card sx={{ minWidth: 275 }} square>
         <CardContent>
           <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
             User Home
@@ -267,7 +268,11 @@ export default function UserHomePage() {
                 />
               </Grid>
               <Grid xs={4}>
-                <TextField onChange={(event, newValue) => {setMaxDistance(newValue)}} label="Distance" />
+                <TextField onChange={(event, newValue) => {setMaxDistance(newValue)}} label="Distance" 
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">km</InputAdornment>,
+                  }}
+                />
               </Grid>
               <Grid xs={2}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>

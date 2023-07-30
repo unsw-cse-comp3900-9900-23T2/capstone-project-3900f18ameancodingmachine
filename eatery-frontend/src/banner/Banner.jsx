@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { UserContext } from '../App.jsx';
 
@@ -33,7 +34,7 @@ export default function Banner() {
   const navigate = useNavigate();
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" elevation={0}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <IconButton
@@ -55,6 +56,11 @@ export default function Banner() {
           {userContext === null && <Button color="inherit" component={NavLink} to="/login">Login</Button>}
           {userContext === null && <Button color="inherit" component={NavLink} to="/register">Register</Button>}
           {userContext === false && <Button color="inherit" component={NavLink} to="/create-restaurant">New Restaurant</Button>}
+          {userContext === true && 
+            <IconButton sx={{marginLeft: 'auto'}} size="large" onClick={() => {navigate("/user-profile")}} color="inherit">
+              <AccountCircle />
+            </IconButton>
+          }
         </Toolbar>
       </Container>
     </AppBar>
