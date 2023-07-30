@@ -1,15 +1,20 @@
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
+/* eslint-disable react/prop-types */
 
+import React from 'react';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+
+/**
+ *
+ * @param {*} props
+ * @return {JSX} Restaurant Review component
+ */
 export function RestaurantReviewGridItem(props) {
   return (
     <Container maxWidth="sm">
-      <Card sx={{ minWidth: 100 }}>
+      <Card sx={{minWidth: 100}}>
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
             {props.review}
@@ -23,10 +28,15 @@ export function RestaurantReviewGridItem(props) {
   );
 }
 
+/**
+ *
+ * @param {*} props
+ * @return {JSX} Restaurant Post component
+ */
 export function RestaurantPostGridItem(props) {
   return (
     <Container maxWidth="sm">
-      <Card sx={{ minWidth: 100 }}>
+      <Card sx={{minWidth: 100}}>
         <CardContent>
           <Typography gutterBottom variant="h4" component="div">
             {props.title}

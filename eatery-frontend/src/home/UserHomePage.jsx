@@ -1,38 +1,38 @@
 /* eslint-disable react/prop-types */
 
-import React, { useState, useContext, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, {useState, useContext, useEffect, useRef} from 'react';
+import {useNavigate} from 'react-router-dom';
 
-import Autocomplete from "@mui/material/Autocomplete";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Unstable_Grid2";
-import InputAdornment from "@mui/material/InputAdornment";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import Autocomplete from '@mui/material/Autocomplete';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Unstable_Grid2';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { UserContext } from "../App.jsx";
-import RestaurantPost from "./RestaurantPost";
-import jwtDecode from "jwt-decode";
-import axios from "axios";
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
+import {UserContext} from '../App.jsx';
+import RestaurantPost from './RestaurantPost';
+import jwtDecode from 'jwt-decode';
+import axios from 'axios';
 
 import {
   LoadScript,
   Autocomplete as MapAutoComplete,
-} from "@react-google-maps/api";
+} from '@react-google-maps/api';
 
 /**
  *
  * @param {*} param0
  * @return {JSX} location component
  */
-const LocationAutocomplete = ({ apiKey, onPlaceChanged }) => {
+const LocationAutocomplete = ({apiKey, onPlaceChanged}) => {
   const autocompleteRef = useRef(null);
 
   return (
@@ -69,7 +69,7 @@ const getUserSubscribers = async () => {
       user: userId,
       id: eatery.restaurantId,
       name: eatery.name,
-      cuisine: eatery.cuisine || "not added",
+      cuisine: eatery.cuisine || 'not added',
       location: eatery.suburb,
     }));
     return subscribedEateries;
@@ -122,7 +122,7 @@ function loadSubscriptions(setCurrentSubs, index, count) {
  * @return {List} eateries
  */
 async function getLatestEateries() {
-  const getEateries = await axios.get("api/user/eatery/all");
+  const getEateries = await axios.get('api/user/eatery/all');
   let eateries = getEateries.data.results;
   eateries = eateries.filter((eatery, index) => {
     // filter duplicate value based on their id on whether it matches
@@ -137,20 +137,20 @@ async function getLatestEateries() {
     user: userId || null,
     id: eatery.id,
     name: eatery.name,
-    cuisine: eatery.cuisine || "not added",
+    cuisine: eatery.cuisine || 'not added',
     location: eatery.suburb,
   }));
   return newEateries;
 }
 
-const googleMapsLibraries = ["places"];
+const googleMapsLibraries = ['places'];
 
 /**
  * @return {JSX} User Home component
  */
 export default function UserHomePage() {
   // Null: not logged in, true: user, false: restaurant
-  const { userContext, setUserContext } = useContext(UserContext);
+  const {userContext, setUserContext} = useContext(UserContext);
 
   const [viewSubscriptions, setViewSubscriptions] = useState(false);
   const [currentSubs, setCurrentSubs] = useState([]);
@@ -177,7 +177,7 @@ export default function UserHomePage() {
     async function loading() {
       try {
         // use checkToken as middleware to verify token
-        const result = await axios.get("api/user/");
+        const result = await axios.get('api/user/');
         const data = result.data;
         if (data.success !== 0) {
           const decrypt = jwtDecode(data.token);
@@ -186,15 +186,15 @@ export default function UserHomePage() {
           userId = getUserId.data.data[0].id;
           eateriesSubscribed = await getUserSubscribers();
           setUserContext(true);
-          console.log("is logged in");
+          console.log('is logged in');
         }
       } catch (err) {
         // error when checking token using checktoken
         setUserContext(null);
-        console.log("Not logged in");
+        console.log('Not logged in');
       }
 
-      const getCuisine = await axios.get("api/user/eatery/cuisines");
+      const getCuisine = await axios.get('api/user/eatery/cuisines');
       const cuisines = getCuisine.data.results;
       setCuisineList(cuisines);
       const latestEateriesArr = await getLatestEateries();
@@ -243,7 +243,7 @@ export default function UserHomePage() {
     // const url =
     // "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
     // FIX
-    navigate("/browse", {
+    navigate('/browse', {
       state: {
         search: search,
         location: location,
@@ -257,9 +257,9 @@ export default function UserHomePage() {
   // TODO: have to hide the google api code
   return (
     <Container maxWidth="lg">
-      <Card sx={{ minWidth: 275 }} square>
+      <Card sx={{minWidth: 275}} square>
         <CardContent>
-          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
             User Home
           </Typography>
           <Grid container spacing={2}>
@@ -268,7 +268,7 @@ export default function UserHomePage() {
                 <Autocomplete
                   id="restaurant-search"
                   freeSolo
-                  options={["maccas", "kfc", "Dominos"]}
+                  options={['maccas', 'kfc', 'Dominos']}
                   onChange={(event, newValue) => {
                     setSearch(newValue);
                   }}
@@ -291,11 +291,11 @@ export default function UserHomePage() {
             <Grid container xs={12} spacing={2}>
               <Grid xs={4}>
                 <LoadScript
-                  googleMapsApiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"}
+                  googleMapsApiKey={'AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q'}
                   libraries={googleMapsLibraries}
                 >
                   <LocationAutocomplete
-                    apiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"}
+                    apiKey={'AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q'}
                     onPlaceChanged={setLocation}
                   />
                 </LoadScript>
@@ -318,7 +318,7 @@ export default function UserHomePage() {
                 <Autocomplete
                   id="dietary-dropdown"
                   value={dietary}
-                  options={["lactose free", "gluten free", "vegetarian"]}
+                  options={['lactose free', 'gluten free', 'vegetarian']}
                   getOptionLabel={(option) => option}
                   onChange={(event, newValue) => {
                     setDietary(newValue);
@@ -376,13 +376,13 @@ export default function UserHomePage() {
         </CardActions>
         {viewSubscriptions === true && (
           <CardContent
-            sx={{ bgcolor: "#FAFAFA", border: "10px groove #61dafb" }}
+            sx={{bgcolor: '#FAFAFA', border: '10px groove #61dafb'}}
           >
-            <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+            <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
               My Subscriptions
             </Typography>
             <Grid
-              sx={{ alignSelf: "center", minHeight: 350 }}
+              sx={{alignSelf: 'center', minHeight: 350}}
               container
               spacing={2}
             >
@@ -390,12 +390,12 @@ export default function UserHomePage() {
                 <Button
                   variant="contained"
                   onClick={handleOnClickLeftSubscriptions}
-                  sx={{ minHeight: 295 }}
+                  sx={{minHeight: 295}}
                 >
                   &lt;
                 </Button>
               ) : (
-                <Button variant="contained" sx={{ visibility: "hidden" }}>
+                <Button variant="contained" sx={{visibility: 'hidden'}}>
                   &lt;
                 </Button>
               )}
@@ -427,7 +427,7 @@ export default function UserHomePage() {
           <Grid container spacing={2}>
             <Grid xs={12} spacing={2}>
               <Typography
-                sx={{ fontSize: 30 }}
+                sx={{fontSize: 30}}
                 color="text.primary"
                 gutterBottom
               >
@@ -453,7 +453,7 @@ export default function UserHomePage() {
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography
-                sx={{ fontSize: 30 }}
+                sx={{fontSize: 30}}
                 color="text.primary"
                 gutterBottom
               >
@@ -467,14 +467,14 @@ export default function UserHomePage() {
                   id={restaurant.id}
                   user={userId}
                   name={restaurant.name}
-                  cuisine={restaurant.cuisine || "unknown"}
-                  location={restaurant.location || "unknown"}
+                  cuisine={restaurant.cuisine || 'unknown'}
+                  location={restaurant.location || 'unknown'}
                 />
               ))}
             </Grid>
             <Grid xs={12} spacing={2}>
               <Typography
-                sx={{ fontSize: 30 }}
+                sx={{fontSize: 30}}
                 color="text.primary"
                 gutterBottom
               >

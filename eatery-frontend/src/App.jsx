@@ -1,16 +1,17 @@
-import React, { createContext, useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Banner from "./banner/Banner";
-import HomePage from "./home/HomePage";
-import LoginPage from "./user/LoginPage";
-import ForgotPassPage from "./user/ForgotPassPage";
-import ForgotPassCodeEntry from "./user/FogotPassCodeEntry";
-import ForgotPassNewPass from "./user/ForgotPassNewPass";
-import RegistrationPage from "./user/RegistrationPage";
-import RestaurantRegistrationPage from "./restaurant/RestaurantRegistrationPage";
-import Browse from "./home/BrowsePage";
-import RestaurantProfile from "./restaurant/RestaurantProfile";
-import UserProfile from "./user/UserProfile";
+import React, {createContext, useState} from 'react';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import Banner from './banner/Banner';
+import HomePage from './home/HomePage';
+import LoginPage from './user/LoginPage';
+import ForgotPassPage from './user/ForgotPassPage';
+import ForgotPassCodeEntry from './user/FogotPassCodeEntry';
+import ForgotPassNewPass from './user/ForgotPassNewPass';
+import RegistrationPage from './user/RegistrationPage';
+import RestaurantRegistrationPage
+  from './restaurant/RestaurantRegistrationPage';
+import Browse from './home/BrowsePage';
+import RestaurantProfile from './restaurant/RestaurantProfile';
+import UserProfile from './user/UserProfile';
 
 export const UserContext = createContext(null);
 

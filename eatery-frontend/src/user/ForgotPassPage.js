@@ -1,15 +1,15 @@
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from 'react-router-dom';
 
-import * as React from "react";
-import axios from "axios";
+import * as React from 'react';
+import axios from 'axios';
 
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 /**
  * Send recovery email
@@ -17,13 +17,13 @@ import Typography from "@mui/material/Typography";
  */
 async function sendRecoveryEmail(email) {
   try {
-    const { data } = await axios.post("api/user/reset", { login: email });
+    const {data} = await axios.post('api/user/reset', {login: email});
     if (data.success) {
-      console.log("Email successfully sent");
+      console.log('Email successfully sent');
       return true;
     }
   } catch {
-    console.log("Failed to send email");
+    console.log('Failed to send email');
   }
   return false;
 }
@@ -33,7 +33,7 @@ async function sendRecoveryEmail(email) {
  * @return {JSX} Email Entry component
  */
 function EmailEntry() {
-  const [email, setEmail] = React.useState("");
+  const [email, setEmail] = React.useState('');
   const [resetFail, setResetFail] = React.useState(false);
   const navigate = useNavigate();
 
@@ -41,7 +41,7 @@ function EmailEntry() {
     event.preventDefault();
 
     if (await sendRecoveryEmail(email)) {
-      navigate("/RecoveryCodeEntry", { state: { login: email } });
+      navigate('/RecoveryCodeEntry', {state: {login: email}});
     }
     setResetFail(true);
   };
@@ -52,19 +52,19 @@ function EmailEntry() {
         sx={{
           maxWidth: 500,
           m: 10,
-          border: "10px inset #61dafb",
-          bgcolor: "#F5F5F5",
+          border: '10px inset #61dafb',
+          bgcolor: '#F5F5F5',
         }}
       >
         <CardContent>
-          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
             Password Recovery
           </Typography>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             Enter Email Address
           </Typography>
           <TextField
-            sx={{ bgcolor: "white" }}
+            sx={{bgcolor: 'white'}}
             required
             id="register-email"
             label="email"
@@ -74,7 +74,7 @@ function EmailEntry() {
             }}
           />
           {resetFail && (
-            <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>
+            <Typography sx={{fontSize: 14}} color="red" gutterBottom>
               No account created with this email
             </Typography>
           )}
@@ -83,7 +83,7 @@ function EmailEntry() {
           <Button
             size="small"
             onClick={handleSubmit}
-            sx={{ maxWidth: 200, bgcolor: "white", borderRadius: "4px" }}
+            sx={{maxWidth: 200, bgcolor: 'white', borderRadius: '4px'}}
           >
             Recover Password
           </Button>

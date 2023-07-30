@@ -1,25 +1,35 @@
-import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import * as React from 'react';
+import {useNavigate} from 'react-router-dom';
 
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import Container from "@mui/material/Container";
-import FormControl from "@mui/material/FormControl";
-import InputAdornment from "@mui/material/InputAdornment";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import validator from "validator";
-import axios from "axios";
-import { createAddress, createAccount } from "../user/RegistrationPage";
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Container from '@mui/material/Container';
+import FormControl from '@mui/material/FormControl';
+import InputAdornment from '@mui/material/InputAdornment';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import validator from 'validator';
+import axios from 'axios';
+import {createAddress, createAccount} from '../user/RegistrationPage';
 
+/**
+ *
+ * @param {*} name
+ * @param {*} addressId
+ * @param {*} phone
+ * @param {*} email
+ * @param {*} loginId
+ * @param {*} url
+ * @return {Int} Eatery ID
+ */
 async function createEatery(name, addressId, phone, email, loginId, url) {
   try {
-    const { data } = await axios.post("api/user/eatery", {
+    const {data} = await axios.post('api/user/eatery', {
       name: name,
       addressId: addressId,
       phone: phone,
@@ -28,7 +38,7 @@ async function createEatery(name, addressId, phone, email, loginId, url) {
       url: url,
     });
     if (data.success) {
-      console.log("Eatery successfully created");
+      console.log('Eatery successfully created');
       return data.data.insertId;
     }
   } catch (error) {
@@ -37,56 +47,60 @@ async function createEatery(name, addressId, phone, email, loginId, url) {
   return 0;
 }
 
+/**
+ * @return {JSX} Restaurant Registration component
+ */
 export default function RestaurantRegistrationPage() {
   const cuisines = [
-    "italian",
-    "french",
-    "mexican",
-    "thai",
-    "japanese",
-    "vietnamese",
-    "turkish",
-    "greek",
+    'italian',
+    'french',
+    'mexican',
+    'thai',
+    'japanese',
+    'vietnamese',
+    'turkish',
+    'greek',
   ];
   const navigate = useNavigate();
   const [registerFail, setRegisterFail] = React.useState(false);
-  const [registerMSG, setRegisterMSG] = React.useState("");
-  const [name, setName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [phoneNumber, setPhoneNumber] = React.useState("");
-  const [website, setWebsite] = React.useState("");
-  //address details
-  const [street, setStreet] = React.useState("");
-  const [suburb, setSuburb] = React.useState("");
-  const [region, setRegion] = React.useState("");
-  const [postCode, setPostCode] = React.useState("");
+  const [registerMSG, setRegisterMSG] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [phoneNumber, setPhoneNumber] = React.useState('');
+  const [website, setWebsite] = React.useState('');
+  // address details
+  const [street, setStreet] = React.useState('');
+  const [suburb, setSuburb] = React.useState('');
+  const [region, setRegion] = React.useState('');
+  const [postCode, setPostCode] = React.useState('');
   const [cuisine, setCuisine] = React.useState(cuisines[0]);
-  const [password, setPassword] = React.useState("");
-  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [password, setPassword] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    let success, message;
+    let success; let message;
     for ([success, message] of [
-      [validator.isEmail(email), "Please use a valid email"],
-      [confirmPassword === password, "Passwords do not match"],
+      [validator.isEmail(email), 'Please use a valid email'],
+      [confirmPassword === password, 'Passwords do not match'],
       [
         validator.isStrongPassword(password),
-        "Password length must be atleast 8 with 1 uppercase and lowercase character aswell as 1 number and symbol",
+        'Password length must be atleast 8 with 1 uppercase and ' +
+        'lowercase character aswell as 1 number and symbol',
       ],
-      [validator.isMobilePhone(phoneNumber), "Please use a valid phone number"],
+      [validator.isMobilePhone(phoneNumber), 'Please use a valid phone number'],
       [
-        validator.isPostalCode(postCode, "AU"),
-        "Please use a valid postal address",
+        validator.isPostalCode(postCode, 'AU'),
+        'Please use a valid postal address',
       ],
       [
-        !validator.isEmpty(street, { ignore_whitespace: true }) &&
-          !validator.isEmpty(suburb, { ignore_whitespace: true }) &&
-          !validator.isEmpty(region, { ignore_whitespace: true }) &&
-          !validator.isEmpty(name, { ignore_whitespace: true }),
-        //TODO: check for website valdiity
-        "Please fill out all the required fields",
+        !validator.isEmpty(street, {ignore_whitespace: true}) &&
+          !validator.isEmpty(suburb, {ignore_whitespace: true}) &&
+          !validator.isEmpty(region, {ignore_whitespace: true}) &&
+          !validator.isEmpty(name, {ignore_whitespace: true}),
+        // TODO: check for website valdiity
+        'Please fill out all the required fields',
       ],
     ]) {
       if (!success) {
@@ -96,39 +110,39 @@ export default function RestaurantRegistrationPage() {
       }
     }
 
-    //if the function has not returned, fields are appropriate
+    // if the function has not returned, fields are appropriate
     setRegisterFail(false);
-    setRegisterMSG("");
+    setRegisterMSG('');
 
     const loginId = await createAccount(email, password);
-    //if create account returns 0
+    // if create account returns 0
     if (!loginId) {
       setRegisterFail(true);
-      setRegisterMSG("An account with this email already exists");
+      setRegisterMSG('An account with this email already exists');
       return;
     }
     const addressId = await createAddress(street, suburb, region, postCode);
     console.log(addressId);
     const eateryId = await createEatery(
-      name,
-      addressId,
-      phoneNumber,
-      email,
-      loginId,
-      website,
+        name,
+        addressId,
+        phoneNumber,
+        email,
+        loginId,
+        website,
     );
     console.log(eateryId);
-    navigate("/login");
+    navigate('/login');
   };
 
   return (
     <Container maxWidth="md">
-      <Card sx={{ minWidth: 275 }}>
+      <Card sx={{minWidth: 275}}>
         <CardContent>
-          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
             Sign up your Restaurant
           </Typography>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             Name
           </Typography>
           <TextField
@@ -140,7 +154,7 @@ export default function RestaurantRegistrationPage() {
               setName(event.target.value);
             }}
           />
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             Email Address
           </Typography>
           <TextField
@@ -152,7 +166,7 @@ export default function RestaurantRegistrationPage() {
               setEmail(event.target.value);
             }}
           />
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             Phone Number
           </Typography>
           <TextField
@@ -160,12 +174,12 @@ export default function RestaurantRegistrationPage() {
             id="register-phone"
             label="phone"
             value={phoneNumber}
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            inputProps={{inputMode: 'numeric', pattern: '[0-9]*'}}
             onChange={(event) => {
               setPhoneNumber(event.target.value);
             }}
           />
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             Street
           </Typography>
           <TextField
@@ -177,7 +191,7 @@ export default function RestaurantRegistrationPage() {
               setStreet(event.target.value);
             }}
           />
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             Suburb
           </Typography>
           <TextField
@@ -189,7 +203,7 @@ export default function RestaurantRegistrationPage() {
               setSuburb(event.target.value);
             }}
           />
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             Region
           </Typography>
           <TextField
@@ -201,7 +215,7 @@ export default function RestaurantRegistrationPage() {
               setRegion(event.target.value);
             }}
           />
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             PostCode
           </Typography>
           <TextField
@@ -213,7 +227,7 @@ export default function RestaurantRegistrationPage() {
               setPostCode(event.target.value);
             }}
           />
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             Website
           </Typography>
           <TextField
@@ -241,13 +255,12 @@ export default function RestaurantRegistrationPage() {
                 setCuisine(event.target.value);
               }}
             >
-              {/* <MenuItem value={cuisines[0]}>{cuisines[0].toUpperCase()}</MenuItem> */}
               {cuisines.map((c) => (
-                <MenuItem value={c}>{c.toUpperCase()}</MenuItem>
+                <MenuItem key={c} value={c}>{c.toUpperCase()}</MenuItem>
               ))}
             </Select>
           </FormControl>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             Password
           </Typography>
           <TextField
@@ -260,7 +273,7 @@ export default function RestaurantRegistrationPage() {
               setPassword(event.target.value);
             }}
           />
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
             Confirm Password
           </Typography>
           <TextField
@@ -274,7 +287,7 @@ export default function RestaurantRegistrationPage() {
             }}
           />
           {registerFail && (
-            <Typography sx={{ fontSize: 14 }} color="red" gutterBottom>
+            <Typography sx={{fontSize: 14}} color="red" gutterBottom>
               {registerMSG}
             </Typography>
           )}
