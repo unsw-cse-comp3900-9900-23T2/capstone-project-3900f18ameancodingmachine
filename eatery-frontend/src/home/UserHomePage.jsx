@@ -1,36 +1,38 @@
 /* eslint-disable react/prop-types */
 
-import React, {useState, useContext, useEffect, useRef} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useState, useContext, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
-import Autocomplete from '@mui/material/Autocomplete';
-import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Unstable_Grid2';
-import InputAdornment from '@mui/material/InputAdornment';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import Autocomplete from "@mui/material/Autocomplete";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Unstable_Grid2";
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 
-import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
-import {DatePicker} from '@mui/x-date-pickers/DatePicker';
-import {UserContext} from '../App.jsx';
-import RestaurantPost from './RestaurantPost';
-import jwtDecode from 'jwt-decode';
-import axios from 'axios';
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { UserContext } from "../App.jsx";
+import RestaurantPost from "./RestaurantPost";
+import jwtDecode from "jwt-decode";
+import axios from "axios";
 
-import {LoadScript, Autocomplete as MapAutoComplete}
-  from '@react-google-maps/api';
+import {
+  LoadScript,
+  Autocomplete as MapAutoComplete,
+} from "@react-google-maps/api";
 
 /**
  *
  * @param {*} param0
  * @return {JSX} location component
  */
-const LocationAutocomplete = ({apiKey, onPlaceChanged}) => {
+const LocationAutocomplete = ({ apiKey, onPlaceChanged }) => {
   const autocompleteRef = useRef(null);
 
   return (
@@ -67,7 +69,7 @@ const getUserSubscribers = async () => {
       user: userId,
       id: eatery.restaurantId,
       name: eatery.name,
-      cuisine: eatery.cuisine || 'not added',
+      cuisine: eatery.cuisine || "not added",
       location: eatery.suburb,
     }));
     return subscribedEateries;
@@ -112,7 +114,7 @@ function loadSubscriptions(setCurrentSubs, index, count) {
     setCurrentSubs(fullyLoadedData);
     return;
   }
-  setCurrentSubs(fullyLoadedData.slice(index, index+count));
+  setCurrentSubs(fullyLoadedData.slice(index, index + count));
   return;
 }
 
@@ -120,7 +122,7 @@ function loadSubscriptions(setCurrentSubs, index, count) {
  * @return {List} eateries
  */
 async function getLatestEateries() {
-  const getEateries = await axios.get('api/user/eatery/all');
+  const getEateries = await axios.get("api/user/eatery/all");
   let eateries = getEateries.data.results;
   eateries = eateries.filter((eatery, index) => {
     // filter duplicate value based on their id on whether it matches
@@ -135,20 +137,20 @@ async function getLatestEateries() {
     user: userId || null,
     id: eatery.id,
     name: eatery.name,
-    cuisine: eatery.cuisine || 'not added',
+    cuisine: eatery.cuisine || "not added",
     location: eatery.suburb,
   }));
   return newEateries;
 }
 
-const googleMapsLibraries = ['places'];
+const googleMapsLibraries = ["places"];
 
 /**
  * @return {JSX} User Home component
  */
 export default function UserHomePage() {
   // Null: not logged in, true: user, false: restaurant
-  const {userContext, setUserContext} = useContext(UserContext);
+  const { userContext, setUserContext } = useContext(UserContext);
 
   const [viewSubscriptions, setViewSubscriptions] = useState(false);
   const [currentSubs, setCurrentSubs] = useState([]);
@@ -175,7 +177,7 @@ export default function UserHomePage() {
     async function loading() {
       try {
         // use checkToken as middleware to verify token
-        const result = await axios.get('api/user/');
+        const result = await axios.get("api/user/");
         const data = result.data;
         if (data.success !== 0) {
           const decrypt = jwtDecode(data.token);
@@ -184,15 +186,15 @@ export default function UserHomePage() {
           userId = getUserId.data.data[0].id;
           eateriesSubscribed = await getUserSubscribers();
           setUserContext(true);
-          console.log('is logged in');
+          console.log("is logged in");
         }
       } catch (err) {
         // error when checking token using checktoken
         setUserContext(null);
-        console.log('Not logged in');
+        console.log("Not logged in");
       }
 
-      const getCuisine = await axios.get('api/user/eatery/cuisines');
+      const getCuisine = await axios.get("api/user/eatery/cuisines");
       const cuisines = getCuisine.data.results;
       setCuisineList(cuisines);
       const latestEateriesArr = await getLatestEateries();
@@ -215,7 +217,7 @@ export default function UserHomePage() {
   function handleOnClickViewSubscriptions() {
     loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
     setViewSubscriptions(true);
-  };
+  }
 
   /**
    * handle right subscriptions
@@ -223,7 +225,7 @@ export default function UserHomePage() {
   function handleOnClickRightSubscriptions() {
     setCurrentSubsIndex((prevIndex) => prevIndex + 3);
     loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
-  };
+  }
 
   /**
    * handle left subscriptions
@@ -231,7 +233,7 @@ export default function UserHomePage() {
   function handleOnClickLeftSubscriptions() {
     setCurrentSubsIndex((prevIndex) => Math.max(prevIndex - 3, 0));
     loadSubscriptions(setCurrentSubs, currentSubsIndex, currentSubsCount);
-  };
+  }
 
   /**
    * handle browse click
@@ -241,27 +243,23 @@ export default function UserHomePage() {
     // const url =
     // "/browse?location="+location+"&cuisine="+cuisine+"&dietary="+dietary;
     // FIX
-    navigate('/browse',
-        {state: {
-          search: search,
-          location: location,
-          cuisine: cuisine,
-          dietary: dietary,
-          distance: maxDistance,
-        }});
-  };
-
+    navigate("/browse", {
+      state: {
+        search: search,
+        location: location,
+        cuisine: cuisine,
+        dietary: dietary,
+        distance: maxDistance,
+      },
+    });
+  }
 
   // TODO: have to hide the google api code
   return (
     <Container maxWidth="lg">
-      <Card sx={{minWidth: 275}} square>
+      <Card sx={{ minWidth: 275 }} square>
         <CardContent>
-          <Typography
-            sx={{fontSize: 30}}
-            color="text.primary"
-            gutterBottom
-          >
+          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
             User Home
           </Typography>
           <Grid container spacing={2}>
@@ -270,37 +268,34 @@ export default function UserHomePage() {
                 <Autocomplete
                   id="restaurant-search"
                   freeSolo
-                  options={['maccas', 'kfc', 'Dominos']}
+                  options={["maccas", "kfc", "Dominos"]}
                   onChange={(event, newValue) => {
                     setSearch(newValue);
                   }}
-                  renderInput={(params) =>
-                    <TextField
-                      {...params}
-                      label="Restaurant Search"
-                    />
-                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Restaurant Search" />
+                  )}
                 />
               </Grid>
               <Grid xs={2}>
-                <Button
-                  variant="contained"
-                  onClick={handleOnClickBrowse}>
-                    Browse
+                <Button variant="contained" onClick={handleOnClickBrowse}>
+                  Browse
                 </Button>
               </Grid>
               <Grid xs={2}>
-                <Button variant="contained" onClick={() => {}}>Random</Button>
+                <Button variant="contained" onClick={() => {}}>
+                  Random
+                </Button>
               </Grid>
             </Grid>
             <Grid container xs={12} spacing={2}>
               <Grid xs={4}>
                 <LoadScript
-                  googleMapsApiKey={'AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q'}
+                  googleMapsApiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"}
                   libraries={googleMapsLibraries}
                 >
                   <LocationAutocomplete
-                    apiKey={'AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q'}
+                    apiKey={"AIzaSyDWsyvTM523ypAQXrHtWAzeHLgbB9jLe6Q"}
                     onPlaceChanged={setLocation}
                   />
                 </LoadScript>
@@ -323,9 +318,7 @@ export default function UserHomePage() {
                 <Autocomplete
                   id="dietary-dropdown"
                   value={dietary}
-                  options={
-                    ['lactose free', 'gluten free', 'vegetarian']
-                  }
+                  options={["lactose free", "gluten free", "vegetarian"]}
                   getOptionLabel={(option) => option}
                   onChange={(event, newValue) => {
                     setDietary(newValue);
@@ -336,14 +329,16 @@ export default function UserHomePage() {
                 />
               </Grid>
               <Grid xs={4}>
-                <TextField onChange={(event, newValue) => {
-                  setMaxDistance(newValue);
-                }} label="Distance"
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">
-                    km
-                  </InputAdornment>,
-                }}
+                <TextField
+                  onChange={(event, newValue) => {
+                    setMaxDistance(newValue);
+                  }}
+                  label="Distance"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">km</InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid xs={2}>
@@ -351,83 +346,91 @@ export default function UserHomePage() {
                   <DatePicker />
                 </LocalizationProvider>
               </Grid>
-
             </Grid>
           </Grid>
         </CardContent>
         <CardActions>
-          {userContext===true &&
+          {userContext === true && (
             <Button variant="contained" onClick={() => {}}>
               View Past Bookings
             </Button>
-          }
-          {userContext===true &&
-            !viewSubscriptions &&
+          )}
+          {userContext === true && !viewSubscriptions && (
             <Button
               variant="contained"
               onClick={handleOnClickViewSubscriptions}
             >
               View Subscriptions
             </Button>
-          }
-          {userContext===true &&
-            viewSubscriptions &&
-            <Button variant="contained" onClick={() => {
-              setViewSubscriptions(false);
-            }}>Hide Subscriptions</Button>}
+          )}
+          {userContext === true && viewSubscriptions && (
+            <Button
+              variant="contained"
+              onClick={() => {
+                setViewSubscriptions(false);
+              }}
+            >
+              Hide Subscriptions
+            </Button>
+          )}
         </CardActions>
-        {
-          viewSubscriptions === true &&
-        <CardContent sx={{bgcolor: '#FAFAFA', border: '10px groove #61dafb'}}>
-          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-            My Subscriptions
-          </Typography>
-          <Grid
-            sx={{alignSelf: 'center', minHeight: 350}}
-            container
-            spacing={2}
+        {viewSubscriptions === true && (
+          <CardContent
+            sx={{ bgcolor: "#FAFAFA", border: "10px groove #61dafb" }}
           >
-            {currentSubsIndex !== 0 ?
-              <Button
-                variant="contained"
-                onClick={handleOnClickLeftSubscriptions}
-                sx={{minHeight: 295}}
-              >
-                &lt;
-              </Button> :
-              <Button variant="contained" sx={{visibility: 'hidden'}} >
-                &lt;
-              </Button>
-            }
-            {currentSubs.map((currentSub) => {
-              return (
-                <SubscriptionGridItem
-                  key={currentSub.id}
-                  user={userId}
-                  id={currentSub.id}
-                  name={currentSub.name}
-                  cuisine={currentSub.cuisine}
-                  location={currentSub.location}
-                />
-              );
-            })}
-            {currentSubs.length === 3 &&
-              <Button
-                variant="contained"
-                onClick={handleOnClickRightSubscriptions}
-              >
-                &gt;
-              </Button>
-            }
-          </Grid>
-        </CardContent>
-        }
-
+            <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+              My Subscriptions
+            </Typography>
+            <Grid
+              sx={{ alignSelf: "center", minHeight: 350 }}
+              container
+              spacing={2}
+            >
+              {currentSubsIndex !== 0 ? (
+                <Button
+                  variant="contained"
+                  onClick={handleOnClickLeftSubscriptions}
+                  sx={{ minHeight: 295 }}
+                >
+                  &lt;
+                </Button>
+              ) : (
+                <Button variant="contained" sx={{ visibility: "hidden" }}>
+                  &lt;
+                </Button>
+              )}
+              {currentSubs.map((currentSub) => {
+                return (
+                  <SubscriptionGridItem
+                    key={currentSub.id}
+                    user={userId}
+                    id={currentSub.id}
+                    name={currentSub.name}
+                    cuisine={currentSub.cuisine}
+                    location={currentSub.location}
+                  />
+                );
+              })}
+              {currentSubs.length === 3 && (
+                <Button
+                  variant="contained"
+                  onClick={handleOnClickRightSubscriptions}
+                >
+                  &gt;
+                </Button>
+              )}
+            </Grid>
+          </CardContent>
+        )}
 
         <CardContent>
           <Grid container spacing={2}>
             <Grid xs={12} spacing={2}>
-              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+              <Typography
+                sx={{ fontSize: 30 }}
+                color="text.primary"
+                gutterBottom
+              >
                 Current Offers
               </Typography>
             </Grid>
@@ -449,23 +452,32 @@ export default function UserHomePage() {
               />
             </Grid>
             <Grid xs={12} spacing={2}>
-              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+              <Typography
+                sx={{ fontSize: 30 }}
+                color="text.primary"
+                gutterBottom
+              >
                 New Restaurants
               </Typography>
             </Grid>
             <Grid container xs={12} spacing={2}>
-              {newRestaurants.map((restaurant) =>
+              {newRestaurants.map((restaurant) => (
                 <RestaurantGridItem
                   key={restaurant.id}
                   id={restaurant.id}
                   user={userId}
                   name={restaurant.name}
-                  cuisine={restaurant.cuisine || 'unknown'}
-                  location={restaurant.location || 'unknown'}
-                />)}
+                  cuisine={restaurant.cuisine || "unknown"}
+                  location={restaurant.location || "unknown"}
+                />
+              ))}
             </Grid>
             <Grid xs={12} spacing={2}>
-              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+              <Typography
+                sx={{ fontSize: 30 }}
+                color="text.primary"
+                gutterBottom
+              >
                 Suggestions For You
               </Typography>
             </Grid>

@@ -1,14 +1,14 @@
-import React, {useState, useEffect} from 'react';
-import {useLocation} from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
-import CardContent from '@mui/material/CardContent';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Unstable_Grid2';
-import Typography from '@mui/material/Typography';
+import CardContent from "@mui/material/CardContent";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Unstable_Grid2";
+import Typography from "@mui/material/Typography";
 
-import RestaurantPost from './RestaurantPost';
+import RestaurantPost from "./RestaurantPost";
 
-import axios from 'axios';
+import axios from "axios";
 
 let userId;
 
@@ -41,27 +41,26 @@ let userId;
  */
 async function loadResults(string, address, cuisine, diet, distance) {
   try {
-    const {data} = await axios.get(`api/user/user/browser`, {params: {
-      string,
-      address,
-      cuisine,
-      diet,
-      distance,
-    }});
+    const { data } = await axios.get(`api/user/user/browser`, {
+      params: {
+        string,
+        address,
+        cuisine,
+        diet,
+        distance,
+      },
+    });
     if (data.success) {
       const display = data.results.map((element) => ({
         name: element.name,
         cuisine: element.cuisine,
-        location: element.street +
-          ', ' +
-          element.suburb +
-          ', ' +
-          element.region,
+        location:
+          element.street + ", " + element.suburb + ", " + element.region,
       }));
       return display;
     } else {
       // Throw an error if 'success' is not true
-      throw new Error('Failed to fetch data');
+      throw new Error("Failed to fetch data");
     }
   } catch (error) {
     console.log(error);
@@ -74,7 +73,7 @@ async function loadResults(string, address, cuisine, diet, distance) {
  */
 export default function Browse() {
   // FIX
-  const {state} = useLocation();
+  const { state } = useLocation();
   const search = state.search;
   const location = state.location;
   const distance = state.distance;
@@ -90,7 +89,11 @@ export default function Browse() {
     async function fetchData() {
       try {
         const data = await loadResults(
-            search, location, cuisine, dietary, distance,
+          search,
+          location,
+          cuisine,
+          dietary,
+          distance,
         );
         setResults(data);
       } catch (err) {
@@ -103,15 +106,16 @@ export default function Browse() {
 
   return (
     <Container maxWidth="600">
-      <CardContent sx={{bgcolor: '#FAFAFA', border: '10px groove #61dafb'}}>
-        <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+      <CardContent sx={{ bgcolor: "#FAFAFA", border: "10px groove #61dafb" }}>
+        <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
           Search Results
         </Typography>
-        <Grid sx={{alignSelf: 'center'}} container spacing={2}>
-          {results.length === 0 &&
-            <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+        <Grid sx={{ alignSelf: "center" }} container spacing={2}>
+          {results.length === 0 && (
+            <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
               No Results
-            </Typography>}
+            </Typography>
+          )}
           {results.map((result) => (
             <RestaurantPost
               key={result.id}
