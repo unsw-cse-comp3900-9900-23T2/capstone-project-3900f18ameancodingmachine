@@ -1,6 +1,8 @@
 import * as React from 'react';
 
 import { useState, useEffect } from 'react';
+import { NavLink } from "react-router-dom";
+
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -17,21 +19,27 @@ import axios from 'axios';
 export default function RestaurantPost(props) {
   // to preserve the state on whether the user has subscribed or not
   // store the state in key-value pair where key -> subscribe(userId)(restaurantId)
-  const restaurantId = props.id
+  let restaurantPost = props.rpost
+  const restaurantId = restaurantPost.id
   const userId = props.user
   const mainKey = `subscribe`
   const uid = mainKey.concat('', userId, restaurantId)
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
-    const subscribedState = localStorage.getItem(uid)
-    return subscribedState ? subscribedState : false
+    // Compare ID to determin if items is subscribed or not
+    return props.allSubs.some(item => restaurantPost.id === item.id);
   });
+  
+  useEffect(() => {
+    setIsSubscribed(() => {
+      // Compare ID to determin if items is subscribed or not
+      return props.allSubs.some(item => restaurantPost.id === item.id);})
+  }, [props.allSubs])
 
   /*  TODO
    *  Function to subscribe user
    */
   async function userSubscribe() {
-
     if (!userId) {
       alert("need to sign in first")
       return 
@@ -44,8 +52,7 @@ export default function RestaurantPost(props) {
       })
       console.log("subscribed")
       setIsSubscribed(true)
-      localStorage.setItem(uid, true)
-      window.location.reload(false)
+      props.setAllSubs([...props.allSubs, restaurantPost])
     } catch (error) {
       if (error.response.status === 409) {
         alert("already subscribed")
@@ -66,8 +73,8 @@ export default function RestaurantPost(props) {
       })
       console.log("unsubscribed")
       setIsSubscribed(false)
-      localStorage.removeItem(uid)
-      window.location.reload(false)
+      props.setAllSubs(props.allSubs.filter((restaurant) => restaurant.id !== restaurantId))
+
     } catch (error) {
       console.log(error) 
     }
@@ -80,20 +87,20 @@ export default function RestaurantPost(props) {
         <CardMedia
           sx={{ height: 140 }}
           component="img"
-          image={props.image || paella} // TODO get actual image
+          image={restaurantPost.image || paella} // TODO get actual image
           title="Paella"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {props.name}
+            {restaurantPost.name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {props.cuisine} | {props.location}
+            {restaurantPost.cuisine} | {restaurantPost.location}
           </Typography>
         </CardContent>
         <CardActions>
           <Button size="small">Share</Button>
-          <Button size="small">Learn More</Button>
+          <Button size="small" component={NavLink} to={`/RestaurantProfile/${restaurantId}`}>Learn More</Button>
           {userId && (isSubscribed ? <Button size="small" onClick={userUnSubscribe}>Unsub</Button> : <Button size="small" onClick={userSubscribe}>Sub</Button>)}
         </CardActions>
       </Card>
