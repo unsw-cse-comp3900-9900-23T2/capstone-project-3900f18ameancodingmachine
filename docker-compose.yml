@@ -1,0 +1,14 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./eatery-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" 
+  backend:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    ports:
+      - "4000:3000"
