@@ -19,6 +19,8 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 
+import {NavLink} from 'react-router-dom';
+
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 // //HELPER FUNCTIONS////
@@ -269,6 +271,15 @@ async function uploadPost(title, body) {
 }
 
 /**
+ * Genereates the URL from the restaurant id
+ * @param {String} toSet toSet function for the string to hold URL
+ */
+async function generateProfileLink(toSet) {
+  const eateryId = await getEateryId();
+  const urlToReturn = `/RestaurantProfile/${eateryId}`;
+  toSet(urlToReturn);
+}
+/**
  * @return {JSX}
  */
 export default function RestaurantHomePage() {
@@ -280,6 +291,8 @@ export default function RestaurantHomePage() {
   const [titlePost, setTitlePost] = React.useState('');
   const [bodyPost, setBodyPost] = React.useState('');
   const [vouchers, setVouchers] = React.useState([]);
+  const [profileURL, setProfileURL] = React.useState('');
+  generateProfileLink(setProfileURL);
 
   return (
     <Container maxWidth="lg">
@@ -302,6 +315,8 @@ export default function RestaurantHomePage() {
           <Button variant="contained" onClick={() => {
             uploadHours();
           }}>Upload Hours</Button>
+          <Button variant="contained" component={NavLink} to={profileURL}>
+            View Profile</Button>
         </CardActions>
       </Card>
 
