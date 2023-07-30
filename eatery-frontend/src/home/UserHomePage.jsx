@@ -139,6 +139,7 @@ async function getLatestEateries() {
     name: eatery.name,
     cuisine: eatery.cuisine || 'not added',
     location: eatery.suburb,
+    image: eatery.image
   }));
   return newEateries;
 }
@@ -374,55 +375,44 @@ export default function UserHomePage() {
             </Button>
           )}
         </CardActions>
-        {viewSubscriptions === true && (
-          <CardContent
-            sx={{bgcolor: '#FAFAFA', border: '10px groove #61dafb'}}
-          >
-            <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-              My Subscriptions
-            </Typography>
-            <Grid
-              sx={{alignSelf: 'center', minHeight: 350}}
-              container
-              spacing={2}
-            >
-              {currentSubsIndex !== 0 ? (
-                <Button
-                  variant="contained"
-                  onClick={handleOnClickLeftSubscriptions}
-                  sx={{minHeight: 295}}
-                >
+        {
+        viewSubscriptions === true &&
+        <CardContent sx={{bgcolor: '#FAFAFA', border: "10px groove #61dafb"}}>
+          <Typography sx={{ fontSize: 30 }} color="text.primary" gutterBottom>
+            My Subscriptions
+          </Typography>
+          <Grid sx={{alignSelf: 'center', minHeight: 350}} container spacing={2}>
+            {currentSubsIndex !== 0 ?
+              <Button
+                variant="contained"
+                onClick={handleOnClickLeftSubscriptions}
+                sx={{minHeight: 295}}>
                   &lt;
-                </Button>
-              ) : (
-                <Button variant="contained" sx={{visibility: 'hidden'}}>
-                  &lt;
-                </Button>
-              )}
-              {currentSubs.map((currentSub) => {
-                return (
-                  <SubscriptionGridItem
-                    key={currentSub.id}
-                    user={userId}
-                    id={currentSub.id}
-                    name={currentSub.name}
-                    cuisine={currentSub.cuisine}
-                    location={currentSub.location}
-                  />
-                );
-              })}
-              {currentSubs.length === 3 && (
-                <Button
-                  variant="contained"
-                  onClick={handleOnClickRightSubscriptions}
-                >
-                  &gt;
-                </Button>
-              )}
-            </Grid>
-          </CardContent>
-        )}
-
+              </Button> :
+              <Button variant="contained" sx={{visibility:'hidden'}} >
+                &lt;
+              </Button>}
+            {currentSubs.map(currentSub => {
+              return ( 
+                <SubscriptionGridItem
+                  key={currentSub.id}
+                  user={userId}
+                  id={currentSub.id}
+                  name={currentSub.name}
+                  cuisine={currentSub.cuisine}
+                  location={currentSub.location}
+                  image={currentSub.image}
+                />
+              );
+            })}
+            {currentSubs.length === 3 &&
+              <Button variant="contained" onClick={handleOnClickRightSubscriptions}>
+                &gt;
+              </Button>
+            }
+          </Grid>
+        </CardContent>
+        }
         <CardContent>
           <Grid container spacing={2}>
             <Grid xs={12} spacing={2}>
@@ -469,6 +459,7 @@ export default function UserHomePage() {
                   name={restaurant.name}
                   cuisine={restaurant.cuisine || 'unknown'}
                   location={restaurant.location || 'unknown'}
+                  image={restaurant.image}
                 />
               ))}
             </Grid>
@@ -520,6 +511,7 @@ function RestaurantGridItem(props) {
         name={props.name}
         cuisine={props.cuisine}
         location={props.location}
+        image={props.image}
       />
     </Grid>
   );
@@ -540,6 +532,7 @@ function SubscriptionGridItem(props) {
         name={props.name}
         cuisine={props.cuisine}
         location={props.location}
+        image={props.image}
       />
     </Grid>
   );

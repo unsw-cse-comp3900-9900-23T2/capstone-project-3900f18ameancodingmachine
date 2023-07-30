@@ -1,4 +1,6 @@
 import { poolPromise } from '../db-config/db_connection.js'
+import fs from 'fs'
+import path from 'path'
 
 export async function createLogin (data) {
     // insert login details
@@ -235,7 +237,7 @@ export async function insertSubscribedTo (data) {
 }
 
 export async function removeSubscribedTo (data) {
-    const query = `delete from SubscribedTo where userId = ? and restaurantId = ?`
+    const query = 'delete from SubscribedTo where userId = ? and restaurantId = ?'
     const value = [data.userId, data.restaurantId]
     const [results] = await poolPromise.execute(query, value)
     return {
@@ -256,10 +258,19 @@ export async function resetPassword (data) {
 }
 
 export async function findSubscribedEateriesFromUserId (id) {
-    const query = 'select \
-    restaurantId, name, street, \
-    suburb, region, postcode, phone, email, url, cuisine \
-    from userSubscription where userId = ?'
+    const query = `select 
+                        restaurantId, 
+                        name, 
+                        street, 
+                        suburb, 
+                        region, 
+                        postcode, 
+                        phone, 
+                        email, 
+                        url,
+                        image
+                    from userSubscription 
+                    where userId = ?`
     const value = [id]
     const [results] = await poolPromise.execute(query, value)
     return {
@@ -367,6 +378,58 @@ export async function getAllDietaries () {
     return {
         success: 1,
         results: result
+    }
+}
+
+// store and update image path for the user
+export async function storeUserProfileImg (imgPath, userId) {
+    // find existing image path
+    let query = 'select imagePath from userProfileImages where userId = ?'
+    const [result] = await poolPromise.execute(query, [userId])
+
+    const relativePath = path.relative('public', imgPath)
+
+    if (result.length !== 0) {
+        // delete current profile image
+        fs.unlink(result[0].imagePath, (err) => {
+            if (err) {
+                console.log('file does not exist')
+            }
+        })
+
+        // insert new path
+        query = 'update userProfileImages set imagePath = ? where userId = ?'
+        await poolPromise.execute(query, [relativePath, userId])
+        return {
+            success: 1,
+            message: 'Image updated successfully'
+        }
+    }
+
+    query = 'insert into userProfileImages(userId, imagePath) values (?, ?)'
+    await poolPromise.execute(query, [userId, relativePath])
+    return {
+        success: 1,
+        message: 'Image upload successfully'
+    }
+}
+
+export async function getUserProfileImgPath (userId) {
+    const query = 'select imagePath from userProfileImages where userId = ?'
+    const [result] = await poolPromise.execute(query, [userId])
+
+    if (result.length === 0) {
+        return {
+            success: 0,
+            message: 'no image found'
+        }
+    }
+
+    const imgPath = result[0].imagePath
+    const relativePath = path.relative('public', imgPath)
+    return {
+        success: 1,
+        results: relativePath
     }
 }
 

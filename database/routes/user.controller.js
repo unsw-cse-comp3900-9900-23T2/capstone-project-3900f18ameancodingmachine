@@ -21,8 +21,10 @@ import {
     getEateryByFilter,
     findSubscribedEateriesFromUserId,
     resetPassword,
+    storeUserProfileImg,
     getAllDietaries,
-    removeSubscribedTo
+    removeSubscribedTo,
+    getUserProfileImgPath
 } from './user.service.js'
 import crypto from 'crypto'
 import pkg from 'jsonwebtoken'
@@ -147,7 +149,7 @@ export async function deleteSubscribedTo (req, res) {
             })
         }
     } catch (error) {
-        
+
     }
 }
 
@@ -476,6 +478,37 @@ export function getToken (req, res) {
             token: req.cookies.token
         })
     } catch (error) {
+        return res.status(500).json({
+            success: 0,
+            message: 'connection error'
+        })
+    }
+}
+
+export async function storeUserProfileImgController (req, res) {
+    try {
+        const result = await storeUserProfileImg(req.file.path, req.body.userId)
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: 'connection error'
+        })
+    }
+}
+
+export async function getUserProfileImgPathController (req, res) {
+    try {
+        const result = await getUserProfileImgPath(req.params.id)
+
+        if (result.success === 0) {
+            return res.status(409).json(result)
+        }
+
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: 0,
             message: 'connection error'

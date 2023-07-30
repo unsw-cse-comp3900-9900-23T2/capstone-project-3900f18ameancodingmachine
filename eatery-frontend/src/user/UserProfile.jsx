@@ -61,10 +61,12 @@ export default function UserProfile() {
         const data = result.data;
         if (data.success !== 0) {
           const decrypt = jwtDecode(data.token);
+          console.log(decrypt);
           loginId = decrypt.result.id;
           const getUserId = await axios.get(`api/user/login/${loginId}`);
           userId = getUserId.data.data[0].id;
           console.log('User data');
+          console.log(userId);
           setUserData(getUserId.data.data[0]);
           setUserContext(true);
           console.log('is logged in');

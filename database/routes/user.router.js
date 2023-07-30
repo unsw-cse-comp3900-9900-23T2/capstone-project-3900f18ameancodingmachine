@@ -24,11 +24,27 @@ import {
     getEateryFiltered,
     forgottenPasswordReset,
     createUserDietary,
-    deleteSubscribedTo
+    deleteSubscribedTo,
+    storeUserProfileImgController,
+    getUserProfileImgPathController
 } from './user.controller.js'
+
+import {
+    createVoucher,
+    getCuisines,
+    getEateries,
+    updateDescription,
+    createEatery,
+    createEateryDietary,
+    getEateryVouchers,
+    getSearchResults,
+    storeEateryProfileImgController,
+    getEateryProfileImgPathController
+} from './restaurant.controller.js'
+
+import upload from '../img-config/config.js'
 import express from 'express'
 import { checkToken } from '../auth/tokenvalid.js'
-import { createVoucher, getCuisines, getEateries, updateDescription, createEatery, createEateryDietary, getEateryVouchers, getSearchResults } from './restaurant.controller.js'
 import { passwordRecovery } from '../nodemailer/config.js'
 import { verfiyResetCode } from '../nodemailer/pass_reset.js'
 
@@ -61,6 +77,12 @@ router.post('/posts', createEateryPosts)
 router.post('/reviews', createUserReviews)
 router.put('/subscribe', createSubscribedTo)
 router.put('/unsubscribe', deleteSubscribedTo)
+
+// image-related router
+router.post('/image/profile', upload.single('user-avatar'), storeUserProfileImgController)
+router.post('/eatery/image/profile', upload.single('eatery-avatar'), storeEateryProfileImgController)
+router.get('/eatery/image/profile/:id', getEateryProfileImgPathController)
+router.get('/image/profile/:id', getUserProfileImgPathController)
 
 router.get('/post/:id', getPostById)
 router.get('/review/:id', getReviewById)

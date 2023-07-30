@@ -84,7 +84,7 @@ export default function RestaurantPost(props) {
         <CardMedia
           sx={{height: 140}}
           component="img"
-          image={paella} // TODO get actual image
+          image={props.image || paella} // TODO get actual image
           title="Paella"
         />
         <CardContent>
