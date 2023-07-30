@@ -23,7 +23,52 @@ function getRestaurantPosts() {
   // TODO get from backend
 }
 
+// get all of the restaurant and the cuisines from the database
+const n = 4 // change the number depending on the requirements
 
+let loginId, userId;
+
+const getUserSubscribers = async() => {
+  try {
+    const result = await axios.get(`api/user/subscribe/${userId}`)
+    let subscribedEateries = result.data.data
+    subscribedEateries = subscribedEateries.map(eatery => ({
+      key: eatery.restaurantId, 
+      user:userId, 
+      id: eatery.restaurantId, 
+      name: eatery.name, 
+      cuisine: eatery.cuisine || "not added", 
+      location: eatery.suburb,
+      image: eatery.image
+    }))
+    return subscribedEateries
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function getLatestEateries()  {
+  const getEateries = await axios.get('api/user/eatery/all')
+  let eateries = getEateries.data.results
+  eateries = eateries.filter((eatery, index) => {
+    // filter duplicate value based on their id on whether it matches
+    // the array index
+    return eateries.findIndex((e) => e.id === eatery.id) === index;
+  })
+  console.log(eateries)
+  let newEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n)
+
+  newEateries = newEateries.map(eatery => ({
+    key: eatery.id, 
+    user: userId || null, 
+    id: eatery.id, 
+    name: eatery.name, 
+    cuisine: eatery.cuisine || "not added", 
+    location: eatery.suburb,
+    image: eatery.image
+  }))
+  return newEateries;
+}
 
 export default function UserProfile() {
   // Null: not logged in, true: user, false: restaurant
@@ -32,8 +77,9 @@ export default function UserProfile() {
   const [userData, setUserData] = useState(null);
   const [restaurantPosts, setRestaurantPosts] = useState([1,2]);
   const [imageUrl, setImageUrl] = useState(profile_pic);
-
-  let loginId, userId;
+  const [allSubs, setAllSubs] = useState([]);
+  const [newRestaurants, setNewRestaurants] = useState([]);
+  const [cuisineList, setCuisineList] = useState([]);
 
   function handleFileUpload(event) {
     const file = event.target.files[0];
@@ -56,8 +102,9 @@ export default function UserProfile() {
         if (data.success !== 0) {
           const decrypt = jwt_decode(data.token)
           loginId = decrypt.result.id;
-          const getUserId = await axios.get(`api/user/login/${loginId}`)
-          userId = getUserId.data.data[0].id
+          const getUserId = await axios.get(`api/user/login/${loginId}`);
+          userId = getUserId.data.data[0].id;
+          setAllSubs(await getUserSubscribers());
           console.log("User data")
           setUserData(getUserId.data.data[0])
           setUserContext(true)
@@ -68,6 +115,12 @@ export default function UserProfile() {
         setUserContext(null);
         console.log("Not logged in")
       }
+
+      const getCuisine = await axios.get('api/user/eatery/cuisines')
+      const cuisines = getCuisine.data.results
+      setCuisineList(cuisines)
+      let latestEateriesArr = await getLatestEateries()
+      setNewRestaurants(latestEateriesArr)
     }
     loading()
   }, [setUserContext, setUserData])
@@ -209,10 +262,11 @@ export default function UserProfile() {
                 </Typography>
               </Grid>
               {
-                restaurantPosts.map((post) => 
+                newRestaurants.map((restaurant) => 
                   <Grid xs={6}>
                     {/* TODO */}
-                    <RestaurantPost key={"id"} id={"id"} user={"userId"} name={"name"} cuisine={"cuisine"} location={"location"}/>
+                    <RestaurantPost allSubs={allSubs} setAllSubs={setAllSubs} rpost={restaurant} user={userId}/>
+                    {/* <RestaurantPost key={"id"} id={"id"} user={"userId"} name={"name"} cuisine={"cuisine"} location={"location"}/> */}
                   </Grid>
                 )
               }
