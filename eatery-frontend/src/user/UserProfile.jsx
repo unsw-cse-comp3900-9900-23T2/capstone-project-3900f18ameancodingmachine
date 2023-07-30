@@ -23,14 +23,28 @@ function getRestaurantPosts() {
   // TODO get from backend
 }
 
+
+
 export default function UserProfile() {
   // Null: not logged in, true: user, false: restaurant
   const { userContext, setUserContext } = useContext(UserContext);
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [restaurantPosts, setRestaurantPosts] = useState([1,2]);
+  const [imageUrl, setImageUrl] = useState(profile_pic);
 
   let loginId, userId;
+
+  function handleFileUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+  
+    reader.onloadend = () => {
+      setImageUrl(reader.result);
+    };
+  
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     /* check whether user has a token
@@ -86,7 +100,7 @@ export default function UserProfile() {
               >
                 <Avatar
                   alt="Batman"
-                  src={profile_pic}
+                  src={imageUrl}
                   sx={{ width: 200, height: 200 }}
                 />
               </Box>
@@ -97,7 +111,10 @@ export default function UserProfile() {
                 justifyContent="center"
                 alignItems="center"
               >
-                <Button variant="outlined" onClick={() => {}}>Update Image</Button>
+                <Button variant="outlined" component="label" onClick={() => {}}>
+                  Update Image
+                  <input hidden accept="image/*" type="file" onChange={handleFileUpload} />
+                </Button>
               </Box>
             </Grid>
             <Grid container spacing={2} xs={12}>
