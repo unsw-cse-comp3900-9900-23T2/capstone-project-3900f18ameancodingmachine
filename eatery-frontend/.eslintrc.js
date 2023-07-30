@@ -28,6 +28,6 @@ module.exports = {
     'react',
   ],
   'rules': {
-    'max-len': ['error', { 'code': 90 }]
-  }
+    'max-len': ['error', {'code': 90}],
+  },
 };
