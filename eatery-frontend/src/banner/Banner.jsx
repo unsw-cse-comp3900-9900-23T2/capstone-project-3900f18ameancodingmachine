@@ -65,7 +65,7 @@ export default function Banner() {
             <Button color="inherit" component={NavLink} to="/login">Login</Button>}
           {userContext === null &&
             <Button color="inherit" component={NavLink} to="/register">Register</Button>}
-          {userContext === false &&
+          {userContext === null &&
             <Button color="inherit" component={NavLink} to="/create-restaurant">
               New Restaurant
             </Button>}

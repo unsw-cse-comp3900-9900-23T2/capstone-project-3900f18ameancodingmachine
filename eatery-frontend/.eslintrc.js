@@ -29,5 +29,6 @@ module.exports = {
   ],
   'rules': {
     'max-len': ['error', {'code': 90}],
+    'linebreak-style': ['error', process.platform === 'win32' ? 'windows' : 'unix'],
   },
 };

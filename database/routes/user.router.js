@@ -26,7 +26,8 @@ import {
     createUserDietary,
     deleteSubscribedTo,
     storeUserProfileImgController,
-    getUserProfileImgPathController
+    getUserProfileImgPathController,
+    getAddress
 } from './user.controller.js'
 
 import {
@@ -91,6 +92,7 @@ router.get('/eatery/cuisines', getCuisines)
 router.get('/eatery/:id', getEateryById)
 router.get('/subscribe/:id', showSubscribedEateries)
 router.get('/user/browser', getSearchResults)
+router.get('/address/:id', getAddress)
 
 router.post('/voucher', createVoucher)
 router.put('/eatery/description', updateDescription)

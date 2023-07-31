@@ -24,7 +24,8 @@ import {
     storeUserProfileImg,
     getAllDietaries,
     removeSubscribedTo,
-    getUserProfileImgPath
+    getUserProfileImgPath,
+    getAddressById
 } from './user.service.js'
 import crypto from 'crypto'
 import pkg from 'jsonwebtoken'
@@ -258,6 +259,7 @@ export function logout (req, res) {
     const token = req.cookies.token
     if (token) {
         tokenBlackList.push(token)
+        res.clearCookie('token');
         return res.json({
             success: 1,
             message: "You've been logged-out!"
@@ -512,6 +514,19 @@ export async function getUserProfileImgPathController (req, res) {
         return res.status(500).json({
             success: 0,
             message: 'connection error'
+        })
+    }
+}
+
+export async function getAddress(req, res) {
+    try {
+        const result = await getAddressById(req.params.id)
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
         })
     }
 }
