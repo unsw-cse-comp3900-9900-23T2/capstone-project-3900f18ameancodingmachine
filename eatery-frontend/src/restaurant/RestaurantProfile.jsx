@@ -12,6 +12,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import CardMedia from '@mui/material/CardMedia';
 
+import axios from 'axios';
 import tempImage from '../home/paella.jpg';
 import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
@@ -169,6 +170,18 @@ async function getEateryId() {
   const eateryId = eateryRes.data.data.id;
   return eateryId;
 }
+/**
+ * @param {Int} eateryId
+ * @param {*} setRestaurantName
+ * @return {*} Places result in setRestaurantName
+ */
+async function getEateryName(eateryId, setRestaurantName) {
+  // const result = await axios.get(`api/user/eatery/${eateryId}`);
+  const result = 'Not working (getEateryName)';
+  console.log(result);
+  setRestaurantName(result);
+  return;
+}
 
 /**
  * Stub for editDescription button
@@ -238,9 +251,9 @@ export default function RestaurantProfile() {
   const [displayReviews, setDisplayReviews] = useState([]);
   const [description, setDescription] = useState('No Description Given');
   const currentPosts = loadPosts(restaurantId);
+  const [restaurantName, setRestaurantName] = useState('');
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
-
   const noBorderTextField = {
     padding: 0,
     border: 'none',
@@ -256,6 +269,7 @@ export default function RestaurantProfile() {
       loadDescription(setDescription);
     }
     loading();
+    getEateryName(restaurantId, setRestaurantName);
   }, [setUserContext]);
 
   useEffect(() => {
@@ -278,7 +292,7 @@ export default function RestaurantProfile() {
       <Card sx={{mb: 2}}>
         <CardContent>
           <Typography sx={{fontSize: 45}} color="text.primary" gutterBottom>
-            {restaurantId} (TODO: Lookup with Axios Restaurant Name)
+            {restaurantName}
           </Typography>
         </CardContent>
 
