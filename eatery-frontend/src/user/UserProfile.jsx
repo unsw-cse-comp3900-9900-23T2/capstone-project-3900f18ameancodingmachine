@@ -116,9 +116,14 @@ export default function UserProfile() {
           loginId = decrypt.result.id;
           const getUserId = await axios.get(`api/user/login/${loginId}`);
           userId = getUserId.data.data[0].id;
-          //get the address
-          const getUserAddress = (await axios.get(`api/user/address/${userId}`)).data
-          getUserId.data.data[0].address = getUserAddress.data.street + ", " + getUserAddress.data.suburb + ", " + getUserAddress.data.region
+          // get the address
+          const getUserAddress = (await axios.get(`api/user/address/${userId}`)).data;
+          getUserId.data.data[0].address =
+          getUserAddress.data.street +
+          ', ' +
+          getUserAddress.data.suburb +
+          ', ' +
+          getUserAddress.data.region;
           setAllSubs(await getUserSubscribers());
           console.log('User data');
           setUserData(getUserId.data.data[0]);
