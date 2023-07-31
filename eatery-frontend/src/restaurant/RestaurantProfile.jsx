@@ -188,7 +188,7 @@ export default function RestaurantProfile() {
       <Card sx={{mb: 2}}>
         <CardContent>
           <Typography sx={{fontSize: 45}} color="text.primary" gutterBottom>
-            {restaurantId}
+            {restaurantId} (TODO: Lookup with Axios Restaurant Name)
           </Typography>
         </CardContent>
 
@@ -209,7 +209,7 @@ export default function RestaurantProfile() {
           </Card>
         </Grid>
         <Grid xs={6}>
-          <Card>
+          <Card sx={{minHeight: 680, display: 'flex', flexDirection: 'column'}}>
             <CardContent>
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
                             Reviews
@@ -223,7 +223,7 @@ export default function RestaurantProfile() {
                 );
               })}
             </CardContent>
-            <CardActions>
+            <CardActions disableSpacing sx={{mt: 'auto'}}>
               {indexReviews !== 0 ? <Button variant="contained"
                 onClick={() => setIndexReviews((prevIndex) => prevIndex - countReviews)}>
                   Last Reviews
