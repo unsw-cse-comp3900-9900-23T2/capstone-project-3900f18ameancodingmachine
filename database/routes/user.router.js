@@ -28,7 +28,8 @@ import {
     storeUserProfileImgController,
     getUserProfileImgPathController,
     postNewCommentController,
-    increaseLikesController
+    increaseLikesController,
+    getCommentsFromPostIdController
 } from './user.controller.js'
 
 import {
@@ -94,6 +95,7 @@ router.get('/eatery/:id', getEateryById)
 router.get('/subscribe/:id', showSubscribedEateries)
 router.get('/user/browser', getSearchResults)
 router.post('/user/comment', postNewCommentController)
+router.get('/eatery/post/comments', getCommentsFromPostIdController)
 router.put('/user/likes', increaseLikesController)
 
 router.post('/voucher', createVoucher)

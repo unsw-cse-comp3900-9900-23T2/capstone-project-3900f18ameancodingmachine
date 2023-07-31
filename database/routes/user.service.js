@@ -177,7 +177,7 @@ export async function createNewPost (data) {
 
 export async function getPostByPostId (id) {
     // gets post by id
-    const query = 'select * from postAndComments where postId = ?'
+    const query = 'select id, postedBy, title, content from Posts where id = ?'
     const value = [id]
     const [results] = await poolPromise.execute(query, value)
 
@@ -439,6 +439,15 @@ export async function postNewComment (userId, postId, comment) {
     return {
         success: 1,
         message: "comment added"
+    }
+}
+
+export async function getCommentsFromPostId (postId) {
+    const query =  `select * from commentsFromUser where postId = ?`
+    const [result] = await poolPromise.execute(query, [postId])
+    return {
+        success: 1,
+        data: result
     }
 }
 

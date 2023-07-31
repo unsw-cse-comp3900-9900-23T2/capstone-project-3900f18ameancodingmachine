@@ -135,4 +135,32 @@ describe('/comment', () => {
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
     })
+
+    test('see comments made by a post', async () => {
+        const commentData = {
+            userId: userId,
+            postId: postId,
+            comment: "first comment"
+        }
+
+        let response = await request(app).post("/api/user/user/comment").send(commentData);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+
+        const commentData2 = {
+            userId: userId,
+            postId: postId,
+            comment: "second comment"
+        }
+
+        response = await request(app).post("/api/user/user/comment").send(commentData2);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+
+        response = await request(app).get("/api/user/eatery/post/comments").send({ postId: postId })
+        console.log(response.body.data)
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+        expect(response.body.data.length).toBe(2);
+    })
 })
