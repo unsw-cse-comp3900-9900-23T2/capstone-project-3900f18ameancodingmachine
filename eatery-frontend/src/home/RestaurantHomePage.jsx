@@ -320,7 +320,7 @@ export default function RestaurantHomePage() {
 
       <Grid container spacing={0} xs={12}>
         <Grid xs={6}>
-          <Card sx={{minWidth: 275}}>
+          <Card sx={{minWidth: 275, minHeight: 625}}>
             <CardContent>
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
                 Vouchers
@@ -375,7 +375,7 @@ export default function RestaurantHomePage() {
             </CardActions>
 
             <CardContent>
-              <List>
+              <List sx={{height: 200, overflowX: 'auto', overflowY: 'auto'}}>
 
                 {vouchers.map((voucher) => {
                   return (
