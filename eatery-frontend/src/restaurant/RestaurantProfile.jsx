@@ -175,7 +175,6 @@ async function getEateryId() {
  * @return {Boolean}
  */
 async function editDescription() {
-  // alert("editDescription: Pressed editDescription");
   const description = prompt('Enter your description:');
   try {
     const eateryId = await getEateryId();
@@ -207,22 +206,22 @@ async function loadDescription(setDes) {
     // insert into the database
     setDes(await axios.get('api/user/eatery/description'));
 
-    setDes('Discover a culinary oasis at Savory Bites & Co., '+
-          'where passion meets perfection, and every morsel tells '+
-          'a tale of delightful flavors. Situated in the heart of '+
-          'a bustling city, this enchanting restaurant is a celebration '+
-          'of gastronomy, offering an unforgettable dining experience that '+
-          'lingers in your memory long after the last bite. As you step '+
-          'inside, the ambiance embraces you like a warm hug, a harmonious '+
-          'blend of contemporary elegance and rustic charm. The soothing '+
-          'color palette, soft lighting, and tasteful decor create an '+
-          'inviting setting that beckons you to indulge in the culinary '+
-          'wonders that await.');
+
     */
-    setDes('This description is loaded from loadDescription');
-    alert('description updated');
+    setDes('Discover a culinary oasis at Savory Bites & Co., '+
+    'where passion meets perfection, and every morsel tells '+
+    'a tale of delightful flavors. Situated in the heart of '+
+    'a bustling city, this enchanting restaurant is a celebration '+
+    'of gastronomy, offering an unforgettable dining experience that '+
+    'lingers in your memory long after the last bite. As you step '+
+    'inside, the ambiance embraces you like a warm hug, a harmonious '+
+    'blend of contemporary elegance and rustic charm. The soothing '+
+    'color palette, soft lighting, and tasteful decor create an '+
+    'inviting setting that beckons you to indulge in the culinary '+
+    'wonders that await.');
+    console.log('description updated');
   } catch (error) {
-    alert('something is wrong in the database');
+    console.log('something is wrong in the database');
     console.log(error);
   }
 }
@@ -241,6 +240,12 @@ export default function RestaurantProfile() {
   const currentPosts = loadPosts(restaurantId);
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
+
+  const noBorderTextField = {
+    padding: 0,
+    border: 'none',
+    outline: 'none',
+  };
 
   // setDisplayReviews(loadDisplayReviews(currentReviews, 0, 3))
   useEffect(() => {
@@ -281,20 +286,24 @@ export default function RestaurantProfile() {
 
       <Grid container spacing={2}>
         <Grid xs={6}>
-          <Card>
+          <Card sx={{minHeight: 640}}>
             <CardContent>
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
                 Description
               </Typography>
-              {userContext && <Typography sx={{fontSize: 16}}
-                color="text.primary" gutterBottom>
-                {description}
-              </Typography>}
+              <Card sx={{minHeight: 300, display: 'flex',
+                flexDirection: 'column', padding: 2}}>
+                {userContext && <Typography sx={{fontSize: 16}}
+                  color="text.primary" gutterBottom>
+                  {description}
+                </Typography>}
 
-              {!userContext && <TextField id="outlined-basic"
-                value={description} onChange={(event) => {
+                {!userContext && <TextField multiline InputProps={{style:
+                  noBorderTextField}} id="outlined-basic" value={description}
+                onChange={(event) => {
                   setDescription(event.target.value);
                 }}/>}
+              </Card>
             </CardContent>
             <CardActions>
               <Button variant="contained"
