@@ -18,6 +18,7 @@ import jwtDecode from 'jwt-decode';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Grid from '@mui/material/Unstable_Grid2';
 
 import {NavLink} from 'react-router-dom';
 
@@ -191,10 +192,7 @@ async function createVoucher(percentage, numVouchers, startDate, endDate, reoccu
       count: numVouchers,
       code: voucherCode,
     });
-
-    alert('voucher created');
   } catch (error) {
-    alert('something is wrong in the database');
     console.log(error);
   }
   return false;
@@ -320,102 +318,125 @@ export default function RestaurantHomePage() {
         </CardActions>
       </Card>
 
-      <Card sx={{minWidth: 275}}>
-        <CardContent>
-          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-            Vouchers
-          </Typography>
-        </CardContent>
+      <Grid container spacing={0} xs={12}>
+        <Grid xs={6}>
+          <Card sx={{minWidth: 275}}>
+            <CardContent>
+              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+                Vouchers
+              </Typography>
+            </CardContent>
+            <Grid container spacing={2} xs={12}>
+              <Grid xs={12}>
+                <TextField sx={{minWidth: 258.4}}
+                  required id="voucher-percentage" label="Percentage"
+                  value={percentage} onChange={(event) => {
+                    setPercentage(event.target.value);
+                  }}
+                />
+                <TextField sx={{minWidth: 258.4}}
+                  required id="voucher-num" label="Number of Vouchers"
+                  value={numVouchers} onChange={(event) => {
+                    setNumVouchers(event.target.value);
+                  }}
+                />
+              </Grid>
+              <Grid xs={12}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker label="Start Date" value={startDate} onChange={(event) => {
+                    setStartDate(event);
+                  }}/>
+                  <DatePicker label="End Date" value={endDate} onChange={(event) => {
+                    setEndDate(event);
+                  }}/>
+                </LocalizationProvider>
+              </Grid>
+            </Grid>
+            <FormGroup>
+              <FormControlLabel control={<Checkbox defaultChecked />}
+                label="Reoccuring" value={reoccuring} onChange={(event) => {
+                  const {name, checked} = event.target; setReoccuring(checked);
+                  console.log(name);
+                }}/>
+            </FormGroup>
+            <CardActions >
+              <Button variant="contained" onClick={() => {
+                createVoucher(percentage, numVouchers, startDate, endDate, reoccuring);
+              }}>Create Voucher</Button>
+            </CardActions>
 
-        <TextField required id="voucher-percentage" label="Percentage"
-          value={percentage} onChange={(event) => {
-            setPercentage(event.target.value);
-          }}
-        />
-        <TextField required id="voucher-num" label="Number of Vouchers"
-          value={numVouchers} onChange={(event) => {
-            setNumVouchers(event.target.value);
-          }}
-        />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker label="Start Date" value={startDate} onChange={(event) => {
-            setStartDate(event);
-          }}/>
-          <DatePicker label="End Date" value={endDate} onChange={(event) => {
-            setEndDate(event);
-          }}/>
-        </LocalizationProvider>
-        <FormGroup>
-          <FormControlLabel control={<Checkbox defaultChecked />}
-            label="Reoccuring" value={reoccuring} onChange={(event) => {
-              const {name, checked} = event.target; setReoccuring(checked);
-              console.log(name);
-            }}/>
-        </FormGroup>
-        <CardActions >
-          <Button variant="contained" onClick={() => {
-            createVoucher(percentage, numVouchers, startDate, endDate, reoccuring);
-          }}>Create Voucher</Button>
-        </CardActions>
+            <CardActions>
+              { vouchers.length == 0 && <Button size="large" onClick={() => {
+                viewVouchers(setVouchers);
+              }}>View Created Vouchers</Button> }
+              { vouchers.length > 0 && <Button size="large" onClick={() => {
+                setVouchers([]);
+              }}>Hide Vouchers</Button> }
+            </CardActions>
 
-        <CardActions>
-          { vouchers.length == 0 && <Button size="large" onClick={() => {
-            viewVouchers(setVouchers);
-          }}>View Created Vouchers</Button> }
-          { vouchers.length > 0 && <Button size="large" onClick={() => {
-            setVouchers([]);
-          }}>Hide Vouchers</Button> }
-        </CardActions>
+            <CardContent>
+              <List>
 
-        <CardContent>
-          <List>
+                {vouchers.map((voucher) => {
+                  return (
+                    <ListItem key={voucher.code}>
+                      <Grid container spacing={0} xs={12}>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.discount} />
+                        </Grid>
+                        <Grid xs={2}>
+                          <ListItemText primary={voucher.count} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.code} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.startOffer.slice(0, 10)} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.endOffer.slice(0, 10)} />
+                        </Grid>
+                      </Grid>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </CardContent>
 
-            {vouchers.map((voucher) => {
-              return (
-                <ListItem key={voucher.code}>
-                  <ListItemText primary={voucher.discount} />
-                  <ListItemText primary={voucher.count} />
-                  <ListItemText primary={voucher.code} />
-                  <ListItemText primary={voucher.startOffer.slice(0, 10)} />
-                  <ListItemText primary={voucher.endOffer.slice(0, 10)} />
-                </ListItem>
-              );
-            })}
-          </List>
-        </CardContent>
+          </Card>
+        </Grid>
+        <Grid xs={6}>
+          <Card sx={{minWidth: 275}}>
+            <CardContent>
+              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+                Create Post
+              </Typography>
 
-      </Card>
-
-      <Card sx={{minWidth: 275}}>
-        <CardContent>
-          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-            Create Post
-          </Typography>
-
-          <Typography sx={{fontSize: 14}} color="text.primary" gutterBottom>
-            Title
-          </Typography>
-          <TextField required id="title-post" placeholder="Title" value={titlePost}
-            onChange={(event) => {
-              setTitlePost(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Body
-          </Typography>
-          <TextField sx={{minWidth: 500}} multiline rows={8} required id="body-post"
-            placeholder="Body" value={bodyPost} onChange={(event) => {
-              setBodyPost(event.target.value);
-            }}
-          />
-        </CardContent>
-        <CardActions>
-          <Button variant="contained" onClick={() => {
-            uploadPost(titlePost, bodyPost);
-          }}>Post</Button>
-        </CardActions>
-      </Card>
-
+              <Typography sx={{fontSize: 14}} color="text.primary" gutterBottom>
+                Title
+              </Typography>
+              <TextField required id="title-post" placeholder="Title" value={titlePost}
+                onChange={(event) => {
+                  setTitlePost(event.target.value);
+                }}
+              />
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Body
+              </Typography>
+              <TextField sx={{minWidth: 500}} multiline rows={8} required id="body-post"
+                placeholder="Body" value={bodyPost} onChange={(event) => {
+                  setBodyPost(event.target.value);
+                }}
+              />
+            </CardContent>
+            <CardActions>
+              <Button variant="contained" onClick={() => {
+                uploadPost(titlePost, bodyPost);
+              }}>Post</Button>
+            </CardActions>
+          </Card>
+        </Grid>
+      </Grid>
     </Container>
   );
 }
