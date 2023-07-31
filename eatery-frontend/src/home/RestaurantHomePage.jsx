@@ -398,6 +398,10 @@ export default function RestaurantHomePage() {
               <Button variant="contained" onClick={() => {
                 createVoucher(percentage, numVouchers, startDate,
                     endDate, reoccuring, setVoucherError);
+                setPercentage('');
+                setNumVouchers('');
+                setStartDate('');
+                setEndDate('');
               }}>Create Voucher</Button>
               {voucherError == '' &&
                 <Typography sx={{fontSize: 20, marginLeft: 'auto'}}
