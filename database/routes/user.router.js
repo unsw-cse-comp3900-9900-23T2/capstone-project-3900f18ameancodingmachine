@@ -27,7 +27,8 @@ import {
     deleteSubscribedTo,
     storeUserProfileImgController,
     getUserProfileImgPathController,
-    postNewCommentController
+    postNewCommentController,
+    increaseLikesController
 } from './user.controller.js'
 
 import {
@@ -93,6 +94,7 @@ router.get('/eatery/:id', getEateryById)
 router.get('/subscribe/:id', showSubscribedEateries)
 router.get('/user/browser', getSearchResults)
 router.post('/user/comment', postNewCommentController)
+router.put('/user/likes', increaseLikesController)
 
 router.post('/voucher', createVoucher)
 router.put('/eatery/description', updateDescription)

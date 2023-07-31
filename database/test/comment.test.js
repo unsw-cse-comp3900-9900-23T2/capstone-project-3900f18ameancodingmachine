@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app, server } from '../server';
 import { poolPromise } from '../db-config/db_connection';
+import { db_clear } from '../db-config/db_clear';
 
 // after all test done, it will stop pool connection
 // otherwise jest won't exit
@@ -10,6 +11,10 @@ afterAll((done) => {
         done();
     });
 });
+
+afterEach(async () => {
+    await db_clear()
+})
 
 ///////////////////////////////////////Sample Data//////////////////////////////////
 
@@ -95,15 +100,6 @@ describe('/comment', () => {
 
         response = await request(app).post('/api/user/posts').send(postData)
         postId = response.body.data.insertId
-    })
-
-    afterEach(async () => {
-        let query = `delete from LoginInfo`
-        let res = await poolPromise.execute(query)
-        query = `delete from Posts`
-        res = await poolPromise.execute(query)
-        query = `delete from PostComments`
-        res = await poolPromise.execute(query)
     })
 
     test('write comment will return statuscode 200 and success of 1', async () => {

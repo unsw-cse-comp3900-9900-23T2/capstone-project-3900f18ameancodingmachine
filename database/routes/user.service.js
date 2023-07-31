@@ -1,4 +1,4 @@
-import { poolPromise } from '../db-config/db_connection.js'
+import { pool, poolPromise } from '../db-config/db_connection.js'
 import fs from 'fs'
 import path from 'path'
 
@@ -177,7 +177,7 @@ export async function createNewPost (data) {
 
 export async function getPostByPostId (id) {
     // gets post by id
-    const query = 'select id, postedBy, title, content from Posts where id = ?'
+    const query = 'select * from postAndComments where postId = ?'
     const value = [id]
     const [results] = await poolPromise.execute(query, value)
 
@@ -189,7 +189,7 @@ export async function getPostByPostId (id) {
     } else {
         return {
             success: 1,
-            data: results[0]
+            data: results
         }
     }
 }
@@ -439,6 +439,15 @@ export async function postNewComment (userId, postId, comment) {
     return {
         success: 1,
         message: "comment added"
+    }
+}
+
+export async function increaseLikes (postId) {
+    const query = `update Posts set likes = likes + 1 where id = ?`
+    await poolPromise.execute(query, [postId])
+    return {
+        success: 1,
+        message: "liked the post"
     }
 }
 

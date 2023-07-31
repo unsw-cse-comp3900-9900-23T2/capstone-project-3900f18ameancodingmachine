@@ -139,3 +139,19 @@ from    EateryAccount ea
 join    provideDietary pd on (ea.id = pd.restaurantId)
 join    DietaryRestrictions dr on (dr.id = pd.dietId)
 ;
+
+-- views table related to posts and comments
+
+drop view if exists postAndComments;
+
+create view postAndComments as
+select
+    p.id as postId,
+    p.postedBy as restaurantId,
+    p.title,
+    p.content,
+    p.likes,
+    pc.comment
+from        Posts p
+left join   PostComments pc on (pc.postId = p.id)
+; 

@@ -90,7 +90,7 @@ create table CuisineOffer (
     restaurantId    integer references EateryAccount(id),
     cuisineId       integer references Cuisines(id),
     primary key (restaurantId, cuisineId),
-    foreign key (restaurantId) references EateryAccount(id) on delete cascade ,
+    foreign key (restaurantId) references EateryAccount(id) on delete cascade,
     foreign key (cuisineId) references Cuisines(id) on delete cascade 
 );
 
@@ -116,7 +116,7 @@ create table userDietary (
     userId      integer,
     dietId      integer,
     primary key (userId, dietId),
-    FOREIGN KEY (userId) REFERENCES UserAccount(id) on delete cascade ,
+    FOREIGN KEY (userId) REFERENCES UserAccount(id) on delete cascade,
     FOREIGN KEY (dietId) REFERENCES DietaryRestrictions(id) on delete cascade 
 );
 
@@ -124,7 +124,7 @@ create table provideDietary (
     restaurantId    integer,
     dietId          integer,
     primary key (restaurantId, dietId),
-    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id) on delete cascade ,
+    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id) on delete cascade,
     FOREIGN KEY (dietId) REFERENCES DietaryRestrictions(id) on delete cascade 
 );
 
@@ -163,6 +163,8 @@ create table PostComments (
     FOREIGN KEY (userId) REFERENCES UserAccount(id) on delete cascade ,
     FOREIGN KEY (postId) REFERENCES Posts(id) on delete cascade  
 );
+
+-- view tables
 
 -- view related to user account
 
@@ -258,7 +260,7 @@ join    LoginInfo l on (ea.login = l.id)
 
 -- restaurant cusines that they offer
 create view restaurantCuisines as
-select  ea.name as "eatery", c.name "cuisine"
+select  ea.name as "eatery", c.name as "cuisine"
 from    EateryAccount ea
 join    CuisineOffer co on (co.restaurantId = ea.id)
 join    Cuisines c on (co.cuisineId = c.id)
@@ -305,3 +307,19 @@ from    EateryAccount ea
 join    provideDietary pd on (ea.id = pd.restaurantId)
 join    DietaryRestrictions dr on (dr.id = pd.dietId)
 ;
+
+-- views table related to posts and comments
+
+drop view if exists postAndComments;
+
+create view postAndComments as
+select
+    p.id as postId,
+    p.postedBy as restaurantId,
+    p.title,
+    p.content,
+    p.likes,
+    pc.comment
+from        Posts p
+left join   PostComments pc on (pc.postId = p.id)
+; 

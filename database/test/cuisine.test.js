@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app, server } from '../server';
 import { poolPromise } from '../db-config/db_connection';
+import { db_clear } from '../db-config/db_clear';
 
 // after all test done, it will stop pool connection
 // otherwise jest won't exit
@@ -10,6 +11,10 @@ afterAll((done) => {
         done();
     });
 });
+
+afterEach(async () => {
+    await db_clear();
+})
 
 ///////////////////////////////////////Sample Data//////////////////////////////////
 
@@ -49,11 +54,6 @@ describe("/cuisine", () => {
         name: "new cuisine" //fake
     }
 
-    afterEach(async () => {
-        const query = `delete from Cuisines`
-        await poolPromise.execute(query)
-    })
-
     test("adding new cuisine should return statuscode 200 and success of 1", async () => {
         const response = await request(app).post('/api/user/cuisine').send(cuisineData)
         expect(response.statusCode).toBe(200)
@@ -91,16 +91,6 @@ describe("/cuisine-offer", () => {
 
         response = await request(app).post("/api/user/eatery").send(eateryAccount);
         restaurantId = response.body.results.insertId
-    })
-
-
-    afterEach(async () => {
-        let query = `delete from LoginInfo`;
-        let res = await poolPromise.execute(query)
-        query = `delete from Cuisines`;
-        res = await poolPromise.execute(query)
-        query = `delete from CuisineOffer`;
-        res = await poolPromise.execute(query)
     })
 
     test("restaurant linking to a cuisine would have statuscode 200 and success of 1", async () => {

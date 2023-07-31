@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app, server } from '../server';
 import { poolPromise } from '../db-config/db_connection';
+import { db_clear } from '../db-config/db_clear';
 
 // after all test done, it will stop pool connection
 // otherwise jest won't exit
@@ -10,6 +11,10 @@ afterAll((done) => {
         done();
     });
 });
+
+afterEach(async () => {
+    await db_clear();
+})
 
 ///////////////////////////////////////Sample Data//////////////////////////////////
 
@@ -44,19 +49,6 @@ const eateryLoginData = {
 //////////////////////////////////////////////////////////////////////////////////////
 
 describe("/reviews", () => {
-
-    afterEach(async () => {
-        let query = `delete from LoginInfo`;
-        let res = await poolPromise.execute(query)
-        query = `delete from Reviews`;
-        res = await poolPromise.execute(query)
-        query = `delete from Address`;
-        res = await poolPromise.execute(query)
-        query = `delete from UserAccount`;
-        res = await poolPromise.execute(query)
-        query = `delete from EateryAccount`;
-        res = await poolPromise.execute(query)
-    })
 
     test("user review a restaurant, when search for the review, return statuscode 200 and success 1", async () => {
         // register user
@@ -120,6 +112,5 @@ describe("/reviews", () => {
         expect(response.statusCode).toBe(404)
         expect(response.body.success).toBe(0)
     })
-    
 
 })

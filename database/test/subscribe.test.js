@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app, server } from '../server';
 import { poolPromise } from '../db-config/db_connection';
+import { db_clear } from '../db-config/db_clear';
 
 // after all test done, it will stop pool connection
 // otherwise jest won't exit
@@ -10,6 +11,10 @@ afterAll((done) => {
         done();
     });
 });
+
+afterEach(async () => {
+    await db_clear();
+})
 
 ///////////////////////////////////////Sample Data//////////////////////////////////
 
@@ -85,17 +90,6 @@ describe('/subscribe', () => {
 
         response = await request(app).post("/api/user/user").send(userAccount)
         userAccountId = response.body.data.insertId
-    })
-
-    afterEach(async () => {
-        let query = `delete from LoginInfo`
-        let res = await poolPromise.execute(query)
-        query = `delete from UserAccount`;
-        res = await poolPromise.execute(query);
-        query = `delete from EateryAccount`;
-        res = await poolPromise.execute(query);
-        query = `delete from Address`;
-        res = await poolPromise.execute(query);
     })
 
     test("user subscribe to registered restaurant", async () => {

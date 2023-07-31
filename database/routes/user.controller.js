@@ -25,7 +25,8 @@ import {
     getAllDietaries,
     removeSubscribedTo,
     getUserProfileImgPath,
-    postNewComment
+    postNewComment,
+    increaseLikes
 } from './user.service.js'
 import crypto from 'crypto'
 import pkg from 'jsonwebtoken'
@@ -315,6 +316,7 @@ export async function getPostById (req, res) {
         }
         return res.status(200).json(result)
     } catch (err) {
+        console.log(err)
         return res.status(500).json({
             success: 0,
             message: 'Database connection error'
@@ -521,6 +523,20 @@ export async function postNewCommentController (req, res) {
     try {
         const body = req.body
         const result = await postNewComment(body.userId, body.postId, body.comment)
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: 'connection error'
+        })
+    }
+}
+
+export async function increaseLikesController (req, res) {
+    try {
+        const body = req.body
+        const result = await increaseLikes(body.postId)
         return res.status(200).json(result)
     } catch (error) {
         console.log(error)
