@@ -310,16 +310,14 @@ join    DietaryRestrictions dr on (dr.id = pd.dietId)
 
 -- views table related to posts and comments
 
-drop view if exists postAndComments;
+drop view if exists commentsFromUser;
 
-create view postAndComments as
+create view commentsFromUser as
 select
-    p.id as postId,
-    p.postedBy as restaurantId,
-    p.title,
-    p.content,
-    p.likes,
+    pc.postId,
+    ua.first,
+    ua.last,
     pc.comment
-from        Posts p
-left join   PostComments pc on (pc.postId = p.id)
+from        UserAccount ua
+left join   PostComments pc on (pc.userId = ua.id)
 ; 
