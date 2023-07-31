@@ -72,6 +72,16 @@ export async function getUserByLoginId (id) {
     }
 }
 
+
+export async function getAddressById (id) {
+    const query = "select * from Address where id = ?"
+    const [results] = await poolPromise.execute(query, [id])
+    return {
+        success: 1,
+        data: results[0]
+    }
+}
+
 export async function getUserByUserId (id) {
     // gets user by id
     const query = 'select id, first, last, login, address from UserAccount where id = ?'

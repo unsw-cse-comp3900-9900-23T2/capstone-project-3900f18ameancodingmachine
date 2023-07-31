@@ -55,7 +55,7 @@ export default function Banner() {
             </Button>}
           {userContext === null && <Button color="inherit" component={NavLink} to="/login">Login</Button>}
           {userContext === null && <Button color="inherit" component={NavLink} to="/register">Register</Button>}
-          {userContext === false && <Button color="inherit" component={NavLink} to="/create-restaurant">New Restaurant</Button>}
+          {userContext === null && <Button color="inherit" component={NavLink} to="/create-restaurant">New Restaurant</Button>}
           {userContext === true && 
             <IconButton sx={{marginLeft: 'auto'}} size="large" onClick={() => {navigate("/user-profile")}} color="inherit">
               <AccountCircle />
