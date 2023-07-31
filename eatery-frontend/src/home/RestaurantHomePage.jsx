@@ -168,14 +168,43 @@ async function uploadHours() {
  * @param {*} startDate
  * @param {*} endDate
  * @param {*} reoccuring
+ * @param {*} setError set function for string for error message
  * @return {Boolean}
  */
-async function createVoucher(percentage, numVouchers, startDate, endDate, reoccuring) {
-  if (percentage === '' || numVouchers === '') { // field must be filled
-    alert('fill the voucher details');
-    return;
-  } else if (startDate > endDate) { // start date must be earlier than end date
-    alert('start date older than the end date');
+async function createVoucher(percentage, numVouchers, startDate, endDate,
+    reoccuring, setError) {
+  // Guard Statements
+  let isError = false;
+  setError('');
+  if (percentage === '') {
+    setError((prevState) => prevState + 'Enter Percentage. ');
+    isError = true;
+  }
+  if (isNaN(+percentage)) {
+    setError((prevState) => prevState + 'Percentage must be a number. ');
+    isError = true;
+  }
+  if (numVouchers === '') {
+    setError((prevState) => prevState + 'Enter Number of Vouchers. ');
+    isError = true;
+  }
+  if (isNaN(+numVouchers)) {
+    setError((prevState) => prevState + 'Number of Vouchers must be a number. ');
+    isError = true;
+  }
+  if (startDate === '') { // start date must be earlier than end date
+    setError((prevState) => prevState + 'Enter Start date. ');
+    isError = true;
+  }
+  if (endDate === '') { // start date must be earlier than end date
+    setError((prevState) => prevState + 'Enter End date. ');
+    isError = true;
+  }
+  if (startDate > endDate && endDate !== '') {
+    setError((prevState) => prevState + 'Start date older than the end date. ');
+    isError = true;
+  }
+  if (isError) {
     return;
   }
 
@@ -207,7 +236,7 @@ async function viewVouchers(setVouchers) {
   try {
     const eateryId = await getEateryId();
     const {data} = await axios.get(`api/user/eatery/vouchers/${eateryId}`);
-    const results = data.results;
+    const results = data.results.reverse();
     // adding column titles
     results.unshift({
       id: 'Id',
@@ -290,6 +319,8 @@ export default function RestaurantHomePage() {
   const [bodyPost, setBodyPost] = React.useState('');
   const [vouchers, setVouchers] = React.useState([]);
   const [profileURL, setProfileURL] = React.useState('');
+  // Set to '_', so Voucher Created isn't displayed initially
+  const [voucherError, setVoucherError] = React.useState('_');
   generateProfileLink(setProfileURL);
 
   return (
@@ -359,15 +390,26 @@ export default function RestaurantHomePage() {
                   console.log(name);
                 }}/>
             </FormGroup>
+            {voucherError !== '_' &&
+              <Typography sx={{fontSize: 14}} color="red" gutterBottom>
+                {voucherError}
+              </Typography>}
             <CardActions >
               <Button variant="contained" onClick={() => {
-                createVoucher(percentage, numVouchers, startDate, endDate, reoccuring);
+                createVoucher(percentage, numVouchers, startDate,
+                    endDate, reoccuring, setVoucherError);
               }}>Create Voucher</Button>
+              {voucherError == '' &&
+                <Typography sx={{fontSize: 20, marginLeft: 'auto'}}
+                  color="green" gutterBottom>
+                  Voucher Created
+                </Typography>}
             </CardActions>
 
             <CardActions>
               { vouchers.length == 0 && <Button size="large" onClick={() => {
                 viewVouchers(setVouchers);
+                setVoucherError('_');
               }}>View Created Vouchers</Button> }
               { vouchers.length > 0 && <Button size="large" onClick={() => {
                 setVouchers([]);
