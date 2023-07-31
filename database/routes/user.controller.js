@@ -27,7 +27,8 @@ import {
     getUserProfileImgPath,
     postNewComment,
     increaseLikes,
-    getCommentsFromPostId
+    getCommentsFromPostId,
+    getAddressById
 } from './user.service.js'
 import crypto from 'crypto'
 import pkg from 'jsonwebtoken'
@@ -261,6 +262,7 @@ export function logout (req, res) {
     const token = req.cookies.token
     if (token) {
         tokenBlackList.push(token)
+        res.clearCookie('token');
         return res.json({
             success: 1,
             message: "You've been logged-out!"
@@ -524,6 +526,18 @@ export async function postNewCommentController (req, res) {
     try {
         const body = req.body
         const result = await postNewComment(body.userId, body.postId, body.comment)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: 'connection error'
+        })
+    }
+}
+
+export async function getAddress(req, res) {
+    try {
+        const result = await getAddressById(req.params.id)
         return res.status(200).json(result)
     } catch (error) {
         console.log(error)
@@ -557,7 +571,7 @@ export async function getCommentsFromPostIdController (req, res) {
         console.log(error)
         return res.status(500).json({
             success: 0,
-            message: 'connection error'
+            message: "Database connection error"
         })
     }
 }
