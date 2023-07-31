@@ -448,7 +448,7 @@ export async function postNewComment (userId, postId, comment) {
     const [result] = await poolPromise.execute(query, [userId, postId, comment])
     return {
         success: 1,
-        message: "comment added"
+        data: result
     }
 }
 

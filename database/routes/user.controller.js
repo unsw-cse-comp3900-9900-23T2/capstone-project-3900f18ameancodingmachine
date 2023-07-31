@@ -526,6 +526,7 @@ export async function postNewCommentController (req, res) {
     try {
         const body = req.body
         const result = await postNewComment(body.userId, body.postId, body.comment)
+        return res.status(200).json(result)
     } catch (error) {
         console.log(error)
         return res.status(500).json({
