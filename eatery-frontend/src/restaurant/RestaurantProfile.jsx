@@ -1,5 +1,5 @@
 import {useParams} from 'react-router-dom';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 
 
 import Button from '@mui/material/Button';
@@ -15,6 +15,7 @@ import CardMedia from '@mui/material/CardMedia';
 import tempImage from '../home/paella.jpg';
 import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
+import {UserContext} from '../App.jsx';
 
 /**
  *  Loads reviews from backend
@@ -153,6 +154,79 @@ function loadPosts(restaurantId) {
   return tempData;
 }
 
+// helper function to get the eatery id
+/**
+ * @return {Int}
+ */
+async function getEateryId() {
+  const result = await axios.get('api/user/');
+  const data = result.data;
+  const decrypt = jwtDecode(data.token);
+  const loginId = decrypt.result.id;
+
+  // get the restaurantId
+  const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
+  const eateryId = eateryRes.data.data.id;
+  return eateryId;
+}
+
+/**
+ * Stub for editDescription button
+ * @return {Boolean}
+ */
+async function editDescription() {
+  // alert("editDescription: Pressed editDescription");
+  const description = prompt('Enter your description:');
+  try {
+    const eateryId = await getEateryId();
+
+    // insert into the database
+    await axios.put('api/user/eatery/description', {
+      restaurantId: eateryId,
+      description: description,
+    });
+
+    console.log('description updated');
+  } catch (error) {
+    console.log('something is wrong in the database');
+    console.log(error);
+  }
+  return false;
+}
+
+/**
+ * Stub for editDescription button
+ * @param {string} setDes set function for description
+ * @return {Boolean}
+ */
+async function loadDescription(setDes) {
+  try {
+    /*
+    const eateryId = await getEateryId();
+
+    // insert into the database
+    setDes(await axios.get('api/user/eatery/description'));
+
+    setDes('Discover a culinary oasis at Savory Bites & Co., '+
+          'where passion meets perfection, and every morsel tells '+
+          'a tale of delightful flavors. Situated in the heart of '+
+          'a bustling city, this enchanting restaurant is a celebration '+
+          'of gastronomy, offering an unforgettable dining experience that '+
+          'lingers in your memory long after the last bite. As you step '+
+          'inside, the ambiance embraces you like a warm hug, a harmonious '+
+          'blend of contemporary elegance and rustic charm. The soothing '+
+          'color palette, soft lighting, and tasteful decor create an '+
+          'inviting setting that beckons you to indulge in the culinary '+
+          'wonders that await.');
+    */
+    setDes('This description is loaded from loadDescription');
+    alert('description updated');
+  } catch (error) {
+    alert('something is wrong in the database');
+    console.log(error);
+  }
+}
+
 /**
  * @return {JSX}
  */
@@ -163,10 +237,21 @@ export default function RestaurantProfile() {
   const [indexReviews, setIndexReviews] = useState(0);
   const countReviews = 3;
   const [displayReviews, setDisplayReviews] = useState([]);
-
+  const [description, setDescription] = useState('No Description Given');
   const currentPosts = loadPosts(restaurantId);
+  // Null: not logged in, true: user, false: restaurant
+  const {userContext, setUserContext} = useContext(UserContext);
 
   // setDisplayReviews(loadDisplayReviews(currentReviews, 0, 3))
+  useEffect(() => {
+    /**
+     *
+     */
+    async function loading() {
+      loadDescription(setDescription);
+    }
+    loading();
+  }, [setUserContext]);
 
   useEffect(() => {
     /*
@@ -197,15 +282,27 @@ export default function RestaurantProfile() {
       <Grid container spacing={2}>
         <Grid xs={6}>
           <Card>
-            <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-                            Menu
-            </Typography>
-            <CardMedia
-              sx={{height: 140}}
-              component="img"
-              image={tempImage} // TODO get actual image
-              title="Logo of this Restaurant"
-            />
+            <CardContent>
+              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+                Description
+              </Typography>
+              {userContext && <Typography sx={{fontSize: 16}}
+                color="text.primary" gutterBottom>
+                {description}
+              </Typography>}
+
+              {!userContext && <TextField id="outlined-basic"
+                value={description} onChange={(event) => {
+                  setDescription(event.target.value);
+                }}/>}
+            </CardContent>
+            <CardActions>
+              <Button variant="contained"
+                onClick={() =>
+                  editDescription(description)}>
+                Update Description
+              </Button>
+            </CardActions>
           </Card>
         </Grid>
         <Grid xs={6}>
@@ -240,6 +337,19 @@ export default function RestaurantProfile() {
                     Next Reviews
                 </Button>}
             </CardActions>
+          </Card>
+        </Grid>
+        <Grid xs={6}>
+          <Card>
+            <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+              Menu
+            </Typography>
+            <CardMedia
+              sx={{height: 140}}
+              component="img"
+              image={tempImage} // TODO get actual image
+              title="Logo of this Restaurant"
+            />
           </Card>
         </Grid>
       </Grid>
