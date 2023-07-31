@@ -1,5 +1,5 @@
-import React, { createContext, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, {createContext, useState} from 'react';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Banner from './banner/Banner';
 import HomePage from './home/HomePage';
 import LoginPage from './user/LoginPage';
@@ -14,6 +14,9 @@ import UserProfile from './user/UserProfile';
 
 export const UserContext = createContext(null);
 
+/**
+ * @return {JSX}
+ */
 export default function App() {
   const [userContext, setUserContext] = useState(null);
 
@@ -21,7 +24,7 @@ export default function App() {
     <Router>
       <UserContext.Provider value={{
         userContext,
-        setUserContext
+        setUserContext,
       }}>
         <Banner />
         <Routes>
