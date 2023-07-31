@@ -69,7 +69,6 @@ describe("/account", () => {
             login: login,
             password: password
         })
-        console.log(response)
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
     })

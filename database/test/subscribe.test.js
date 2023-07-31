@@ -118,7 +118,6 @@ describe('/subscribe', () => {
         expect(res.length).toBe(1)
 
         response = await request(app).get(`/api/user/subscribe/${userAccountId}`)
-        // console.log(response)
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
     })

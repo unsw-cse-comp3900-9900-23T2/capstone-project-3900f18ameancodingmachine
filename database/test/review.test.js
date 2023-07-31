@@ -61,7 +61,6 @@ describe("/reviews", () => {
        
         // create address   
         response = await request(app).post('/api/user/address').send(data)
-        console.log(response.body.data.insertId)
         const addressId = response.body.data.insertId
 
         // create user account, leaves address
