@@ -1,4 +1,4 @@
-import { poolPromise } from '../db-config/db_connection.js'
+import { pool, poolPromise } from '../db-config/db_connection.js'
 import fs from 'fs'
 import path from 'path'
 
@@ -199,7 +199,7 @@ export async function getPostByPostId (id) {
     } else {
         return {
             success: 1,
-            data: results[0]
+            data: results
         }
     }
 }
@@ -440,6 +440,33 @@ export async function getUserProfileImgPath (userId) {
     return {
         success: 1,
         results: relativePath
+    }
+}
+
+export async function postNewComment (userId, postId, comment) {
+    const query = `insert into PostComments(userId, postId, comment) values (?, ?, ?)`
+    const [result] = await poolPromise.execute(query, [userId, postId, comment])
+    return {
+        success: 1,
+        data: result
+    }
+}
+
+export async function getCommentsFromPostId (postId) {
+    const query =  `select * from commentsFromUser where postId = ?`
+    const [result] = await poolPromise.execute(query, [postId])
+    return {
+        success: 1,
+        data: result
+    }
+}
+
+export async function increaseLikes (postId) {
+    const query = `update Posts set likes = likes + 1 where id = ?`
+    await poolPromise.execute(query, [postId])
+    return {
+        success: 1,
+        message: "liked the post"
     }
 }
 
