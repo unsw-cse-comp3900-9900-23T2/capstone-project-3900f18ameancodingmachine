@@ -117,7 +117,8 @@ export default function UserProfile() {
           const getUserId = await axios.get(`api/user/login/${loginId}`);
           userId = getUserId.data.data[0].id;
           // get the address
-          const getUserAddress = (await axios.get(`api/user/address/${userId}`)).data;
+          const addressId = getUserId.data.data[0].address;
+          const getUserAddress = (await axios.get(`api/user/address/${addressId}`)).data;
           getUserId.data.data[0].address =
           getUserAddress.data.street +
           ', ' +
