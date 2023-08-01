@@ -10,7 +10,8 @@ import {
     createEateryAccount,
     createRestaurantDietary,
     getAllEateryVouchers,
-    storeEateryProfileImg
+    storeEateryProfileImg,
+    getDescriptionByEateryId
 } from './restaurant.service.js'
 import axios from 'axios'
 import 'dotenv/config'
@@ -47,6 +48,26 @@ export async function updateDescription (req, res) {
     try {
         const body = req.body
         const result = await updateExistingDescription(body)
+        return res.status(200).json(result)
+    } catch (err) {
+        return res.status(500).json({
+            success: 0,
+            message: 'Database connection error'
+        })
+    }
+}
+
+/**
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @returns result called from service function with statuscode 200
+ * @returns object with success: 0 and database connection error with statuscode 500
+ */
+export async function getDescriptionById (req, res) {
+    try {
+        const id = req.params.id
+        const result = await getDescriptionByEateryId(id)
         return res.status(200).json(result)
     } catch (err) {
         return res.status(500).json({

@@ -88,6 +88,23 @@ export async function getEateriesByCuisine (cuisine) {
         results: result
     }
 }
+
+export async function getDescriptionByEateryId (eateryId) {
+    let query = 'select description from EateryAccount where eateryId = ?'
+    let values = [eateryId]
+    const [results] = await poolPromise.execute(query, values)
+    if (results.length === 0) {
+        return {
+            success: 0,
+            message: 'Eatery not found'
+        }
+    } else {
+        return {
+            success: 1,
+            results: results[0]
+        }
+    }
+}
 /// ///////////////
 
 /**
