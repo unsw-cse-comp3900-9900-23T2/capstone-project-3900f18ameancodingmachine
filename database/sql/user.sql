@@ -3,7 +3,7 @@
 -- refresh view table
 drop view if exists userInfo;
 drop view if exists userLoginInfo;
-drop view if exists userSubcription;
+drop view if exists userSubscription;
 drop view if exists userReviews;
 
 -- general user Info
@@ -21,11 +21,23 @@ join    LoginInfo l on (u.login = l.id)
 ;
 
 -- see what the user subscribed to
-create view userSubcription as
-select  u.first, u.last, ea.name
-from    UserAccount u
-join    SubscribedTo st on (u.id = st.userId)
-join    EateryAccount ea on (ea.id = st.restaurantId)
+create view userSubscription as
+select
+    st.userId,
+    ea.id as restaurantId,
+    ea.name, 
+    a.street, 
+    a.suburb, 
+    a.region, 
+    a.postcode,
+    ea.phone,
+    ea.email,
+    ea.url,
+    up.imagePath as image 
+from        SubscribedTo st
+left join   EateryAccount ea on (ea.id = st.restaurantId)
+left join   Address a on (a.id = ea.address)
+left join   restaurantProfileImages up on (up.restaurantId = ea.id)
 ;
 
 -- see user reviews

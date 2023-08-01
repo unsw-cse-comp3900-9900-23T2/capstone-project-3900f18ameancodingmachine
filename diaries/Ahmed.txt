@@ -8,6 +8,19 @@ Week 2
   - Learn more about the Express framework, routing and authentication (cookies, tokens, etc)
 Week 3
   - Finished multiple objective paragraphs and the system architecture diagram (as well as the accompanying explanations).
+  - Found real world examples to strengthen the purpose of each objective.
   - Finalised and helped submit the report.
 Week 4
---
+  - Researched and informed teammates about the mysql2 library and how to use it to communicate with the cloud database.
+  - Started working on the backend by introducing multiple routes relevant to account creation and indentification (user.service/controller/router)
+Week 5
+  - implemented a token system using jwt so that users and eateries may use it to access the features offered by the application.
+  - added the login and logout functionality for users and eateries using the existing token system.
+  - added user registration functionality.
+Week 6
+  - added Eatery registration functionality.
+Week 7
+  - created registration checks for both eateries and usersn ensuring that correct details are provided
+  - implemented the 'forgotten' password functionality which allows both eateries and users to reset their password using their email
+Week 8
+  -TODO
