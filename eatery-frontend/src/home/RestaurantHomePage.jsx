@@ -160,6 +160,34 @@ async function uploadHours() {
   return false;
 }
 
+
+/**
+ * upload restaurant profile image into the server
+ * @param {*} event
+ */
+async function uploadProfileImage(event) {
+  const file = event.target.files[0];
+  const formData = new FormData();
+
+  try {
+    // key is user-avatar, must be exact
+    const eateryId = await getEateryId();
+    formData.append('eatery-avatar', file);
+    // for request body
+    formData.append('restaurantId', eateryId);
+    // store into the database
+    await axios.post('/api/user/eatery/image/profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    alert('image upload success');
+  } catch (error) {
+    console.log('Error uploading file into the server');
+  }
+}
+
 /**
  * Stub code for creating new voucher
  * Note that logic for reoccuring has not been implemented yet
@@ -344,6 +372,10 @@ export default function RestaurantHomePage() {
           <Button variant="contained" onClick={() => {
             uploadHours();
           }}>Upload Hours</Button>
+          <Button variant="contained" component="label">
+            Upload Profile Image
+            <input hidden accept="image/*" type="file" onChange={uploadProfileImage}/>
+          </Button>
           <Button variant="contained" component={NavLink} to={profileURL}>
             View Profile</Button>
         </CardActions>
