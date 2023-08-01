@@ -85,13 +85,13 @@ function loadReviews(restaurantId) {
  *  From loaded list display the given review at given index to count
  *  If count is not possible from index display the most possible,
  *  if index fails then fail
- * @param {*} reviewList
- * @param {*} index
- * @param {*} count
+ * @param {*} list List that you want to be sliced
+ * @param {*} index The start index
+ * @param {*} count How many entries to get
  * @return {List}
  */
-function loadDisplayReviews(reviewList, index, count) {
-  return reviewList.slice(index, index+count);
+function loadDisplay(list, index, count) {
+  return list.slice(index, index+count);
 }
 
 /**
@@ -240,6 +240,24 @@ async function loadDescription(setDes) {
 }
 
 /**
+ * Stub for uploadMenu button
+ * @return {Boolean}
+ */
+function uploadMenu() {
+  alert('uploadMenu: Pressed uploadMenu');
+  return false;
+}
+
+/**
+ * Stub for uploadSeating button
+ * @return {Boolean}
+ */
+function uploadSeating() {
+  alert('uploadSeating: Pressed uploadSeating');
+  return false;
+}
+
+/**
  * @return {JSX}
  */
 export default function RestaurantProfile() {
@@ -249,8 +267,13 @@ export default function RestaurantProfile() {
   const [indexReviews, setIndexReviews] = useState(0);
   const countReviews = 3;
   const [displayReviews, setDisplayReviews] = useState([]);
-  const [description, setDescription] = useState('No Description Given');
+
   const currentPosts = loadPosts(restaurantId);
+  const [indexPosts, setIndexPosts] = useState(0);
+  const countPosts = 3;
+  const [displayPosts, setDisplayPosts] = useState([]);
+
+  const [description, setDescription] = useState('No Description Given');
   const [restaurantName, setRestaurantName] = useState('');
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
@@ -277,10 +300,20 @@ export default function RestaurantProfile() {
     * Whenever the indexReviews is toggled,
     * load displayReviews with current index
     */
-    setDisplayReviews(loadDisplayReviews(
+    setDisplayReviews(loadDisplay(
         currentReviews, indexReviews, countReviews,
     ));
   }, [indexReviews]);
+
+  useEffect(() => {
+    /*
+    * Whenever the indexReviews is toggled,
+    * load displayReviews with current index
+    */
+    setDisplayPosts(loadDisplay(
+        currentPosts, indexPosts, countPosts,
+    ));
+  }, [indexPosts]);
 
   // Menu DONE
   // Reviews DONE
@@ -363,16 +396,55 @@ export default function RestaurantProfile() {
           </Card>
         </Grid>
         <Grid xs={6}>
-          <Card>
+          <Card sx={{maxWidth: '100%', display: 'flex', flexDirection: 'column'}}>
             <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
               Menu
             </Typography>
             <CardMedia
-              sx={{height: 140}}
+              sx={{minHeight: 140}}
               component="img"
               image={tempImage} // TODO get actual image
-              title="Logo of this Restaurant"
+              title="The Menu"
             />
+          </Card>
+          {!userContext && <CardActions>
+            <Button variant="contained" onClick={() => {
+              uploadMenu();
+            }}>Update Menu</Button>
+          </CardActions>}
+        </Grid>
+        <Grid xs={6}>
+          <Card sx={{minHeight: 605, display: 'flex', flexDirection: 'column'}}>
+            <CardContent>
+              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+                Posts
+              </Typography>
+
+              {displayPosts.map((currentPost) => {
+                return (
+                  <RestaurantPostGridItem key={currentPost.title}
+                    title={currentPost.title} post={currentPost.post}
+                  />
+                );
+              })}
+            </CardContent>
+            <CardActions disableSpacing sx={{mt: 'auto'}}>
+              {indexPosts !== 0 ? <Button variant="contained"
+                onClick={() => setIndexPosts((prevIndex) => prevIndex - countPosts)}>
+                  Last Posts
+              </Button> :
+                <Button variant="contained" sx={{visibility: 'hidden'}}
+                  onClick={() =>
+                    setIndexPosts((prevIndex) => prevIndex - countPosts)}>
+                  Last Posts
+                </Button> }
+              {displayPosts.length === 3 &&
+                <Button variant="contained"
+                  onClick={() =>
+                    setIndexPosts((prevIndex) => prevIndex + countPosts)}>
+                    Next Posts
+                </Button>}
+            </CardActions>
           </Card>
         </Grid>
       </Grid>
@@ -390,23 +462,14 @@ export default function RestaurantProfile() {
           />
           <TextField label="Book Table (TEMP NOT SURE HOW WE WANT TO DO THIS)" />
         </CardContent>
+        {!userContext && <CardActions>
+          <Button variant="contained" onClick={() => {
+            uploadSeating();
+          }}>Update Seating</Button>
+        </CardActions>}
       </Card>
 
-      <Card sx={{mb: 2}}>
-        <CardContent>
-          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-                        Posts
-          </Typography>
 
-          {currentPosts.map((currentPost) => {
-            return (
-              <RestaurantPostGridItem
-                key={currentPost.title} title={currentPost.title} post={currentPost.post}
-              />
-            );
-          })}
-        </CardContent>
-      </Card>
     </Container>
   );
 }
