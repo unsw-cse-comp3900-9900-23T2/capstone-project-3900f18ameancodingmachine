@@ -43,7 +43,8 @@ import {
     getEateryVouchers,
     getSearchResults,
     storeEateryProfileImgController,
-    getEateryProfileImgPathController
+    getEateryProfileImgPathController,
+    getDescriptionById
 } from './restaurant.controller.js'
 
 import upload from '../img-config/config.js'
@@ -102,6 +103,7 @@ router.get('/address/:id', getAddress)
 
 router.post('/voucher', createVoucher)
 router.put('/eatery/description', updateDescription)
+router.get('/eatery/description/:id', getDescriptionById)
 
 // check account based on loginid
 router.get('/eatery/login/:id', getEateryByLogin)
