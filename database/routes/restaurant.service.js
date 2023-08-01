@@ -1,4 +1,6 @@
 import { poolPromise } from '../db-config/db_connection.js'
+import fs from 'fs'
+import path from 'path'
 
 /**
  * insert new voucher details into the database
@@ -11,8 +13,8 @@ import { poolPromise } from '../db-config/db_connection.js'
  * @param {string} data.code        code of coupon generated
  * @returns {object}    if successful object with success 1, otherwise 0
  */
-export async function createNewVoucher(data) {
-    const query = `insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)`
+export async function createNewVoucher (data) {
+    const query = 'insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)'
     const values = [data.offeredBy, data.discount, data.startOffer, data.endOffer, data.count, data.code]
     const result = await poolPromise.execute(query, values)
 
@@ -41,13 +43,13 @@ export async function updateExistingDescription (data) {
     }
 }
 
-//////////for search//////////////
+/// ///////for search//////////////
 export async function getEateriesBySearchString (string) {
     let query = 'select * from restaurantInfo where name regexp ?'
-    let values = [string];
+    let values = [string]
     if (!string) {
-        query = 'select * from restaurantInfo';
-        values = [];
+        query = 'select * from restaurantInfo'
+        values = []
     }
     const [result] = await poolPromise.execute(query, values)
 
@@ -61,8 +63,8 @@ export async function getEateriesByDiet (diet) {
     let query = 'select * from restaurantInfo where diet = ?'
     let values = [diet]
     if (!diet) {
-        query = 'select * from restaurantInfo';
-        values = [];
+        query = 'select * from restaurantInfo'
+        values = []
     }
     const [result] = await poolPromise.execute(query, values)
 
@@ -76,8 +78,8 @@ export async function getEateriesByCuisine (cuisine) {
     let query = 'select * from restaurantInfo where cuisine = ?'
     let values = [cuisine]
     if (!cuisine) {
-        query = 'select * from restaurantInfo';
-        values = [];
+        query = 'select * from restaurantInfo'
+        values = []
     }
     const [result] = await poolPromise.execute(query, values)
 
@@ -86,7 +88,24 @@ export async function getEateriesByCuisine (cuisine) {
         results: result
     }
 }
-//////////////////
+
+export async function getDescriptionByEateryId (eateryId) {
+    let query = 'select description from EateryAccount where eateryId = ?'
+    let values = [eateryId]
+    const [results] = await poolPromise.execute(query, values)
+    if (results.length === 0) {
+        return {
+            success: 0,
+            message: 'Eatery not found'
+        }
+    } else {
+        return {
+            success: 1,
+            results: results[0]
+        }
+    }
+}
+/// ///////////////
 
 /**
  * get all vouchers associated with an eatery
@@ -117,7 +136,7 @@ export async function getAllCuisines () {
 }
 
 /**
- * gets infromation about each existing eatery 
+ * gets infromation about each existing eatery
  * @returns {object}    if successful object with success 1, otherwise 0
  */
 export async function getAllEateries () {
@@ -133,8 +152,8 @@ export async function getAllEateries () {
  * create new and unique eatery account
  * @param {object} data
  * @param {string} data.name        name of eatery
- * @param {string} data.addressId   address id of the 
- * @param {string} data.phone       phone number of the eatery 
+ * @param {string} data.addressId   address id of the
+ * @param {string} data.phone       phone number of the eatery
  * @param {string} data.email       the eatery email
  * @param {string} data.url         website of the eatery
  * @param {string} data.loginId     login id for the eatery
@@ -184,15 +203,66 @@ export async function createRestaurantDietary (data) {
         const values1 = [data.restriction]
         const result1 = await poolPromise.execute(insertQuery1, values1)
         dietId = result1[0].insertId
-        console.log('insert result')
-        console.log(result1)
     }
-    console.log(dietId)
+
     const insertQuery = 'insert into provideDietary(restaurantId, dietId) values (?, ?)'
     const insertValues = [data.id, dietId]
     const [result] = await poolPromise.execute(insertQuery, insertValues)
     return {
         success: 1,
         results: result
+    }
+}
+
+// store and update the image path of the eatery
+export async function storeEateryProfileImg (imgPath, restaurantId) {
+    // find existing image path
+    let query = 'select imagePath from restaurantProfileImages where restaurantId = ?'
+    const [result] = await poolPromise.execute(query, [restaurantId])
+
+    // remove public from path -> path stored becomes upload/(image name)
+    const relativePath = path.relative('public', imgPath)
+
+    if (result.length !== 0) {
+        // delete the existing image
+        fs.unlink(result[0].imagePath, (err) => {
+            if (err) {
+                console.log('file does not exist')
+            }
+        })
+
+        // update image path
+        query = 'update restaurantProfileImages set imagePath = ? where restaurantId = ?'
+        await poolPromise.execute(query, [relativePath, restaurantId])
+        return {
+            success: 1,
+            message: 'Image updated successfully'
+        }
+    }
+
+    query = 'insert into restaurantProfileImages(restaurantId, imagePath) values (?, ?)'
+    await poolPromise.execute(query, [restaurantId, relativePath])
+    return {
+        success: 1,
+        message: 'Image uploaded successfully'
+    }
+}
+
+export async function getEateryProfileImgPath (restaurantId) {
+    const query = 'select imagePath from restaurantProfileImages where restaurantId = ?'
+    const [result] = await poolPromise.execute(query, [restaurantId])
+
+    if (result.length === 0) {
+        return {
+            success: 0,
+            message: 'no image found'
+        }
+    }
+
+    const imgPath = result[0].imagePath
+    const relativePath = path.relative('public', imgPath)
+    return {
+        success: 1,
+        results: relativePath
     }
 }

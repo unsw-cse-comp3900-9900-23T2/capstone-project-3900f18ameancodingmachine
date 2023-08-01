@@ -22,13 +22,15 @@ select
     a.region, 
     a.postcode,
     c.name as cuisine,
-    dr.restriction as diet
+    dr.restriction as diet,
+    rp.imagePath as image
 from         EateryAccount ea
 left join    Address a on (ea.address = a.id)
 left join    CuisineOffer co on (co.restaurantId = ea.id)
 left join    Cuisines c on (co.cuisineId = c.id)
 left join    provideDietary pd on (pd.restaurantId = ea.id)
 left join    DietaryRestrictions dr on (dr.id = pd.dietId)
+left join    restaurantProfileImages rp on (rp.restaurantId = ea.id)
 ;
 
 -- restaurant login info
