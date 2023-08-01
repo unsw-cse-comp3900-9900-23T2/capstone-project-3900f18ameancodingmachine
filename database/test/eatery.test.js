@@ -204,6 +204,7 @@ describe("/eatery/description", () => {
             email: "anotherrestaurant@gmail.com",
             loginId: eateryLoginId, 
             url: "www.anotherrestaurant.com",
+            description: "another description",
         }
 
         response = await request(app).post("/api/user/eatery").send(eateryAccount);
@@ -219,6 +220,22 @@ describe("/eatery/description", () => {
 
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
+    })
+
+    test("get description would return statuscode 200 and success 1", async () => {
+
+        response = await request(app).get(`/api/user/eatery/description/${eateryLoginId}`)
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+    })
+
+    test("get description with invalid id would return statuscode 500 and success 0", async () => {
+
+        response = await request(app).get(`/api/user/eatery/description/12345`)
+
+        expect(response.statusCode).toBe(500)
+        expect(response.body.success).toBe(0)
     })
 })
 
