@@ -62,3 +62,10 @@ Week 9
 Tuesday 26-07
 - Had meeting discussing how we will proceed
 - Implemented basic profile page for restaurant
+
+Saturday 29-07
+- Implemented the ability for a restaurant to edit their profile if logged in
+
+Week 10
+Monday 1-08
+- Improved rest registration page
