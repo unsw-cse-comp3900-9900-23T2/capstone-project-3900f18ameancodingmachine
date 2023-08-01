@@ -18,6 +18,9 @@ import jwtDecode from 'jwt-decode';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Grid from '@mui/material/Unstable_Grid2';
+
+import {NavLink} from 'react-router-dom';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -165,14 +168,43 @@ async function uploadHours() {
  * @param {*} startDate
  * @param {*} endDate
  * @param {*} reoccuring
+ * @param {*} setError set function for string for error message
  * @return {Boolean}
  */
-async function createVoucher(percentage, numVouchers, startDate, endDate, reoccuring) {
-  if (percentage === '' || numVouchers === '') { // field must be filled
-    alert('fill the voucher details');
-    return;
-  } else if (startDate > endDate) { // start date must be earlier than end date
-    alert('start date older than the end date');
+async function createVoucher(percentage, numVouchers, startDate, endDate,
+    reoccuring, setError) {
+  // Guard Statements
+  let isError = false;
+  setError('');
+  if (percentage === '') {
+    setError((prevState) => prevState + 'Enter Percentage. ');
+    isError = true;
+  }
+  if (isNaN(+percentage)) {
+    setError((prevState) => prevState + 'Percentage must be a number. ');
+    isError = true;
+  }
+  if (numVouchers === '') {
+    setError((prevState) => prevState + 'Enter Number of Vouchers. ');
+    isError = true;
+  }
+  if (isNaN(+numVouchers)) {
+    setError((prevState) => prevState + 'Number of Vouchers must be a number. ');
+    isError = true;
+  }
+  if (startDate === '') { // start date must be earlier than end date
+    setError((prevState) => prevState + 'Enter Start date. ');
+    isError = true;
+  }
+  if (endDate === '') { // start date must be earlier than end date
+    setError((prevState) => prevState + 'Enter End date. ');
+    isError = true;
+  }
+  if (startDate > endDate && endDate !== '') {
+    setError((prevState) => prevState + 'Start date older than the end date. ');
+    isError = true;
+  }
+  if (isError) {
     return;
   }
 
@@ -189,10 +221,7 @@ async function createVoucher(percentage, numVouchers, startDate, endDate, reoccu
       count: numVouchers,
       code: voucherCode,
     });
-
-    alert('voucher created');
   } catch (error) {
-    alert('something is wrong in the database');
     console.log(error);
   }
   return false;
@@ -207,7 +236,7 @@ async function viewVouchers(setVouchers) {
   try {
     const eateryId = await getEateryId();
     const {data} = await axios.get(`api/user/eatery/vouchers/${eateryId}`);
-    const results = data.results;
+    const results = data.results.reverse();
     // adding column titles
     results.unshift({
       id: 'Id',
@@ -269,6 +298,15 @@ async function uploadPost(title, body) {
 }
 
 /**
+ * Genereates the URL from the restaurant id
+ * @param {String} toSet toSet function for the string to hold URL
+ */
+async function generateProfileLink(toSet) {
+  const eateryId = await getEateryId();
+  const urlToReturn = `/RestaurantProfile/${eateryId}`;
+  toSet(urlToReturn);
+}
+/**
  * @return {JSX}
  */
 export default function RestaurantHomePage() {
@@ -280,6 +318,10 @@ export default function RestaurantHomePage() {
   const [titlePost, setTitlePost] = React.useState('');
   const [bodyPost, setBodyPost] = React.useState('');
   const [vouchers, setVouchers] = React.useState([]);
+  const [profileURL, setProfileURL] = React.useState('');
+  // Set to '_', so Voucher Created isn't displayed initially
+  const [voucherError, setVoucherError] = React.useState('_');
+  generateProfileLink(setProfileURL);
 
   return (
     <Container maxWidth="lg">
@@ -302,105 +344,145 @@ export default function RestaurantHomePage() {
           <Button variant="contained" onClick={() => {
             uploadHours();
           }}>Upload Hours</Button>
+          <Button variant="contained" component={NavLink} to={profileURL}>
+            View Profile</Button>
         </CardActions>
       </Card>
 
-      <Card sx={{minWidth: 275}}>
-        <CardContent>
-          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-            Vouchers
-          </Typography>
-        </CardContent>
+      <Grid container spacing={0} xs={12}>
+        <Grid xs={6}>
+          <Card sx={{minWidth: 275, minHeight: 625}}>
+            <CardContent>
+              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+                Vouchers
+              </Typography>
+            </CardContent>
+            <Grid container spacing={2} xs={12}>
+              <Grid xs={12}>
+                <TextField sx={{minWidth: 258.4}}
+                  required id="voucher-percentage" label="Percentage"
+                  value={percentage} onChange={(event) => {
+                    setPercentage(event.target.value);
+                  }}
+                />
+                <TextField sx={{minWidth: 258.4}}
+                  required id="voucher-num" label="Number of Vouchers"
+                  value={numVouchers} onChange={(event) => {
+                    setNumVouchers(event.target.value);
+                  }}
+                />
+              </Grid>
+              <Grid xs={12}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker label="Start Date" value={startDate} onChange={(event) => {
+                    setStartDate(event);
+                  }}/>
+                  <DatePicker label="End Date" value={endDate} onChange={(event) => {
+                    setEndDate(event);
+                  }}/>
+                </LocalizationProvider>
+              </Grid>
+            </Grid>
+            <FormGroup>
+              <FormControlLabel control={<Checkbox defaultChecked />}
+                label="Reoccuring" value={reoccuring} onChange={(event) => {
+                  const {name, checked} = event.target; setReoccuring(checked);
+                  console.log(name);
+                }}/>
+            </FormGroup>
+            {voucherError !== '_' &&
+              <Typography sx={{fontSize: 14}} color="red" gutterBottom>
+                {voucherError}
+              </Typography>}
+            <CardActions >
+              <Button variant="contained" onClick={() => {
+                createVoucher(percentage, numVouchers, startDate,
+                    endDate, reoccuring, setVoucherError);
+                setPercentage('');
+                setNumVouchers('');
+                setStartDate('');
+                setEndDate('');
+              }}>Create Voucher</Button>
+              {voucherError == '' &&
+                <Typography sx={{fontSize: 20, marginLeft: 'auto'}}
+                  color="green" gutterBottom>
+                  Voucher Created
+                </Typography>}
+            </CardActions>
 
-        <TextField required id="voucher-percentage" label="Percentage"
-          value={percentage} onChange={(event) => {
-            setPercentage(event.target.value);
-          }}
-        />
-        <TextField required id="voucher-num" label="Number of Vouchers"
-          value={numVouchers} onChange={(event) => {
-            setNumVouchers(event.target.value);
-          }}
-        />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker label="Start Date" value={startDate} onChange={(event) => {
-            setStartDate(event);
-          }}/>
-          <DatePicker label="End Date" value={endDate} onChange={(event) => {
-            setEndDate(event);
-          }}/>
-        </LocalizationProvider>
-        <FormGroup>
-          <FormControlLabel control={<Checkbox defaultChecked />}
-            label="Reoccuring" value={reoccuring} onChange={(event) => {
-              const {name, checked} = event.target; setReoccuring(checked);
-              console.log(name);
-            }}/>
-        </FormGroup>
-        <CardActions >
-          <Button variant="contained" onClick={() => {
-            createVoucher(percentage, numVouchers, startDate, endDate, reoccuring);
-          }}>Create Voucher</Button>
-        </CardActions>
+            <CardActions>
+              { vouchers.length == 0 && <Button size="large" onClick={() => {
+                viewVouchers(setVouchers);
+                setVoucherError('_');
+              }}>View Created Vouchers</Button> }
+              { vouchers.length > 0 && <Button size="large" onClick={() => {
+                setVouchers([]);
+              }}>Hide Vouchers</Button> }
+            </CardActions>
 
-        <CardActions>
-          { vouchers.length == 0 && <Button size="large" onClick={() => {
-            viewVouchers(setVouchers);
-          }}>View Created Vouchers</Button> }
-          { vouchers.length > 0 && <Button size="large" onClick={() => {
-            setVouchers([]);
-          }}>Hide Vouchers</Button> }
-        </CardActions>
+            <CardContent>
+              <List sx={{height: 200, overflowX: 'auto', overflowY: 'auto'}}>
 
-        <CardContent>
-          <List>
+                {vouchers.map((voucher) => {
+                  return (
+                    <ListItem key={voucher.code}>
+                      <Grid container spacing={0} xs={12}>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.discount} />
+                        </Grid>
+                        <Grid xs={2}>
+                          <ListItemText primary={voucher.count} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.code} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.startOffer.slice(0, 10)} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.endOffer.slice(0, 10)} />
+                        </Grid>
+                      </Grid>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </CardContent>
 
-            {vouchers.map((voucher) => {
-              return (
-                <ListItem key={voucher.code}>
-                  <ListItemText primary={voucher.discount} />
-                  <ListItemText primary={voucher.count} />
-                  <ListItemText primary={voucher.code} />
-                  <ListItemText primary={voucher.startOffer.slice(0, 10)} />
-                  <ListItemText primary={voucher.endOffer.slice(0, 10)} />
-                </ListItem>
-              );
-            })}
-          </List>
-        </CardContent>
+          </Card>
+        </Grid>
+        <Grid xs={6}>
+          <Card sx={{minWidth: 275}}>
+            <CardContent>
+              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+                Create Post
+              </Typography>
 
-      </Card>
-
-      <Card sx={{minWidth: 275}}>
-        <CardContent>
-          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-            Create Post
-          </Typography>
-
-          <Typography sx={{fontSize: 14}} color="text.primary" gutterBottom>
-            Title
-          </Typography>
-          <TextField required id="title-post" placeholder="Title" value={titlePost}
-            onChange={(event) => {
-              setTitlePost(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Body
-          </Typography>
-          <TextField sx={{minWidth: 500}} multiline rows={8} required id="body-post"
-            placeholder="Body" value={bodyPost} onChange={(event) => {
-              setBodyPost(event.target.value);
-            }}
-          />
-        </CardContent>
-        <CardActions>
-          <Button variant="contained" onClick={() => {
-            uploadPost(titlePost, bodyPost);
-          }}>Post</Button>
-        </CardActions>
-      </Card>
-
+              <Typography sx={{fontSize: 14}} color="text.primary" gutterBottom>
+                Title
+              </Typography>
+              <TextField required id="title-post" placeholder="Title" value={titlePost}
+                onChange={(event) => {
+                  setTitlePost(event.target.value);
+                }}
+              />
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Body
+              </Typography>
+              <TextField sx={{minWidth: 500}} multiline rows={8} required id="body-post"
+                placeholder="Body" value={bodyPost} onChange={(event) => {
+                  setBodyPost(event.target.value);
+                }}
+              />
+            </CardContent>
+            <CardActions>
+              <Button variant="contained" onClick={() => {
+                uploadPost(titlePost, bodyPost);
+              }}>Post</Button>
+            </CardActions>
+          </Card>
+        </Grid>
+      </Grid>
     </Container>
   );
 }
