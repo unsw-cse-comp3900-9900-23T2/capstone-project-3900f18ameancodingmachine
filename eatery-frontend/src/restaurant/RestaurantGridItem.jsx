@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 export function RestaurantReviewGridItem(props) {
   return (
     <Container maxWidth="sm">
-      <Card sx={{minWidth: 100}}>
+      <Card elevation={0} sx={{minWidth: 100}}>
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
             {props.review}
@@ -35,7 +35,7 @@ export function RestaurantReviewGridItem(props) {
 export function RestaurantPostGridItem(props) {
   return (
     <Container maxWidth="sm">
-      <Card sx={{minWidth: 100}}>
+      <Card elevation={0} sx={{minWidth: 100}}>
 
         <CardContent>
           <Typography gutterBottom variant="h4" component="div">

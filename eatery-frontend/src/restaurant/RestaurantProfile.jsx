@@ -1,7 +1,8 @@
-import {useParams} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import React, {useState, useEffect, useContext} from 'react';
 
 
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -11,6 +12,9 @@ import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import CardMedia from '@mui/material/CardMedia';
+
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 import axios from 'axios';
 import tempImage from '../home/paella.jpg';
@@ -269,7 +273,8 @@ function uploadSeating() {
  * @return {JSX}
  */
 export default function RestaurantProfile() {
-  const {restaurantId} = useParams();
+  const {state} = useLocation();
+  const restaurantId = state; // TODO state.id
 
   const currentReviews = loadReviews(restaurantId);
   const [indexReviews, setIndexReviews] = useState(0);
@@ -288,7 +293,7 @@ export default function RestaurantProfile() {
   // const navigate = useNavigate();
 
   const noBorderTextField = {
-    padding: 0,
+    padding: 10,
     border: 'none',
     outline: 'none',
   };
@@ -362,15 +367,17 @@ export default function RestaurantProfile() {
   // Booking DONE
   // Previous Post
 
+  console.log('userContext');
+  console.log(userContext);
+
   return (
     <Container maxWidth="lg">
-      <Card sx={{mb: 2}}>
+      <Card elevation={0} sx={{mb: 2}}>
         <CardContent>
           <Typography sx={{fontSize: 45}} color="text.primary" gutterBottom>
             {eateryInfo.name}
           </Typography>
         </CardContent>
-
       </Card>
 
       <Grid container spacing={2}>
@@ -380,14 +387,14 @@ export default function RestaurantProfile() {
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
                 Description
               </Typography>
-              <Card sx={{minHeight: 300, display: 'flex',
+              <Card elevation={0} sx={{minHeight: 300, display: 'flex',
                 flexDirection: 'column', padding: 2}}>
-                {userContext && <Typography sx={{fontSize: 16}}
+                {userContext !== false && <Typography sx={{fontSize: 16}}
                   color="text.primary" gutterBottom>
                   {description}
                 </Typography>}
 
-                {!userContext && <TextField multiline InputProps={{style:
+                {userContext === false && <TextField multiline InputProps={{style:
                   noBorderTextField}} id="outlined-basic" value={description}
                 onChange={(event) => {
                   setDescription(event.target.value);
@@ -395,19 +402,19 @@ export default function RestaurantProfile() {
               </Card>
             </CardContent>
             <CardActions>
-              <Button variant="contained"
+              {userContext === false && <Button variant="contained"
                 onClick={() =>
                   editDescription(description)}>
                 Update Description
-              </Button>
+              </Button>}
             </CardActions>
           </Card>
         </Grid>
         <Grid xs={6}>
           <Card sx={{minHeight: 680, display: 'flex', flexDirection: 'column'}}>
-            <CardContent>
+            <CardContent style={{flexGrow: 1}}>
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-                            Reviews
+                Reviews
               </Typography>
               {displayReviews.map((currentReview) => {
                 return (
@@ -418,23 +425,25 @@ export default function RestaurantProfile() {
                 );
               })}
             </CardContent>
-            <CardActions disableSpacing sx={{mt: 'auto'}}>
-              {indexReviews !== 0 ? <Button variant="contained"
-                onClick={() => setIndexReviews((prevIndex) => prevIndex - countReviews)}>
-                  Last Reviews
-              </Button> :
-                <Button variant="contained" sx={{visibility: 'hidden'}}
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <CardActions sx={{mt: 'auto'}}>
+                <Button variant="contained" disabled={indexReviews === 0}
                   onClick={() =>
                     setIndexReviews((prevIndex) => prevIndex - countReviews)}>
-                  Last Reviews
-                </Button> }
-              {displayReviews.length === 3 &&
+                  <NavigateBeforeIcon/>
+                </Button>
                 <Button variant="contained"
+                  disabled={displayReviews.length !== 3}
                   onClick={() =>
                     setIndexReviews((prevIndex) => prevIndex + countReviews)}>
-                    Next Reviews
-                </Button>}
-            </CardActions>
+                  <NavigateNextIcon/>
+                </Button>
+              </CardActions>
+            </Box>
           </Card>
         </Grid>
         <Grid xs={6}>
@@ -449,7 +458,7 @@ export default function RestaurantProfile() {
               title="The Menu"
             />
           </Card>
-          {!userContext && <CardActions>
+          {userContext === false && <CardActions>
             <Button variant="contained" onClick={() => {
               uploadMenu();
             }}>Update Menu</Button>
@@ -457,7 +466,7 @@ export default function RestaurantProfile() {
         </Grid>
         <Grid xs={6}>
           <Card sx={{minHeight: 605, display: 'flex', flexDirection: 'column'}}>
-            <CardContent>
+            <CardContent style={{flexGrow: 1}}>
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
                 Posts
               </Typography>
@@ -470,23 +479,25 @@ export default function RestaurantProfile() {
                 );
               })}
             </CardContent>
-            <CardActions disableSpacing sx={{mt: 'auto'}}>
-              {indexPosts !== 0 ? <Button variant="contained"
-                onClick={() => setIndexPosts((prevIndex) => prevIndex - countPosts)}>
-                  Last Posts
-              </Button> :
-                <Button variant="contained" sx={{visibility: 'hidden'}}
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <CardActions sx={{mt: 'auto'}}>
+                <Button variant="contained" disabled={indexPosts === 0}
                   onClick={() =>
                     setIndexPosts((prevIndex) => prevIndex - countPosts)}>
-                  Last Posts
-                </Button> }
-              {displayPosts.length === 3 &&
+                  <NavigateBeforeIcon/>
+                </Button>
                 <Button variant="contained"
+                  disabled={displayPosts.length !== 3}
                   onClick={() =>
                     setIndexPosts((prevIndex) => prevIndex + countPosts)}>
-                    Next Posts
-                </Button>}
-            </CardActions>
+                  <NavigateNextIcon/>
+                </Button>
+              </CardActions>
+            </Box>
           </Card>
         </Grid>
       </Grid>
@@ -494,7 +505,7 @@ export default function RestaurantProfile() {
       <Card sx={{mb: 2}}>
         <CardContent>
           <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-                        Booking
+            Booking
           </Typography>
           <CardMedia
             component="img"
@@ -502,9 +513,11 @@ export default function RestaurantProfile() {
             image={tempLayout} // TODO get actual image
             title="Logo of this Restaurant"
           />
-          <TextField label="Book Table (TEMP NOT SURE HOW WE WANT TO DO THIS)" />
+          {userContext === true &&
+            <TextField label="Book Table (TEMP NOT SURE HOW WE WANT TO DO THIS)" />
+          }
         </CardContent>
-        {!userContext && <CardActions>
+        {userContext === false && <CardActions>
           <Button variant="contained" onClick={() => {
             uploadSeating();
           }}>Update Seating</Button>
