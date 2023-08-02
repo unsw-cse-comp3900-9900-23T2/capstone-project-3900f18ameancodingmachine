@@ -270,12 +270,22 @@ async function viewVouchers(setVouchers) {
  * upload new post, character limit hasn't been implemented yet
  * @param {*} title
  * @param {*} body
+ * @param {*} setError set function for error output
  * @return {Boolean}
  */
-async function uploadPost(title, body) {
-  // alert(`uploadPost: Pressed uploadPost\nTitle: ${title}\nBody: ${body}`);
-  if (!title || !body) {
-    alert('please fill in the details');
+async function uploadPost(title, body, setError) {
+  // Guard Statements
+  let isError = false;
+  setError('');
+  if (title === '') {
+    setError((prevState) => prevState + 'Enter title. ');
+    isError = true;
+  }
+  if (body === '') {
+    setError((prevState) => prevState + 'Enter body. ');
+    isError = true;
+  }
+  if (isError) {
     return;
   }
 
@@ -288,8 +298,6 @@ async function uploadPost(title, body) {
       title: title,
       content: body,
     });
-
-    alert('new post created');
   } catch (error) {
     alert('something is wrong in the database');
     console.log(error);
@@ -321,6 +329,7 @@ export default function RestaurantHomePage() {
   const [profileURL, setProfileURL] = React.useState('');
   // Set to '_', so Voucher Created isn't displayed initially
   const [voucherError, setVoucherError] = React.useState('_');
+  const [postError, setPostError] = React.useState('_');
   generateProfileLink(setProfileURL);
 
   return (
@@ -464,6 +473,7 @@ export default function RestaurantHomePage() {
               <TextField required id="title-post" placeholder="Title" value={titlePost}
                 onChange={(event) => {
                   setTitlePost(event.target.value);
+                  setPostError('_');
                 }}
               />
               <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
@@ -472,13 +482,24 @@ export default function RestaurantHomePage() {
               <TextField sx={{minWidth: 500}} multiline rows={8} required id="body-post"
                 placeholder="Body" value={bodyPost} onChange={(event) => {
                   setBodyPost(event.target.value);
+                  setPostError('_');
                 }}
               />
             </CardContent>
             <CardActions>
               <Button variant="contained" onClick={() => {
-                uploadPost(titlePost, bodyPost);
+                uploadPost(titlePost, bodyPost, setPostError);
               }}>Post</Button>
+              {postError == '' &&
+                <Typography sx={{fontSize: 20, textAlign: 'right', marginLeft: 'auto'}}
+                  color="green" gutterBottom>
+                  Post Created
+                </Typography>}
+              {postError !== '_' &&
+              <Typography sx={{fontSize: 14, textAlign: 'right', marginLeft: 'auto'}}
+                color="red" gutterBottom>
+                {postError}
+              </Typography>}
             </CardActions>
           </Card>
         </Grid>
