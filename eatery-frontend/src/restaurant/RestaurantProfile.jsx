@@ -166,6 +166,7 @@ function loadPosts(restaurantId) {
  * @return {Int}
  */
 async function getEateryId() {
+  console.log('getEateryId');
   const result = await axiosProxy.get('api/user/');
   console.log(result);
   const data = result.data;
@@ -187,9 +188,11 @@ async function getEateryInfo(restaurantId, setEateryInfo) {
   try {
     const eateryId = restaurantId;
     const result = await axiosProxy.get(`api/user/eatery/${eateryId}`);
+    console.log('getEateryInfo');
     console.log(result);
     setEateryInfo(result.data.data);
   } catch (error) {
+    console.log('getEateryInfo failed');
     setEateryInfo({});
   }
   return;
@@ -244,7 +247,7 @@ async function loadDescription(setDes) {
     'color palette, soft lighting, and tasteful decor create an '+
     'inviting setting that beckons you to indulge in the culinary '+
     'wonders that await.');
-    console.log('description updated');
+    console.log('description set');
   } catch (error) {
     console.log('something is wrong in the database');
     console.log(error);
@@ -291,7 +294,7 @@ export default function RestaurantProfile() {
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
   // const navigate = useNavigate();
-
+  console.log('"Rest Pro"');
   const noBorderTextField = {
     padding: 10,
     border: 'none',
@@ -311,16 +314,17 @@ export default function RestaurantProfile() {
      */
     async function checkCookies() {
       try {
-        const result = await axiosProxy.get('../api/user/');
+        const result = await axiosProxy.get('/api/user/');
         const data = result.data;
-        console.log(data.data);
+        console.log('"Check Cookies Data"');
+        console.log(data);
         const decrypt = jwtDecode(data.token);
         if (data.success !== 0) {
           const loginId = decrypt.result.id;
           // get EateryAccount, if no result then it will return an 404 error
           // else it will go to restaurant page
           console.log('should be a restaurant');
-          await axiosProxy.get(`../api/user/eatery/login/${loginId}`);
+          await axiosProxy.get(`/api/user/eatery/login/${loginId}`);
           console.log('is a restaurant');
           setUserContext(false);
         }

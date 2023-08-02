@@ -20,7 +20,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Grid from '@mui/material/Unstable_Grid2';
 
-import {useNavigate, NavLink} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 // import {axiosProxy} from '../axios-config/config';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
@@ -374,11 +374,9 @@ async function uploadPost(title, body, setError) {
  * Genereates the URL from the restaurant id
  * @param {String} toSet toSet function for the string to hold URL
  */
-async function generateProfileLink(toSet) {
+async function generateProfileLink() {
   const eateryId = await getEateryId();
-  console.log(`eateryId: ${eateryId}`);
-  const urlToReturn = `/RestaurantProfile/${eateryId}`;
-  toSet(urlToReturn);
+  return eateryId;
 }
 /**
  * @return {JSX}
@@ -394,12 +392,12 @@ export default function RestaurantHomePage() {
   const [posts, setPosts] = React.useState([]);
   const [vouchers, setVouchers] = React.useState([]);
   const navigate = useNavigate();
-  const [profileURL, setProfileURL] = React.useState('');
+  // const [profileURL, setProfileURL] = React.useState('');
 
   // Set to '_', so 'Type' Created isn't displayed initially
   const [voucherError, setVoucherError] = React.useState('_');
   const [postError, setPostError] = React.useState('_');
-  generateProfileLink(setProfileURL);
+  // generateProfileLink(setProfileURL);
 
   return (
     <Container maxWidth="lg">
