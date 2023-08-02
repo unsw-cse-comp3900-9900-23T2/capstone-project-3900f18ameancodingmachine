@@ -15,12 +15,13 @@ import CardMedia from '@mui/material/CardMedia';
 
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import jwtDecode from 'jwt-decode';
 
 import axios from 'axios';
 import tempImage from '../home/paella.jpg';
 import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
-import {axiosProxy} from '../axios-config/config';
+// import {axiosProxy} from '../axios-config/config';
 import {UserContext} from '../App.jsx';
 // import {useNavigate} from 'react-router-dom';
 
@@ -166,15 +167,12 @@ function loadPosts(restaurantId) {
  * @return {Int}
  */
 async function getEateryId() {
-  console.log('getEateryId');
-  const result = await axiosProxy.get('api/user/');
-  console.log(result);
+  const result = await axios.get('api/user/');
   const data = result.data;
   const decrypt = jwtDecode(data.token);
   const loginId = decrypt.result.id;
-
   // get the restaurantId
-  const eateryRes = await axiosProxy.get(`api/user/eatery/login/${loginId}`);
+  const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
   const eateryId = eateryRes.data.data.id;
   return eateryId;
 }
@@ -187,9 +185,7 @@ async function getEateryId() {
 async function getEateryInfo(restaurantId, setEateryInfo) {
   try {
     const eateryId = restaurantId;
-    const result = await axiosProxy.get(`api/user/eatery/${eateryId}`);
-    console.log('getEateryInfo');
-    console.log(result);
+    const result = await axios.get(`api/user/eatery/${eateryId}`);
     setEateryInfo(result.data.data);
   } catch (error) {
     console.log('getEateryInfo failed');
@@ -277,7 +273,7 @@ function uploadSeating() {
  */
 export default function RestaurantProfile() {
   const {state} = useLocation();
-  const restaurantId = state; // TODO state.id
+  const restaurantId = state.id;
 
   const currentReviews = loadReviews(restaurantId);
   const [indexReviews, setIndexReviews] = useState(0);
@@ -294,7 +290,6 @@ export default function RestaurantProfile() {
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
   // const navigate = useNavigate();
-  console.log('"Rest Pro"');
   const noBorderTextField = {
     padding: 10,
     border: 'none',
@@ -314,17 +309,15 @@ export default function RestaurantProfile() {
      */
     async function checkCookies() {
       try {
-        const result = await axiosProxy.get('/api/user/');
+        const result = await axios.get('/api/user/');
         const data = result.data;
-        console.log('"Check Cookies Data"');
-        console.log(data);
         const decrypt = jwtDecode(data.token);
         if (data.success !== 0) {
           const loginId = decrypt.result.id;
           // get EateryAccount, if no result then it will return an 404 error
           // else it will go to restaurant page
           console.log('should be a restaurant');
-          await axiosProxy.get(`/api/user/eatery/login/${loginId}`);
+          await axios.get(`/api/user/eatery/login/${loginId}`);
           console.log('is a restaurant');
           setUserContext(false);
         }
