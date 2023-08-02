@@ -267,6 +267,40 @@ async function viewVouchers(setVouchers) {
 }
 
 /**
+ * Loads all posts made by account
+ * @param {*} setPosts
+ */
+async function viewPosts(setPosts) {
+  console.log('Viewing vouchers');
+  try {
+    // const eateryId = await getEateryId();
+    const {data} = await axios.get(`api/user/post/5`);
+    console.log(data);
+    const results = data.results;
+    // adding column titles
+    results.unshift({
+      id: 'Id',
+      postedBy: 'postedBy',
+      title: 'title',
+      content: 'content',
+    });
+    if (results.length === 1) {
+      results.push({
+        id: 'N/A',
+        postedBy: 'N/A',
+        title: 'N/A',
+        content: 'N/A',
+      });
+    }
+    setPosts(results);
+  } catch (error) {
+    alert('something is wrong in the database');
+    console.log(error);
+    setPosts([]);
+  }
+}
+
+/**
  * upload new post, character limit hasn't been implemented yet
  * @param {*} title
  * @param {*} body
@@ -325,9 +359,11 @@ export default function RestaurantHomePage() {
   const [reoccuring, setReoccuring] = React.useState(true);
   const [titlePost, setTitlePost] = React.useState('');
   const [bodyPost, setBodyPost] = React.useState('');
+  const [posts, setPosts] = React.useState([]);
   const [vouchers, setVouchers] = React.useState([]);
   const [profileURL, setProfileURL] = React.useState('');
-  // Set to '_', so Voucher Created isn't displayed initially
+
+  // Set to '_', so 'Type' Created isn't displayed initially
   const [voucherError, setVoucherError] = React.useState('_');
   const [postError, setPostError] = React.useState('_');
   generateProfileLink(setProfileURL);
@@ -501,6 +537,42 @@ export default function RestaurantHomePage() {
                 {postError}
               </Typography>}
             </CardActions>
+
+            <CardActions>
+              { posts.length == 0 && <Button size="large" onClick={() => {
+                viewPosts(setPosts);
+                setPostError('_');
+              }}>View Created Posts</Button> }
+              { posts.length > 0 && <Button size="large" onClick={() => {
+                setPosts([]);
+              }}>Hide Posts</Button> }
+            </CardActions>
+
+            <CardContent>
+              <List sx={{height: 200, overflowX: 'auto', overflowY: 'auto'}}>
+
+                {posts.map((post) => {
+                  return (
+                    <ListItem key={post.code}>
+                      <Grid container spacing={0} xs={12}>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={post.id} />
+                        </Grid>
+                        <Grid xs={2}>
+                          <ListItemText primary={post.postedBy} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={post.title} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={post.content} />
+                        </Grid>
+                      </Grid>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </CardContent>
           </Card>
         </Grid>
       </Grid>
