@@ -44,7 +44,9 @@ import {
     getSearchResults,
     storeEateryProfileImgController,
     getEateryProfileImgPathController,
-    getDescriptionById
+    getDescriptionById,
+    storeEateryLayoutImgController,
+    getEateryLayoutImgPathController
 } from './restaurant.controller.js'
 
 import upload from '../img-config/config.js'
@@ -86,8 +88,10 @@ router.put('/unsubscribe', deleteSubscribedTo)
 // image-related router
 router.post('/image/profile', upload.single('user-avatar'), storeUserProfileImgController)
 router.post('/eatery/image/profile', upload.single('eatery-avatar'), storeEateryProfileImgController)
+router.post('/eatery/image/layout', upload.single('restaurant-layout'), storeEateryLayoutImgController)
 router.get('/eatery/image/profile/:id', getEateryProfileImgPathController)
 router.get('/image/profile/:id', getUserProfileImgPathController)
+router.get('/eatery/image/layout/:id', getEateryLayoutImgPathController)
 
 router.get('/post/:id', getPostById)
 router.get('/review/:id', getReviewById)

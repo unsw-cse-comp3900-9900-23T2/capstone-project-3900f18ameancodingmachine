@@ -11,7 +11,9 @@ import {
     createRestaurantDietary,
     getAllEateryVouchers,
     storeEateryProfileImg,
-    getDescriptionByEateryId
+    getDescriptionByEateryId,
+    getEateryLayoutImgPath,
+    storeEateryLayoutImg
 } from './restaurant.service.js'
 import axios from 'axios'
 import 'dotenv/config'
@@ -266,6 +268,35 @@ export async function storeEateryProfileImgController (req, res) {
 export async function getEateryProfileImgPathController (req, res) {
     try {
         const result = await getEateryProfileImgPath(req.params.id)
+        if (result.success === 0) {
+            return res.status(409).json(result)
+        }
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: 'Database connection error'
+        })
+    }
+}
+
+export async function storeEateryLayoutImgController (req, res) {
+    try {
+        const result = await storeEateryLayoutImg(req.file.path, req.body.restaurantId)
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: 'Database connection error'
+        })
+    }
+}
+
+export async function getEateryLayoutImgPathController (req, res) {
+    try {
+        const result = await getEateryLayoutImgPath(req.params.id)
         if (result.success === 0) {
             return res.status(409).json(result)
         }
