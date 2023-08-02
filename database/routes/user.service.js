@@ -1,4 +1,4 @@
-import { poolPromise } from '../db-config/db_connection.js'
+import { pool, poolPromise } from '../db-config/db_connection.js'
 import fs from 'fs'
 import path from 'path'
 
@@ -69,6 +69,16 @@ export async function getUserByLoginId (id) {
     return {
         success: 1,
         data: results
+    }
+}
+
+
+export async function getAddressById (id) {
+    const query = "select * from Address where id = ?"
+    const [results] = await poolPromise.execute(query, [id])
+    return {
+        success: 1,
+        data: results[0]
     }
 }
 
@@ -189,7 +199,7 @@ export async function getPostByPostId (id) {
     } else {
         return {
             success: 1,
-            data: results[0]
+            data: results
         }
     }
 }
@@ -391,7 +401,7 @@ export async function storeUserProfileImg (imgPath, userId) {
 
     if (result.length !== 0) {
         // delete current profile image
-        fs.unlink(result[0].imagePath, (err) => {
+        fs.unlink("public/" + result[0].imagePath, (err) => {
             if (err) {
                 console.log('file does not exist')
             }
@@ -426,10 +436,37 @@ export async function getUserProfileImgPath (userId) {
     }
 
     const imgPath = result[0].imagePath
-    const relativePath = path.relative('public', imgPath)
+    const relativePath = path.relative('public', 'public/' + imgPath)
     return {
         success: 1,
         results: relativePath
+    }
+}
+
+export async function postNewComment (userId, postId, comment) {
+    const query = `insert into PostComments(userId, postId, comment) values (?, ?, ?)`
+    const [result] = await poolPromise.execute(query, [userId, postId, comment])
+    return {
+        success: 1,
+        data: result
+    }
+}
+
+export async function getCommentsFromPostId (postId) {
+    const query =  `select * from commentsFromUser where postId = ?`
+    const [result] = await poolPromise.execute(query, [postId])
+    return {
+        success: 1,
+        data: result
+    }
+}
+
+export async function increaseLikes (postId) {
+    const query = `update Posts set likes = likes + 1 where id = ?`
+    await poolPromise.execute(query, [postId])
+    return {
+        success: 1,
+        message: "liked the post"
     }
 }
 

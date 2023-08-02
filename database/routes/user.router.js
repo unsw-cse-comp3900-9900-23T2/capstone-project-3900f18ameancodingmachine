@@ -26,7 +26,11 @@ import {
     createUserDietary,
     deleteSubscribedTo,
     storeUserProfileImgController,
-    getUserProfileImgPathController
+    getUserProfileImgPathController,
+    postNewCommentController,
+    increaseLikesController,
+    getCommentsFromPostIdController,
+    getAddress
 } from './user.controller.js'
 
 import {
@@ -39,7 +43,8 @@ import {
     getEateryVouchers,
     getSearchResults,
     storeEateryProfileImgController,
-    getEateryProfileImgPathController
+    getEateryProfileImgPathController,
+    getDescriptionById
 } from './restaurant.controller.js'
 
 import upload from '../img-config/config.js'
@@ -91,9 +96,14 @@ router.get('/eatery/cuisines', getCuisines)
 router.get('/eatery/:id', getEateryById)
 router.get('/subscribe/:id', showSubscribedEateries)
 router.get('/user/browser', getSearchResults)
+router.post('/user/comment', postNewCommentController)
+router.get('/eatery/post/comments', getCommentsFromPostIdController)
+router.put('/user/likes', increaseLikesController)
+router.get('/address/:id', getAddress)
 
 router.post('/voucher', createVoucher)
 router.put('/eatery/description', updateDescription)
+router.get('/eatery/description/:id', getDescriptionById)
 
 // check account based on loginid
 router.get('/eatery/login/:id', getEateryByLogin)
