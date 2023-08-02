@@ -30,3 +30,11 @@ Week 8
   Implemented view/hide vouchers functionality. Continued work on improving the styling of pages.
   Redesigned routing pages to what was decided by team. Fixed navigation elements.
 
+Week 9
+  Implemented user profiles. Added restaurant posts to user profile. Restructured routing and banner links.
+  Restyled banner. Fixed input elements on user home page. Added image upload functionality, update user profile
+  image dynamically.
+
+Week 10
+  Added linting checks and standardised code style. Set up users view of restaurant profile. Restyle restaurant
+  profile. Fixed links from restaurant posts to profiles. Implemented page switching buttons for paginated content.
