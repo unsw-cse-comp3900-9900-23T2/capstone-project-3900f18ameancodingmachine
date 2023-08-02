@@ -173,7 +173,7 @@ create table Bookings (
     primary key (id),
     FOREIGN KEY (userId) REFERENCES UserAccount(id),
     FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id),
-    FOREIGN KEY (VoucherId) REFERENCES EateryAccount(id) on delete set null 
+    FOREIGN KEY (VoucherId) REFERENCES Voucher(id) on delete set null 
 );
 
 -- view tables
