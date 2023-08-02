@@ -92,11 +92,30 @@ function uploadMenu() {
 
 /**
  * Stub for uploadLayout button
+ * @param {*} event
  * @return {Boolean}
  */
-function uploadLayout() {
-  alert('uploadLayout: Pressed uploadLayout');
-  return false;
+async function uploadLayout(event) {
+  const file = event.target.files[0];
+  const formData = new FormData();
+
+  try {
+    // key is user-avatar, must be exact
+    const eateryId = await getEateryId();
+    formData.append('restaurant-layout', file);
+    // for request body
+    formData.append('restaurantId', eateryId);
+    // store into the database
+    await axios.post('/api/user/eatery/image/layout', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    alert('image upload success');
+  } catch (error) {
+    console.log('Error uploading file into the server');
+  }
 }
 
 /**
@@ -363,9 +382,10 @@ export default function RestaurantHomePage() {
           <Button variant="contained" onClick={() => {
             uploadMenu();
           }}>Upload Menu</Button>
-          <Button variant="contained" onClick={() => {
-            uploadLayout();
-          }}>Upload Layout</Button>
+          <Button variant="contained" component="label">
+            Upload Layout
+            <input hidden accept="image/*" type="file" onChange={uploadLayout}/>
+          </Button>
           <Button variant="contained" onClick={() => {
             uploadHours();
           }}>Upload Hours</Button>
