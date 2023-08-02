@@ -107,10 +107,14 @@ join    BusinessHour bh on (ea.id = bh.restaurantId)
 
 -- posts made by the restaurant
 create view restaurantPosts as
-select  ro.first, ro.last, ea.name, p.title, p.content
+select  
+    p.id as postId, 
+    ea.id as restaurantId, 
+    ea.name, 
+    p.title, 
+    p.content
 from    EateryAccount ea
 join    Posts p on (ea.id = p.postedBy)
-join    RestaurantOwners ro on (ro.ownerOf = ea.id)
 ;
 
 -- vouchers offered by restaurant

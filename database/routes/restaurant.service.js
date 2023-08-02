@@ -88,6 +88,23 @@ export async function getEateriesByCuisine (cuisine) {
         results: result
     }
 }
+
+export async function getDescriptionByEateryId (eateryId) {
+    let query = 'select description from EateryAccount where eateryId = ?'
+    let values = [eateryId]
+    const [results] = await poolPromise.execute(query, values)
+    if (results.length === 0) {
+        return {
+            success: 0,
+            message: 'Eatery not found'
+        }
+    } else {
+        return {
+            success: 1,
+            results: results[0]
+        }
+    }
+}
 /// ///////////////
 
 /**
@@ -207,7 +224,7 @@ export async function storeEateryProfileImg (imgPath, restaurantId) {
 
     if (result.length !== 0) {
         // delete the existing image
-        fs.unlink(result[0].imagePath, (err) => {
+        fs.unlink("public/" + result[0].imagePath, (err) => {
             if (err) {
                 console.log('file does not exist')
             }
