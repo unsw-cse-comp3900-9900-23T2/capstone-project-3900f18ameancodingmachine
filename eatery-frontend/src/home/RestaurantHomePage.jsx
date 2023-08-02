@@ -19,7 +19,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Grid from '@mui/material/Unstable_Grid2';
-import {axiosProxy} from '../axios-config/config';
+// import {axiosProxy} from '../axios-config/config';
 import {NavLink} from 'react-router-dom';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];

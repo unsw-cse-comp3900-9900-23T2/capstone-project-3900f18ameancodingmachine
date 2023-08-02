@@ -12,7 +12,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import CardMedia from '@mui/material/CardMedia';
 
-import axios from 'axios';
+// import axios from 'axios';
+import {axiosProxy} from '../axios-config/config';
 import tempImage from '../home/paella.jpg';
 import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
@@ -160,13 +161,13 @@ function loadPosts(restaurantId) {
  * @return {Int}
  */
 async function getEateryId() {
-  const result = await axios.get('api/user/');
+  const result = await axiosProxy.get('api/user/');
   const data = result.data;
   const decrypt = jwtDecode(data.token);
   const loginId = decrypt.result.id;
 
   // get the restaurantId
-  const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
+  const eateryRes = await axiosProxy.get(`api/user/eatery/login/${loginId}`);
   const eateryId = eateryRes.data.data.id;
   return eateryId;
 }
@@ -177,7 +178,9 @@ async function getEateryId() {
  */
 async function getEateryName(eateryId, setRestaurantName) {
   try {
-    const result = await axios.get(`api/user/eatery/${eateryId}`);
+    const result = await axiosProxy.get(`api/user/eatery/${eateryId}`);
+    const name = result.data.data.name;
+    setRestaurantName(name);
     console.log(result);
   } catch (error) {
     const result = 'Not working (getEateryName)';
@@ -196,7 +199,7 @@ async function editDescription() {
     const eateryId = await getEateryId();
 
     // insert into the database
-    await axios.put('api/user/eatery/description', {
+    await axiosProxy.put('api/user/eatery/description', {
       restaurantId: eateryId,
       description: description,
     });
@@ -220,7 +223,7 @@ async function loadDescription(setDes) {
     const eateryId = await getEateryId();
 
     // insert into the database
-    setDes(await axios.get('api/user/eatery/description'));
+    setDes(await axiosProxy.get('api/user/eatery/description'));
 
 
     */
