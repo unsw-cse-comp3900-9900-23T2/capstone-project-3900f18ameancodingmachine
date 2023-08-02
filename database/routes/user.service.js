@@ -185,9 +185,9 @@ export async function createNewPost (data) {
     }
 }
 
-export async function getPostByPostId (id) {
+export async function getPostByEateryId (id) {
     // gets post by id
-    const query = 'select id, postedBy, title, content from Posts where id = ?'
+    const query = 'select postId, name, title, content from restaurantPosts where restaurantId = ?'
     const value = [id]
     const [results] = await poolPromise.execute(query, value)
 
