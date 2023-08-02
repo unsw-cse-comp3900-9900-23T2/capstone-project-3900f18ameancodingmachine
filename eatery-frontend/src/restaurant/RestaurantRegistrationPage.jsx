@@ -15,6 +15,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import validator from 'validator';
 import axios from 'axios';
+import Grid from '@mui/material/Unstable_Grid2';
 import {createAddress, createAccount} from '../user/RegistrationPage';
 
 /**
@@ -128,113 +129,150 @@ export default function RestaurantRegistrationPage() {
   };
 
   return (
-    <Container maxWidth="md">
-      <Card sx={{minWidth: 275}}>
+    <Container maxWidth="md" sx={{bgcolor: 'white'}}>
+      <Card sx={{maxWidth: 500, m: 10, border: '10px inset #61dafb', bgcolor: '#F5F5F5'}}>
         <CardContent>
-          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-            Sign up your Restaurant
-          </Typography>
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Name
-          </Typography>
-          <TextField required id="register-name" label="Name" value={name}
-            onChange={(event) => {
-              setName(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Email Address
-          </Typography>
-          <TextField required id="register-email" label="email" value={email}
-            onChange={(event) => {
-              setEmail(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Phone Number
-          </Typography>
-          <TextField required id="register-phone" label="phone" value={phoneNumber}
-            inputProps={{inputMode: 'numeric', pattern: '[0-9]*'}} onChange={(event) => {
-              setPhoneNumber(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Street
-          </Typography>
-          <TextField required id="register-street" label="Street" value={street}
-            onChange={(event) => {
-              setStreet(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Suburb
-          </Typography>
-          <TextField required id="register-suburb" label="Suburb" value={suburb}
-            onChange={(event) => {
-              setSuburb(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Region
-          </Typography>
-          <TextField required id="register-region" label="Region" value={region}
-            onChange={(event) => {
-              setRegion(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            PostCode
-          </Typography>
-          <TextField required id="register-postcode" label="PostCode" value={postCode}
-            onChange={(event) => {
-              setPostCode(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Website
-          </Typography>
-          <TextField required id="register-website" label="Website" value={website}
-            InputProps={{
-              startAdornment: <InputAdornment position="start">https://</InputAdornment>,
-            }} onChange={(event) => {
-              setWebsite(event.target.value);
-            }}
-          />
-          <FormControl fullWidth>
-            <InputLabel id="select-cuisine-label">Cuisine</InputLabel>
-            <Select
-              labelId="select-cuisine-label"
-              id="select-cuisine"
-              value={cuisine}
-              label="Cuisine"
-              onChange={(event) => {
-                setCuisine(event.target.value);
-              }}
-            >
-              {/* <MenuItem value={cuisines[0]}>{cuisines[0].toUpperCase()}</MenuItem> */}
-              {cuisines.map((c) =>
-                <MenuItem key={c} value={c}>{c.toUpperCase()}</MenuItem>)}
-            </Select>
-          </FormControl>
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Password
-          </Typography>
-          <TextField required type="password" id="register-password" label="Password"
-            value={password} onChange={(event) => {
-              setPassword(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Confirm Password
-          </Typography>
-          <TextField required type="password" id="register-confirm-password"
-            label="Confirm Password" value={confirmPassword} onChange={(event) => {
-              setConfirmPassword(event.target.value);
-            }}
-          />
-          {registerFail && <Typography sx={{fontSize: 14}} color="red" gutterBottom>
-            {registerMSG}
-          </Typography> }
+          <Grid container spacing={2}>
+            <Grid xs={12} spacing={2}>
+              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+                Sign up your Restaurant
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Restaurant Name
+              </Typography>
+              <TextField required sx={{bgcolor: 'white'}}
+                id="register-name" label="Name" value={name}
+                onChange={(event) => {
+                  setName(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Email Address
+              </Typography>
+              <TextField required sx={{bgcolor: 'white'}}
+                id="register-email" label="email" value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid xs={6}>
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Phone Number
+              </Typography>
+              <TextField required id="register-phone" sx={{bgcolor: 'white'}}
+                label="phone" value={phoneNumber}
+                inputProps={{inputMode: 'numeric', pattern: '[0-9]*'}}
+                onChange={(event) => {
+                  setPhoneNumber(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid xs={6}>
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Street
+              </Typography>
+              <TextField required sx={{bgcolor: 'white'}} id="register-street"
+                label="Street" value={street}
+                onChange={(event) => {
+                  setStreet(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid xs={6}>
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Suburb
+              </Typography>
+              <TextField required sx={{bgcolor: 'white'}} id="register-suburb"
+                label="Suburb" value={suburb}
+                onChange={(event) => {
+                  setSuburb(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid xs={6}>
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Region
+              </Typography>
+              <TextField required sx={{bgcolor: 'white'}} id="register-region"
+                label="Region" value={region}
+                onChange={(event) => {
+                  setRegion(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid xs={6}>
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                PostCode
+              </Typography>
+              <TextField required sx={{bgcolor: 'white'}} id="register-postcode"
+                label="PostCode" value={postCode}
+                onChange={(event) => {
+                  setPostCode(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid xs={6}>
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Website
+              </Typography>
+              <TextField required sx={{bgcolor: 'white'}} id="register-website"
+                label="Website" value={website}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">
+                    https://</InputAdornment>,
+                }} onChange={(event) => {
+                  setWebsite(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid xs={12}>
+              <FormControl fullWidth>
+                <InputLabel id="select-cuisine-label">Cuisine</InputLabel>
+                <Select sx={{bgcolor: 'white'}}
+                  labelId="select-cuisine-label"
+                  id="select-cuisine"
+                  value={cuisine}
+                  label="Cuisine"
+                  onChange={(event) => {
+                    setCuisine(event.target.value);
+                  }}
+                >
+                  {cuisines.map((c) =>
+                    <MenuItem key={c} value={c}>{c.toUpperCase()}</MenuItem>)}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid xs={6}>
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Password
+              </Typography>
+              <TextField required sx={{bgcolor: 'white'}} type="password"
+                id="register-password" label="Password"
+                value={password} onChange={(event) => {
+                  setPassword(event.target.value);
+                }}
+              />
+            </Grid>
+            <Grid xs={6}>
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Confirm Password
+              </Typography>
+              <TextField required sx={{bgcolor: 'white'}} type="password"
+                id="register-confirm-password"
+                label="Confirm Password" value={confirmPassword} onChange={(event) => {
+                  setConfirmPassword(event.target.value);
+                }}
+              />
+            </Grid>
+            {registerFail && <Typography sx={{fontSize: 14}} color="red" gutterBottom>
+              {registerMSG}
+            </Typography> }
+          </Grid>
         </CardContent>
         <CardActions onClick={handleSubmit}>
           <Button size="small" >REGISTER</Button>
