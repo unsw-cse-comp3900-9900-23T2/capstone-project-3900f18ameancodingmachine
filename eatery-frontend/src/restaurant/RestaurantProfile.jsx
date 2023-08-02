@@ -18,6 +18,7 @@ import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
 import {axiosProxy} from '../axios-config/config';
 import {UserContext} from '../App.jsx';
+// import {useNavigate} from 'react-router-dom';
 
 /**
  *  Loads reviews from backend
@@ -284,6 +285,8 @@ export default function RestaurantProfile() {
   const [eateryInfo, setEateryInfo] = useState({});
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
+  // const navigate = useNavigate();
+
   const noBorderTextField = {
     padding: 0,
     border: 'none',
@@ -303,14 +306,16 @@ export default function RestaurantProfile() {
      */
     async function checkCookies() {
       try {
-        const result = await axios.get('api/user/');
+        const result = await axiosProxy.get('/api/user/');
         const data = result.data;
+        console.log(data);
         const decrypt = jwtDecode(data.token);
         if (data.success !== 0) {
           const loginId = decrypt.result.id;
           // get EateryAccount, if no result then it will return an 404 error
           // else it will go to restaurant page
-          await axios.get(`api/user/eatery/login/${loginId}`);
+          console.log('should be a restaurant');
+          await axiosProxy.get(`../api/user/eatery/login/${loginId}`);
           console.log('is a restaurant');
           setUserContext(false);
         }
@@ -322,7 +327,7 @@ export default function RestaurantProfile() {
           setUserContext(true);
         } else { // not loggedIn
           setUserContext(null);
-          navigate('/');
+          // navigate('/');
           console.log('Not logged in');
         }
       }
