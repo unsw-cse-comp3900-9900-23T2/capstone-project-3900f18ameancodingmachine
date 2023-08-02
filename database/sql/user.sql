@@ -24,6 +24,7 @@ join    LoginInfo l on (u.login = l.id)
 create view userSubscription as
 select
     st.userId,
+    ea.id as restaurantId,
     ea.name, 
     a.street, 
     a.suburb, 
@@ -31,10 +32,12 @@ select
     a.postcode,
     ea.phone,
     ea.email,
-    ea.url 
-from    SubscribedTo st
-join    EateryAccount ea on (ea.id = st.restaurantId)
-join    Address a on (a.id = ea.address)
+    ea.url,
+    up.imagePath as image 
+from        SubscribedTo st
+left join   EateryAccount ea on (ea.id = st.restaurantId)
+left join   Address a on (a.id = ea.address)
+left join   restaurantProfileImages up on (up.restaurantId = ea.id)
 ;
 
 -- see user reviews

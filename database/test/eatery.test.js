@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app, server } from '../server';
 import { poolPromise } from '../db-config/db_connection';
+import { db_clear } from '../db-config/db_clear';
 
 // after all test done, it will stop pool connection
 // otherwise jest won't exit
@@ -11,123 +12,130 @@ afterAll((done) => {
     });
 });
 
-describe("/eatery", () => {
-    const data = {
-        name: "another restaurant",
-        addressId: 0, //fake
-        phone: "0493186858",
-        email: "anotherrestaurant@gmail.com",
-        loginId: 0, //fake
-        url: "www.anotherrestaurant.com",
-    }
+afterEach(async () => {
+    await db_clear();
+})
 
-    afterEach(async () => {
-        const query = `delete from EateryAccount`
-        const res = await poolPromise.execute(query)
-    })
+///////////////////////////////////////Sample Data//////////////////////////////////
+
+// for basic test like login, address, and account router
+const login = "uniquename@gmail.com"
+const password = "test"
+
+// address
+const data = {
+    street: "unicorn street",
+    suburb: "dirtland",
+    region: "NSW",
+    postcode: "2025"
+}
+
+// for router where userId and restaurantId are required
+const userLogin = "anotheraccount"
+const userPassword = "anotherpassword"
+const restaurantLogin = "uniquename@gmail.com"
+const restaurantPassword = "test"
+
+const userLoginData = {
+    login: userLogin,
+    password: userPassword
+}
+
+const eateryLoginData = {
+    login: restaurantLogin,
+    password: restaurantPassword
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+describe("/eatery", () => {
 
     test("eatery registration should return statuscode 200 and success of 1", async () => {
-        const response = await request(app).post("/api/user/eatery").send(data);
+        // register eatery login
+        let response = await request(app).post("/api/user/account").send(eateryLoginData)
+        const eateryLoginId = response.body.data.insertId
+       
+        // create address   
+        response = await request(app).post('/api/user/address').send(data)
+        const addressId = response.body.data.insertId
+
+        // create eatery account
+        const eateryAccount = {
+            name: "another restaurant",
+            addressId: addressId, //fake
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            loginId: eateryLoginId, 
+            url: "www.anotherrestaurant.com",
+        }
+
+        response = await request(app).post("/api/user/eatery").send(eateryAccount);
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
     })
 
     test("register the same eatery with the same info twice should not return success 1", async () => {
-        const response = await request(app).post("/api/user/eatery").send(data);
+        // register eatery login
+        let response = await request(app).post("/api/user/account").send(eateryLoginData)
+        const eateryLoginId = response.body.data.insertId
+       
+        // create address   
+        response = await request(app).post('/api/user/address').send(data)
+        const addressId = response.body.data.insertId
+
+        // create eatery account
+        const eateryAccount = {
+            name: "another restaurant",
+            addressId: addressId, //fake
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            loginId: eateryLoginId, 
+            url: "www.anotherrestaurant.com",
+        }
+
+        response = await request(app).post("/api/user/eatery").send(eateryAccount);
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
 
-        const response2 = await request(app).post("/api/user/eatery").send(data);
-        expect(response2.statusCode).toBe(400);
+        // duplicate account
+        const response2 = await request(app).post("/api/user/eatery").send(eateryAccount);
+        expect(response2.statusCode).toBe(409);
         expect(response2.body.success).toBe(0);
     })
 
 })
 
-describe("/cuisine", () => {
-    const data = {
-        name: "new cuisine" //fake
-    }
 
-    afterEach(async () => {
-        const query = `delete from Cuisines where name = ?`
-        const res = await poolPromise.execute(query, ["new cuisine"])
-    })
-
-    test("adding new cuisine should return statuscode 200 and success of 1", async () => {
-        const response = await request(app).post('/api/user/cuisine').send(data)
-        expect(response.statusCode).toBe(200)
-        expect(response.body.success).toBe(1)
-    })
-})
-
-describe("/cuisine-offer", () => {
-    const cuisineData = {
-        name: "new cuisine" //fake
-    }
-
-    const restaurantData = {
-        name: "another restaurant",
-        addressId: 0, //fake
-        phone: "0493186858",
-        email: "anotherrestaurant@gmail.com",
-        loginId: 0, //fake
-        url: "www.anotherrestaurant.com",
-    }
-
-    // have better method but this is guaranteed
-    afterEach(async () => {
-        let query = `delete from CuisineOffer`;
-        let res = await poolPromise.execute(query)
-        query = `delete from Cuisines`
-        res = await poolPromise.execute(query)
-        query = `delete from EateryAccount`
-        res = await poolPromise.execute(query)
-    })
-
-    test("restaurant linking to a cuisine would have statuscode 200 and success of 1", async () => {
-        // make new cuisine
-        let  response = await request(app).post('/api/user/cuisine').send(cuisineData)
-        const cuisineId = response.body.data.insertId
-        
-        // create the new eatery
-        response = await request(app).post('/api/user/eatery').send(restaurantData)
-        const restaurantId = response.body.results.insertId
-
-        const offerData = {
-            restaurantId: restaurantId,
-            cuisineId: cuisineId
-        }
-
-        // make cuisine offer from restaurant
-        response = await request(app).post('/api/user/cuisine-offer').send(offerData)
-        expect(response.statusCode).toBe(200)
-        expect(response.body.success).toBe(1)
-    })
-
-})
 
 describe("/hour", () => {
-    const data = {
-        name: "another restaurant",
-        addressId: 0, //fake
-        phone: "0493186858",
-        email: "anotherrestaurant@gmail.com",
-        loginId: 0, //fake
-        url: "www.anotherrestaurant.com",
-    }
+    let eateryLoginId;
+    let addressId;
+    let restaurantId;
+    let eateryAccount;
 
-    afterEach(async () => {
-        let query = `delete from BusinessHour`;
-        let res = await poolPromise.execute(query)
-        query = `delete from EateryAccount`
-        res = await poolPromise.execute(query)
+    beforeEach(async () => {
+        let response = await request(app).post("/api/user/account").send(eateryLoginData)
+        eateryLoginId = response.body.data.insertId
+       
+        // create address   
+        response = await request(app).post('/api/user/address').send(data)
+        addressId = response.body.data.insertId
+
+        // create eatery account
+        eateryAccount = {
+            name: "another restaurant",
+            addressId: addressId, //fake
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            loginId: eateryLoginId, 
+            url: "www.anotherrestaurant.com",
+        }
+
+        response = await request(app).post("/api/user/eatery").send(eateryAccount);
+        restaurantId = response.body.results.insertId
     })
 
     test("input business hour return statuscode 200 and success 1", async () => {
-        // create the new eatery
-        let response = await request(app).post('/api/user/eatery').send(data)
-        const restaurantId = response.body.results.insertId
 
         //  insert business hour
         const hourData = {
@@ -137,15 +145,13 @@ describe("/hour", () => {
             close: "17:00"
         }
 
-        response = await request(app).post('/api/user/hour').send(hourData)
+        const response = await request(app).post('/api/user/hour').send(hourData)
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
 
     })
 
     test("input business hour twice will just update the business hour", async () => {
-        let response = await request(app).post('/api/user/eatery').send(data)
-        const restaurantId = response.body.results.insertId
 
         //  insert business hour
         const hourData = {
@@ -155,7 +161,7 @@ describe("/hour", () => {
             close: "17:00"
         }
 
-        response = await request(app).post('/api/user/hour').send(hourData)
+        let response = await request(app).post('/api/user/hour').send(hourData)
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
 
@@ -175,68 +181,39 @@ describe("/hour", () => {
 
 })
 
-describe('/voucher', () => {
-    const restaurantData = {
-        name: "another restaurant",
-        addressId: 0, //fake
-        phone: "0493186858",
-        email: "anotherrestaurant@gmail.com",
-        loginId: 0, //fake
-        url: "www.anotherrestaurant.com",
-    }
+describe("/eatery/description", () => {
 
-    afterEach(async () => {
-        let query = `delete from Voucher`
-        let res = await poolPromise.execute(query)
-        query = `delete from EateryAccount`
-        res = await poolPromise.execute(query)
-    })
+    let eateryLoginId;
+    let addressId;
+    let restaurantId;
+    let eateryAccount;
 
-    test('insert correct voucher data return statuscode 200 and success 1', async () => {
-        // create the new eatery
-        let response = await request(app).post('/api/user/eatery').send(restaurantData)
-        const restaurantId = response.body.results.insertId
+    beforeEach(async () => {
+        let response = await request(app).post("/api/user/account").send(eateryLoginData)
+        eateryLoginId = response.body.data.insertId
+       
+        // create address   
+        response = await request(app).post('/api/user/address').send(data)
+        addressId = response.body.data.insertId
 
-        const start = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        const end = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-        // input for voucher
-        // leave code null
-        const voucherData = {
-            offeredBy: restaurantId,
-            discount: 50,
-            startOffer: start,
-            endOffer: end,
-            count: 1
+        // create eatery account
+        eateryAccount = {
+            name: "another restaurant",
+            addressId: addressId, //fake
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            loginId: eateryLoginId, 
+            url: "www.anotherrestaurant.com",
+            description: "another description",
         }
 
-        response = await request(app).post('/api/user/voucher').send(voucherData);
-        expect(response.statusCode).toBe(200);
-        expect(response.body.success).toBe(1);
+        response = await request(app).post("/api/user/eatery").send(eateryAccount);
+        restaurantId = response.body.results.insertId
     })
-})
-
-describe("/voucher", () => {
-    const restaurantData = {
-        name: "another restaurant",
-        addressId: 0, //fake
-        phone: "0493186858",
-        email: "anotherrestaurant@gmail.com",
-        loginId: 0, //fake
-        url: "www.anotherrestaurant.com",
-    }
-
-    afterEach(async () => {
-        let query = `delete from EateryAccount`
-        let res = await poolPromise.execute(query)
-    })
-
 
     test("update description would return statuscode 200 and success 1", async () => {
-        let response = await request(app).post('/api/user/eatery').send(restaurantData)
-        const restaurantId = response.body.results.insertId
 
-        response = await request(app).put("/api/user/eatery/description").send({
+        const response = await request(app).put("/api/user/eatery/description").send({
             restaurantId: restaurantId,
             description: "hello there"
         })
@@ -244,29 +221,56 @@ describe("/voucher", () => {
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
     })
+
+    test("get description would return statuscode 200 and success 1", async () => {
+
+        response = await request(app).get(`/api/user/eatery/description/${eateryLoginId}`)
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+    })
+
+    test("get description with invalid id would return statuscode 500 and success 0", async () => {
+
+        response = await request(app).get(`/api/user/eatery/description/12345`)
+
+        expect(response.statusCode).toBe(500)
+        expect(response.body.success).toBe(0)
+    })
 })
 
 describe("/eatery/all", () => {
-    const restaurantData = {
-        name: "another restaurant",
-        addressId: 0, //fake
-        phone: "0493186858",
-        email: "anotherrestaurant@gmail.com",
-        loginId: 0, //fake
-        url: "www.anotherrestaurant.com",
-    }
+    
+    let eateryLoginId;
+    let addressId;
+    let restaurantId;
+    let eateryAccount;
 
-    afterEach(async () => {
-        let query = `delete from EateryAccount`
-        let res = await poolPromise.execute(query)
+    beforeEach(async () => {
+        let response = await request(app).post("/api/user/account").send(eateryLoginData)
+        eateryLoginId = response.body.data.insertId
+       
+        // create address   
+        response = await request(app).post('/api/user/address').send(data)
+        addressId = response.body.data.insertId
+
+        // create eatery account
+        eateryAccount = {
+            name: "another restaurant",
+            addressId: addressId, //fake
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            loginId: eateryLoginId, 
+            url: "www.anotherrestaurant.com",
+        }
+
+        response = await request(app).post("/api/user/eatery").send(eateryAccount);
+        restaurantId = response.body.results.insertId
     })
 
     test("getting all eateries should just return statuscode 200 and success of 1", async () => {
-        let response = await request(app).post('/api/user/eatery').send(restaurantData)
-        const restaurantId = response.body.results.insertId
-        response = await request(app).get("/api/user/eatery/all").send({
-            restaurantId: restaurantId,
-            description: "hello there"
+        let response = await request(app).get("/api/user/eatery/all").send({
+            restaurantId: restaurantId
         })
 
         expect(response.statusCode).toBe(200)
@@ -274,12 +278,9 @@ describe("/eatery/all", () => {
     })
 
     test("input 1 restaurant return only 1 restaurant", async () => {
-        let response = await request(app).post('/api/user/eatery').send(restaurantData)
-        const restaurantId = response.body.results.insertId
 
-        response = await request(app).get("/api/user/eatery/all").send({
-            restaurantId: restaurantId,
-            description: "hello there"
+        let response = await request(app).get("/api/user/eatery/all").send({
+            restaurantId: restaurantId
         })
 
         expect(response.body.results.length).toBe(1)
@@ -287,41 +288,3 @@ describe("/eatery/all", () => {
 
 })
 
-// test cases:
-// 1. search based on name
-// 2. search based on suburb
-// 3. search based on cuisine
-// 4. maybe a mix
-// describe("/eatery/find", () => {
-//     const restaurantData1 = {
-//         name: "restaurant 1",
-//         addressId: 0, //fake
-//         phone: "0493186858",
-//         email: "restaurant1@gmail.com",
-//         loginId: 0, //fake
-//         url: "www.restaurant1.com",
-//     }
-
-//     const restaurantData2 = {
-//         name: "restaurant 2",
-//         addressId: 0, //fake
-//         phone: "0493186858",
-//         email: "restaurant2@gmail.com",
-//         loginId: 0, //fake
-//         url: "www.restaurant1.com",
-//     }
-
-//     const restaurantData3 = {
-//         name: "restaurant 3",
-//         addressId: 0, //fake
-//         phone: "0493186858",
-//         email: "restaurant3@gmail.com",
-//         loginId: 0, //fake
-//         url: "www.restaurant3.com",
-//     }
-
-//     afterEach(async () => {
-//         let query = `delete from EateryAccount`
-//         let res = await poolPromise.execute(query)
-//     })
-// })
