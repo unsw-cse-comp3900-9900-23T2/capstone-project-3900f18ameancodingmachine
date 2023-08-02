@@ -19,8 +19,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Grid from '@mui/material/Unstable_Grid2';
-import {axiosProxy} from '../axios-config/config';
-import {NavLink} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -329,10 +328,9 @@ async function uploadPost(title, body) {
  * Genereates the URL from the restaurant id
  * @param {String} toSet toSet function for the string to hold URL
  */
-async function generateProfileLink(toSet) {
+async function generateProfileLink() {
   const eateryId = await getEateryId();
-  const urlToReturn = `/RestaurantProfile/${eateryId}`;
-  toSet(urlToReturn);
+  return eateryId;
 }
 /**
  * @return {JSX}
@@ -346,10 +344,9 @@ export default function RestaurantHomePage() {
   const [titlePost, setTitlePost] = React.useState('');
   const [bodyPost, setBodyPost] = React.useState('');
   const [vouchers, setVouchers] = React.useState([]);
-  const [profileURL, setProfileURL] = React.useState('');
+  const navigate = useNavigate();
   // Set to '_', so Voucher Created isn't displayed initially
   const [voucherError, setVoucherError] = React.useState('_');
-  generateProfileLink(setProfileURL);
 
   return (
     <Container maxWidth="lg">
@@ -376,8 +373,10 @@ export default function RestaurantHomePage() {
             Upload Profile Image
             <input hidden accept="image/*" type="file" onChange={uploadProfileImage}/>
           </Button>
-          <Button variant="contained" component={NavLink} to={profileURL}>
-            View Profile</Button>
+          <Button variant="contained" onClick={async () => {
+            const eateryId = await generateProfileLink();
+            navigate('/RestaurantProfile', {state: {id: eateryId}});
+          }}>View Profile</Button>
         </CardActions>
       </Card>
 

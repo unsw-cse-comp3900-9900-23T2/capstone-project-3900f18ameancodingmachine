@@ -1,4 +1,4 @@
-import {useParams} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import React, {useState, useEffect, useContext} from 'react';
 
 
@@ -264,7 +264,8 @@ function uploadSeating() {
  * @return {JSX}
  */
 export default function RestaurantProfile() {
-  const {restaurantId} = useParams();
+  const {state} = useLocation();
+  const restaurantId = state.id;
 
   const currentReviews = loadReviews(restaurantId);
   const [indexReviews, setIndexReviews] = useState(0);
