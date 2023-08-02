@@ -328,9 +328,6 @@ export default function RestaurantProfile() {
   // Booking DONE
   // Previous Post
 
-  console.log('userContext');
-  console.log(userContext);
-
   return (
     <Container maxWidth="lg">
       <Card elevation={0} sx={{mb: 2}}>
@@ -348,8 +345,9 @@ export default function RestaurantProfile() {
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
                 Description
               </Typography>
-              <Card elevation={0} sx={{minHeight: 300, display: 'flex',
-                flexDirection: 'column', padding: 2}}>
+              <Card elevation={0} style={{flexGrow: 1}}
+                sx={{minHeight: 300, display: 'flex',
+                  flexDirection: 'column', padding: 2}}>
                 {userContext !== false && <Typography sx={{fontSize: 16}}
                   color="text.primary" gutterBottom>
                   {description}
@@ -362,13 +360,19 @@ export default function RestaurantProfile() {
                 }}/>}
               </Card>
             </CardContent>
-            <CardActions>
-              {userContext === false && <Button variant="contained"
-                onClick={() =>
-                  editDescription(description)}>
-                Update Description
-              </Button>}
-            </CardActions>
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <CardActions>
+                {userContext === true && <Button variant="contained"
+                  onClick={() =>
+                    editDescription(description)}>
+                  Update Description
+                </Button>}
+              </CardActions>
+            </Box>
           </Card>
         </Grid>
         <Grid xs={6}>
@@ -419,11 +423,17 @@ export default function RestaurantProfile() {
               title="The Menu"
             />
           </Card>
-          {userContext === false && <CardActions>
-            <Button variant="contained" onClick={() => {
-              uploadMenu();
-            }}>Update Menu</Button>
-          </CardActions>}
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            {userContext === false && <CardActions>
+              <Button variant="contained" onClick={() => {
+                uploadMenu();
+              }}>Update Menu</Button>
+            </CardActions>}
+          </Box>
         </Grid>
         <Grid xs={6}>
           <Card sx={{minHeight: 605, display: 'flex', flexDirection: 'column'}}>
@@ -478,11 +488,17 @@ export default function RestaurantProfile() {
             <TextField label="Book Table (TEMP NOT SURE HOW WE WANT TO DO THIS)" />
           }
         </CardContent>
-        {userContext === false && <CardActions>
-          <Button variant="contained" onClick={() => {
-            uploadSeating();
-          }}>Update Seating</Button>
-        </CardActions>}
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          {userContext === false && <CardActions>
+            <Button variant="contained" onClick={() => {
+              uploadSeating();
+            }}>Update Seating</Button>
+          </CardActions>}
+        </Box>
       </Card>
 
 
