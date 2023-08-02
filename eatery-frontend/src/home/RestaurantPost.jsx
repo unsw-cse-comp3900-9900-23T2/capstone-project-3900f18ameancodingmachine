@@ -89,8 +89,10 @@ export default function RestaurantPost(props) {
       <Card sx={{minWidth: 100}}>
         <CardMedia
           sx={{height: 140}}
-          component="img"
-          image={restaurantPost.image || paella} // TODO get actual image
+          // component="img"
+          component={NavLink}
+          to={`/RestaurantProfile/${restaurantId}`}
+          image={restaurantPost.image || paella}
           title="Paella"
         />
         <CardContent>
