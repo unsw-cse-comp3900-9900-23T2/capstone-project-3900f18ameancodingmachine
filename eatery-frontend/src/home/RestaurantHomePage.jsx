@@ -19,7 +19,9 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Grid from '@mui/material/Unstable_Grid2';
-import {useNavigate} from 'react-router-dom';
+
+import {useNavigate, NavLink} from 'react-router-dom';
+// import {axiosProxy} from '../axios-config/config';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -31,12 +33,14 @@ const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
  */
 async function getEateryId() {
   const result = await axios.get('api/user/');
+  console.log(result);
   const data = result.data;
   const decrypt = jwtDecode(data.token);
   const loginId = decrypt.result.id;
 
   // get the restaurantId
   const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
+  console.log(eateryRes);
   const eateryId = eateryRes.data.data.id;
   return eateryId;
 }
@@ -313,15 +317,59 @@ async function viewVouchers(setVouchers) {
 }
 
 /**
+ * Loads all posts made by account
+ * @param {*} setPosts
+ */
+async function viewPosts(setPosts) {
+  console.log('Viewing vouchers');
+  try {
+    // const eateryId = await getEateryId();
+    const {data} = await axios.get(`api/user/post/5`);
+    console.log(data);
+    const results = data.results;
+    // adding column titles
+    results.unshift({
+      id: 'Id',
+      postedBy: 'postedBy',
+      title: 'title',
+      content: 'content',
+    });
+    if (results.length === 1) {
+      results.push({
+        id: 'N/A',
+        postedBy: 'N/A',
+        title: 'N/A',
+        content: 'N/A',
+      });
+    }
+    setPosts(results);
+  } catch (error) {
+    alert('something is wrong in the database');
+    console.log(error);
+    setPosts([]);
+  }
+}
+
+/**
  * upload new post, character limit hasn't been implemented yet
  * @param {*} title
  * @param {*} body
+ * @param {*} setError set function for error output
  * @return {Boolean}
  */
-async function uploadPost(title, body) {
-  // alert(`uploadPost: Pressed uploadPost\nTitle: ${title}\nBody: ${body}`);
-  if (!title || !body) {
-    alert('please fill in the details');
+async function uploadPost(title, body, setError) {
+  // Guard Statements
+  let isError = false;
+  setError('');
+  if (title === '') {
+    setError((prevState) => prevState + 'Enter title. ');
+    isError = true;
+  }
+  if (body === '') {
+    setError((prevState) => prevState + 'Enter body. ');
+    isError = true;
+  }
+  if (isError) {
     return;
   }
 
@@ -334,8 +382,6 @@ async function uploadPost(title, body) {
       title: title,
       content: body,
     });
-
-    alert('new post created');
   } catch (error) {
     alert('something is wrong in the database');
     console.log(error);
@@ -347,9 +393,11 @@ async function uploadPost(title, body) {
  * Genereates the URL from the restaurant id
  * @param {String} toSet toSet function for the string to hold URL
  */
-async function generateProfileLink() {
+async function generateProfileLink(toSet) {
   const eateryId = await getEateryId();
-  return eateryId;
+  console.log(`eateryId: ${eateryId}`);
+  const urlToReturn = `/RestaurantProfile/${eateryId}`;
+  toSet(urlToReturn);
 }
 /**
  * @return {JSX}
@@ -362,10 +410,15 @@ export default function RestaurantHomePage() {
   const [reoccuring, setReoccuring] = React.useState(true);
   const [titlePost, setTitlePost] = React.useState('');
   const [bodyPost, setBodyPost] = React.useState('');
+  const [posts, setPosts] = React.useState([]);
   const [vouchers, setVouchers] = React.useState([]);
   const navigate = useNavigate();
-  // Set to '_', so Voucher Created isn't displayed initially
+  const [profileURL, setProfileURL] = React.useState('');
+
+  // Set to '_', so 'Type' Created isn't displayed initially
   const [voucherError, setVoucherError] = React.useState('_');
+  const [postError, setPostError] = React.useState('_');
+  generateProfileLink(setProfileURL);
 
   return (
     <Container maxWidth="lg">
@@ -515,6 +568,7 @@ export default function RestaurantHomePage() {
               <TextField required id="title-post" placeholder="Title" value={titlePost}
                 onChange={(event) => {
                   setTitlePost(event.target.value);
+                  setPostError('_');
                 }}
               />
               <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
@@ -523,14 +577,61 @@ export default function RestaurantHomePage() {
               <TextField sx={{minWidth: 500}} multiline rows={8} required id="body-post"
                 placeholder="Body" value={bodyPost} onChange={(event) => {
                   setBodyPost(event.target.value);
+                  setPostError('_');
                 }}
               />
             </CardContent>
             <CardActions>
               <Button variant="contained" onClick={() => {
-                uploadPost(titlePost, bodyPost);
+                uploadPost(titlePost, bodyPost, setPostError);
               }}>Post</Button>
+              {postError == '' &&
+                <Typography sx={{fontSize: 20, textAlign: 'right', marginLeft: 'auto'}}
+                  color="green" gutterBottom>
+                  Post Created
+                </Typography>}
+              {postError !== '_' &&
+              <Typography sx={{fontSize: 14, textAlign: 'right', marginLeft: 'auto'}}
+                color="red" gutterBottom>
+                {postError}
+              </Typography>}
             </CardActions>
+
+            <CardActions>
+              { posts.length == 0 && <Button size="large" onClick={() => {
+                viewPosts(setPosts);
+                setPostError('_');
+              }}>View Created Posts</Button> }
+              { posts.length > 0 && <Button size="large" onClick={() => {
+                setPosts([]);
+              }}>Hide Posts</Button> }
+            </CardActions>
+
+            <CardContent>
+              <List sx={{height: 200, overflowX: 'auto', overflowY: 'auto'}}>
+
+                {posts.map((post) => {
+                  return (
+                    <ListItem key={post.code}>
+                      <Grid container spacing={0} xs={12}>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={post.id} />
+                        </Grid>
+                        <Grid xs={2}>
+                          <ListItemText primary={post.postedBy} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={post.title} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={post.content} />
+                        </Grid>
+                      </Grid>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </CardContent>
           </Card>
         </Grid>
       </Grid>

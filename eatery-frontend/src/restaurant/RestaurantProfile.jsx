@@ -2,6 +2,7 @@ import {useLocation} from 'react-router-dom';
 import React, {useState, useEffect, useContext} from 'react';
 
 
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -12,11 +13,16 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import CardMedia from '@mui/material/CardMedia';
 
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+
 import axios from 'axios';
 import tempImage from '../home/paella.jpg';
 import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
+import {axiosProxy} from '../axios-config/config';
 import {UserContext} from '../App.jsx';
+// import {useNavigate} from 'react-router-dom';
 
 /**
  *  Loads reviews from backend
@@ -160,28 +166,31 @@ function loadPosts(restaurantId) {
  * @return {Int}
  */
 async function getEateryId() {
-  const result = await axios.get('api/user/');
+  const result = await axiosProxy.get('api/user/');
+  console.log(result);
   const data = result.data;
   const decrypt = jwtDecode(data.token);
   const loginId = decrypt.result.id;
 
   // get the restaurantId
-  const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
+  const eateryRes = await axiosProxy.get(`api/user/eatery/login/${loginId}`);
   const eateryId = eateryRes.data.data.id;
   return eateryId;
 }
+
 /**
- * @param {Int} eateryId
- * @param {*} setRestaurantName
- * @return {*} Places result in setRestaurantName
+ * @param {Int} restaurantId
+ * @param {*} setEateryInfo
+ * @return {*} Places result in setEateryInfo
  */
-async function getEateryName(eateryId, setRestaurantName) {
+async function getEateryInfo(restaurantId, setEateryInfo) {
   try {
-    const result = await axios.get(`api/user/eatery/${eateryId}`);
+    const eateryId = restaurantId;
+    const result = await axiosProxy.get(`api/user/eatery/${eateryId}`);
     console.log(result);
+    setEateryInfo(result.data.data);
   } catch (error) {
-    const result = 'Not working (getEateryName)';
-    setRestaurantName(result);
+    setEateryInfo({});
   }
   return;
 }
@@ -281,7 +290,7 @@ async function loadRestaurantLayouts(restaurantId, setLayout) {
  */
 export default function RestaurantProfile() {
   const {state} = useLocation();
-  const restaurantId = state.id;
+  const restaurantId = state; // TODO state.id
 
   const currentReviews = loadReviews(restaurantId);
   const [indexReviews, setIndexReviews] = useState(0);
@@ -296,10 +305,13 @@ export default function RestaurantProfile() {
   const [description, setDescription] = useState('No Description Given');
   const [restaurantName, setRestaurantName] = useState('');
   const [restaurantLayout, setRestaurantLayout] = useState(null);
+  const [eateryInfo, setEateryInfo] = useState({});
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
+  // const navigate = useNavigate();
+
   const noBorderTextField = {
-    padding: 0,
+    padding: 10,
     border: 'none',
     outline: 'none',
   };
@@ -312,9 +324,42 @@ export default function RestaurantProfile() {
     async function loading() {
       loadDescription(setDescription);
     }
+    /**
+     *
+     */
+    async function checkCookies() {
+      try {
+        const result = await axiosProxy.get('/api/user/');
+        const data = result.data;
+        console.log(data);
+        const decrypt = jwtDecode(data.token);
+        if (data.success !== 0) {
+          const loginId = decrypt.result.id;
+          // get EateryAccount, if no result then it will return an 404 error
+          // else it will go to restaurant page
+          console.log('should be a restaurant');
+          await axiosProxy.get(`../api/user/eatery/login/${loginId}`);
+          console.log('is a restaurant');
+          setUserContext(false);
+        }
+      } catch (err) {
+        if (err.response) { // not an eatery
+          console.log(err.response.data.message);
+          console.log(err.response.data);
+          console.log('set to true');
+          setUserContext(true);
+        } else { // not loggedIn
+          setUserContext(null);
+          // navigate('/');
+          console.log('Not logged in');
+        }
+      }
+    }
+    checkCookies();
     loading();
     getEateryName(restaurantId, setRestaurantName);
     loadRestaurantLayouts(restaurantId, setRestaurantLayout);
+    getEateryInfo(restaurantId, setEateryInfo);
   }, [setUserContext]);
 
   useEffect(() => {
@@ -342,15 +387,17 @@ export default function RestaurantProfile() {
   // Booking DONE
   // Previous Post
 
+  console.log('userContext');
+  console.log(userContext);
+
   return (
     <Container maxWidth="lg">
-      <Card sx={{mb: 2}}>
+      <Card elevation={0} sx={{mb: 2}}>
         <CardContent>
           <Typography sx={{fontSize: 45}} color="text.primary" gutterBottom>
-            {restaurantName}
+            {eateryInfo.name}
           </Typography>
         </CardContent>
-
       </Card>
 
       <Grid container spacing={2}>
@@ -360,14 +407,14 @@ export default function RestaurantProfile() {
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
                 Description
               </Typography>
-              <Card sx={{minHeight: 300, display: 'flex',
+              <Card elevation={0} sx={{minHeight: 300, display: 'flex',
                 flexDirection: 'column', padding: 2}}>
-                {userContext && <Typography sx={{fontSize: 16}}
+                {userContext !== false && <Typography sx={{fontSize: 16}}
                   color="text.primary" gutterBottom>
                   {description}
                 </Typography>}
 
-                {!userContext && <TextField multiline InputProps={{style:
+                {userContext === false && <TextField multiline InputProps={{style:
                   noBorderTextField}} id="outlined-basic" value={description}
                 onChange={(event) => {
                   setDescription(event.target.value);
@@ -375,19 +422,19 @@ export default function RestaurantProfile() {
               </Card>
             </CardContent>
             <CardActions>
-              <Button variant="contained"
+              {userContext === false && <Button variant="contained"
                 onClick={() =>
                   editDescription(description)}>
                 Update Description
-              </Button>
+              </Button>}
             </CardActions>
           </Card>
         </Grid>
         <Grid xs={6}>
           <Card sx={{minHeight: 680, display: 'flex', flexDirection: 'column'}}>
-            <CardContent>
+            <CardContent style={{flexGrow: 1}}>
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-                            Reviews
+                Reviews
               </Typography>
               {displayReviews.map((currentReview) => {
                 return (
@@ -398,23 +445,25 @@ export default function RestaurantProfile() {
                 );
               })}
             </CardContent>
-            <CardActions disableSpacing sx={{mt: 'auto'}}>
-              {indexReviews !== 0 ? <Button variant="contained"
-                onClick={() => setIndexReviews((prevIndex) => prevIndex - countReviews)}>
-                  Last Reviews
-              </Button> :
-                <Button variant="contained" sx={{visibility: 'hidden'}}
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <CardActions sx={{mt: 'auto'}}>
+                <Button variant="contained" disabled={indexReviews === 0}
                   onClick={() =>
                     setIndexReviews((prevIndex) => prevIndex - countReviews)}>
-                  Last Reviews
-                </Button> }
-              {displayReviews.length === 3 &&
+                  <NavigateBeforeIcon/>
+                </Button>
                 <Button variant="contained"
+                  disabled={displayReviews.length !== 3}
                   onClick={() =>
                     setIndexReviews((prevIndex) => prevIndex + countReviews)}>
-                    Next Reviews
-                </Button>}
-            </CardActions>
+                  <NavigateNextIcon/>
+                </Button>
+              </CardActions>
+            </Box>
           </Card>
         </Grid>
         <Grid xs={6}>
@@ -429,7 +478,7 @@ export default function RestaurantProfile() {
               title="The Menu"
             />
           </Card>
-          {!userContext && <CardActions>
+          {userContext === false && <CardActions>
             <Button variant="contained" onClick={() => {
               uploadMenu();
             }}>Update Menu</Button>
@@ -437,7 +486,7 @@ export default function RestaurantProfile() {
         </Grid>
         <Grid xs={6}>
           <Card sx={{minHeight: 605, display: 'flex', flexDirection: 'column'}}>
-            <CardContent>
+            <CardContent style={{flexGrow: 1}}>
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
                 Posts
               </Typography>
@@ -450,23 +499,25 @@ export default function RestaurantProfile() {
                 );
               })}
             </CardContent>
-            <CardActions disableSpacing sx={{mt: 'auto'}}>
-              {indexPosts !== 0 ? <Button variant="contained"
-                onClick={() => setIndexPosts((prevIndex) => prevIndex - countPosts)}>
-                  Last Posts
-              </Button> :
-                <Button variant="contained" sx={{visibility: 'hidden'}}
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <CardActions sx={{mt: 'auto'}}>
+                <Button variant="contained" disabled={indexPosts === 0}
                   onClick={() =>
                     setIndexPosts((prevIndex) => prevIndex - countPosts)}>
-                  Last Posts
-                </Button> }
-              {displayPosts.length === 3 &&
+                  <NavigateBeforeIcon/>
+                </Button>
                 <Button variant="contained"
+                  disabled={displayPosts.length !== 3}
                   onClick={() =>
                     setIndexPosts((prevIndex) => prevIndex + countPosts)}>
-                    Next Posts
-                </Button>}
-            </CardActions>
+                  <NavigateNextIcon/>
+                </Button>
+              </CardActions>
+            </Box>
           </Card>
         </Grid>
       </Grid>
@@ -474,7 +525,7 @@ export default function RestaurantProfile() {
       <Card sx={{mb: 2}}>
         <CardContent>
           <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-                        Booking
+            Booking
           </Typography>
           <CardMedia
             component="img"
@@ -482,9 +533,11 @@ export default function RestaurantProfile() {
             image={restaurantLayout} // TODO get actual image
             title="Logo of this Restaurant"
           />
-          <TextField label="Book Table (TEMP NOT SURE HOW WE WANT TO DO THIS)" />
+          {userContext === true &&
+            <TextField label="Book Table (TEMP NOT SURE HOW WE WANT TO DO THIS)" />
+          }
         </CardContent>
-        {!userContext && <CardActions>
+        {userContext === false && <CardActions>
           <Button variant="contained" onClick={() => {
             uploadSeating();
           }}>Update Seating</Button>
