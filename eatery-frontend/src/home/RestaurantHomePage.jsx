@@ -19,7 +19,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Grid from '@mui/material/Unstable_Grid2';
-import {axiosProxy} from '../axios-config/config';
+// import {axiosProxy} from '../axios-config/config';
 import {NavLink} from 'react-router-dom';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
@@ -32,12 +32,14 @@ const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
  */
 async function getEateryId() {
   const result = await axios.get('api/user/');
+  console.log(result);
   const data = result.data;
   const decrypt = jwtDecode(data.token);
   const loginId = decrypt.result.id;
 
   // get the restaurantId
   const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
+  console.log(eateryRes);
   const eateryId = eateryRes.data.data.id;
   return eateryId;
 }
@@ -373,6 +375,7 @@ async function uploadPost(title, body, setError) {
  */
 async function generateProfileLink(toSet) {
   const eateryId = await getEateryId();
+  console.log(`eateryId: ${eateryId}`);
   const urlToReturn = `/RestaurantProfile/${eateryId}`;
   toSet(urlToReturn);
 }

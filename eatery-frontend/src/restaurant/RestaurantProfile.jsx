@@ -16,6 +16,7 @@ import axios from 'axios';
 import tempImage from '../home/paella.jpg';
 import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
+import {axiosProxy} from '../axios-config/config';
 import {UserContext} from '../App.jsx';
 
 /**
@@ -160,28 +161,31 @@ function loadPosts(restaurantId) {
  * @return {Int}
  */
 async function getEateryId() {
-  const result = await axios.get('api/user/');
+  const result = await axiosProxy.get('api/user/');
+  console.log(result);
   const data = result.data;
   const decrypt = jwtDecode(data.token);
   const loginId = decrypt.result.id;
 
   // get the restaurantId
-  const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
+  const eateryRes = await axiosProxy.get(`api/user/eatery/login/${loginId}`);
   const eateryId = eateryRes.data.data.id;
   return eateryId;
 }
+
 /**
- * @param {Int} eateryId
- * @param {*} setRestaurantName
- * @return {*} Places result in setRestaurantName
+ * @param {Int} restaurantId
+ * @param {*} setEateryInfo
+ * @return {*} Places result in setEateryInfo
  */
-async function getEateryName(eateryId, setRestaurantName) {
+async function getEateryInfo(restaurantId, setEateryInfo) {
   try {
-    const result = await axios.get(`api/user/eatery/${eateryId}`);
+    const eateryId = restaurantId;
+    const result = await axiosProxy.get(`api/user/eatery/${eateryId}`);
     console.log(result);
+    setEateryInfo(result.data.data);
   } catch (error) {
-    const result = 'Not working (getEateryName)';
-    setRestaurantName(result);
+    setEateryInfo({});
   }
   return;
 }
@@ -277,7 +281,7 @@ export default function RestaurantProfile() {
   const [displayPosts, setDisplayPosts] = useState([]);
 
   const [description, setDescription] = useState('No Description Given');
-  const [restaurantName, setRestaurantName] = useState('');
+  const [eateryInfo, setEateryInfo] = useState({});
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
   const noBorderTextField = {
@@ -294,8 +298,38 @@ export default function RestaurantProfile() {
     async function loading() {
       loadDescription(setDescription);
     }
+    /**
+     *
+     */
+    async function checkCookies() {
+      try {
+        const result = await axios.get('api/user/');
+        const data = result.data;
+        const decrypt = jwtDecode(data.token);
+        if (data.success !== 0) {
+          const loginId = decrypt.result.id;
+          // get EateryAccount, if no result then it will return an 404 error
+          // else it will go to restaurant page
+          await axios.get(`api/user/eatery/login/${loginId}`);
+          console.log('is a restaurant');
+          setUserContext(false);
+        }
+      } catch (err) {
+        if (err.response) { // not an eatery
+          console.log(err.response.data.message);
+          console.log(err.response.data);
+          console.log('set to true');
+          setUserContext(true);
+        } else { // not loggedIn
+          setUserContext(null);
+          navigate('/');
+          console.log('Not logged in');
+        }
+      }
+    }
+    checkCookies();
     loading();
-    getEateryName(restaurantId, setRestaurantName);
+    getEateryInfo(restaurantId, setEateryInfo);
   }, [setUserContext]);
 
   useEffect(() => {
@@ -328,7 +362,7 @@ export default function RestaurantProfile() {
       <Card sx={{mb: 2}}>
         <CardContent>
           <Typography sx={{fontSize: 45}} color="text.primary" gutterBottom>
-            {restaurantName}
+            {eateryInfo.name}
           </Typography>
         </CardContent>
 
