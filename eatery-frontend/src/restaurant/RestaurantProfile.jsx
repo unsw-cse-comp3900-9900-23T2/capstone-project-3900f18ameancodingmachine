@@ -306,9 +306,9 @@ export default function RestaurantProfile() {
      */
     async function checkCookies() {
       try {
-        const result = await axiosProxy.get('/api/user/');
+        const result = await axiosProxy.get('../api/user/');
         const data = result.data;
-        console.log(data);
+        console.log(data.data);
         const decrypt = jwtDecode(data.token);
         if (data.success !== 0) {
           const loginId = decrypt.result.id;
