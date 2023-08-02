@@ -164,6 +164,18 @@ create table PostComments (
     FOREIGN KEY (postId) REFERENCES Posts(id) on delete cascade  
 );
 
+create table Bookings (
+    id              integer auto_increment,
+    userId          integer,
+    restaurantId    integer,
+    VoucherId       integer,
+    active          boolean,
+    primary key (id),
+    FOREIGN KEY (userId) REFERENCES UserAccount(id),
+    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id),
+    FOREIGN KEY (VoucherId) REFERENCES EateryAccount(id) on delete set null 
+);
+
 -- view tables
 
 -- view related to user account
