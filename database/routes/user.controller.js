@@ -493,6 +493,7 @@ export function getToken (req, res) {
 
 export async function storeUserProfileImgController (req, res) {
     try {
+        console.log(req.body)
         const result = await storeUserProfileImg(req.file.path, req.body.userId)
         return res.status(200).json(result)
     } catch (error) {
@@ -511,7 +512,7 @@ export async function getUserProfileImgPathController (req, res) {
         if (result.success === 0) {
             return res.status(409).json(result)
         }
-
+        
         return res.status(200).json(result)
     } catch (error) {
         console.log(error)

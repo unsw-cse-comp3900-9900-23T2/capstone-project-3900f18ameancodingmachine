@@ -176,10 +176,13 @@ async function getEateryId() {
  * @return {*} Places result in setRestaurantName
  */
 async function getEateryName(eateryId, setRestaurantName) {
-  // const result = await axios.get(`api/user/eatery/${eateryId}`);
-  const result = 'Not working (getEateryName)';
-  console.log(result);
-  setRestaurantName(result);
+  try {
+    const result = await axios.get(`api/user/eatery/${eateryId}`);
+    console.log(result);
+  } catch (error) {
+    const result = 'Not working (getEateryName)';
+    setRestaurantName(result);
+  }
   return;
 }
 

@@ -401,7 +401,7 @@ export async function storeUserProfileImg (imgPath, userId) {
 
     if (result.length !== 0) {
         // delete current profile image
-        fs.unlink(result[0].imagePath, (err) => {
+        fs.unlink("public/" + result[0].imagePath, (err) => {
             if (err) {
                 console.log('file does not exist')
             }
@@ -436,7 +436,7 @@ export async function getUserProfileImgPath (userId) {
     }
 
     const imgPath = result[0].imagePath
-    const relativePath = path.relative('public', imgPath)
+    const relativePath = path.relative('public', 'public/' + imgPath)
     return {
         success: 1,
         results: relativePath

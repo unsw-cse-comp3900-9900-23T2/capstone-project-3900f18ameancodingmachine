@@ -225,7 +225,7 @@ export async function storeEateryProfileImg (imgPath, restaurantId) {
 
     if (result.length !== 0) {
         // delete the existing image
-        fs.unlink(result[0].imagePath, (err) => {
+        fs.unlink("public/" + result[0].imagePath, (err) => {
             if (err) {
                 console.log('file does not exist')
             }
