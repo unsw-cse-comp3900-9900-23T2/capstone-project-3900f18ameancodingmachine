@@ -19,8 +19,9 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Grid from '@mui/material/Unstable_Grid2';
+
+import {useNavigate, NavLink} from 'react-router-dom';
 // import {axiosProxy} from '../axios-config/config';
-import {NavLink} from 'react-router-dom';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -392,6 +393,7 @@ export default function RestaurantHomePage() {
   const [bodyPost, setBodyPost] = React.useState('');
   const [posts, setPosts] = React.useState([]);
   const [vouchers, setVouchers] = React.useState([]);
+  const navigate = useNavigate();
   const [profileURL, setProfileURL] = React.useState('');
 
   // Set to '_', so 'Type' Created isn't displayed initially
@@ -424,8 +426,10 @@ export default function RestaurantHomePage() {
             Upload Profile Image
             <input hidden accept="image/*" type="file" onChange={uploadProfileImage}/>
           </Button>
-          <Button variant="contained" component={NavLink} to={profileURL}>
-            View Profile</Button>
+          <Button variant="contained" onClick={async () => {
+            const eateryId = await generateProfileLink();
+            navigate('/RestaurantProfile', {state: {id: eateryId}});
+          }}>View Profile</Button>
         </CardActions>
       </Card>
 

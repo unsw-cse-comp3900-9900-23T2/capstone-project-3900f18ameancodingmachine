@@ -14,7 +14,7 @@ import {
     insertCuisineFromRestaurant,
     insertHourFromRestaurant,
     getCuisineFromCuisineId,
-    getPostByPostId,
+    getPostByEateryId,
     getReviewByReviewId,
     getEateryByRestaurantId,
     getEateryByLoginId,
@@ -312,7 +312,7 @@ export async function getPostById (req, res) {
     try {
         const id = req.params.id
         console.log(id)
-        const result = await getPostByPostId(id)
+        const result = await getPostByEateryId(id)
 
         if (result.success === 0) {
             return res.status(404).json(result)
