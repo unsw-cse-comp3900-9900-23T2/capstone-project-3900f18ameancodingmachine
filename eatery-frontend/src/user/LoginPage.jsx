@@ -21,7 +21,7 @@ import Typography from '@mui/material/Typography';
   */
 async function checkCredentials(email, pass) {
   try {
-    const {data} = await axios.post('api/user/login', {
+    const {data} = await axios.post('/api/user/login', {
       login: email,
       password: pass,
     });

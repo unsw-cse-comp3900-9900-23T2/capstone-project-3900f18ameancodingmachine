@@ -1,6 +1,8 @@
-FROM node:14 as build-stage
+FROM node:14
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm i
 COPY . .
-RUN npm run build
+CMD ["npm", "run", "start"]
+EXPOSE 3000
+
