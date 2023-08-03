@@ -164,6 +164,18 @@ create table PostComments (
     FOREIGN KEY (postId) REFERENCES Posts(id) on delete cascade  
 );
 
+create table Bookings (
+    id              integer auto_increment,
+    userId          integer,
+    restaurantId    integer,
+    voucherId       integer,
+    active          boolean default 1,
+    primary key (id),
+    FOREIGN KEY (userId) REFERENCES UserAccount(id) on delete cascade,
+    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id) on delete cascade,
+    FOREIGN KEY (VoucherId) REFERENCES Voucher(id) on delete set null 
+);
+
 -- view tables
 
 -- view related to user account
@@ -324,4 +336,22 @@ select
     pc.comment
 from        UserAccount ua
 left join   PostComments pc on (pc.userId = ua.id)
-; 
+;
+
+-- views table related to bookings
+drop view if exists userBookings;
+
+create view userBookings as
+select
+    ua.first,
+    ua.last,
+    b.userId,
+    b.voucherId,
+    b.active,
+    v.offeredBy as restaurantId,
+    v.code,
+    v.discount
+from UserAccount ua
+join Bookings b on (ua.id = b.userId)
+join Voucher v on (v.id = b.voucherId)
+;
