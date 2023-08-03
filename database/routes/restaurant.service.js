@@ -266,3 +266,24 @@ export async function getEateryProfileImgPath (restaurantId) {
         results: relativePath
     }
 }
+
+export async function voucherVerify (code, restaurantId) {
+    const query = `select * from userBookings where code = ? and restaurantId = ? and active = true`
+    const [result] = await poolPromise.execute(query, [code, restaurantId])
+
+    if (result.length === 0) {
+        return {
+            success: 0,
+            message: 'incorrect code or voucher has been reedeemed'
+        }
+    }
+
+    // if there is a result from the query, update active status
+    const updateQuery = `update Bookings set active = false`
+    await poolPromise.execute(updateQuery, [code, restaurantId])
+
+    return {
+        success: 1,
+        message: "voucher verified"
+    }
+}

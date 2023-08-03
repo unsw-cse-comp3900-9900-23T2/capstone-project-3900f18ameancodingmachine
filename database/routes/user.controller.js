@@ -29,7 +29,8 @@ import {
     increaseLikes,
     getCommentsFromPostId,
     getAddressById,
-    userBooking
+    userBooking,
+    getUserBookings
 } from './user.service.js'
 import crypto from 'crypto'
 import pkg from 'jsonwebtoken'
@@ -585,6 +586,23 @@ export async function userBookingController (req, res) {
         const result = await userBooking(body.userId, body.restaurantId, body.voucherId, body.bookingTime)
         if (result.success === 0) {
             return res.status(409).json(result)
+        } 
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        })
+    }
+}
+
+export async function getUserBookingsController (req, res) {
+    try {
+        const id = req.params.id
+        const result = await getUserBookings(id)
+        if (result.success === 0) {
+            return res.status(404).json(result)
         } 
         return res.status(200).json(result)
     } catch (error) {

@@ -472,7 +472,7 @@ export async function increaseLikes (postId) {
 
 
 /**
- * 
+ * check voucher availability and if so then book the voucher to the user
  * @param {Int} userId 
  * @param {Int} restaurantId 
  * @param {Int} voucherId 
@@ -522,6 +522,23 @@ export async function userBooking (userId, restaurantId, voucherId, bookingTime)
     return {
         success: 1,
         message: "booking success"
+    }
+}
+
+export async function getUserBookings (userId) {
+    const query = `select * from userBookings where userId = ?`
+    const [result] = await poolPromise.execute(query, [userId])
+
+    if (result.length === 0) {
+        return {
+            success: 0,
+            message: "no bookings found"
+        }
+    }
+
+    return {
+        success: 1,
+        data: result
     }
 }
 
