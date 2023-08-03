@@ -64,30 +64,6 @@ function generateVoucherCode() {
 // //////////////////////
 
 /**
- * Stub for editDescription button
- * @return {Boolean}
- */
-async function editDescription() {
-  // alert("editDescription: Pressed editDescription");
-  const description = prompt('Enter your description:');
-  try {
-    const eateryId = await getEateryId();
-
-    // insert into the database
-    await axios.put('api/user/eatery/description', {
-      restaurantId: eateryId,
-      description: description,
-    });
-
-    alert('description updated');
-  } catch (error) {
-    alert('something is wrong in the database');
-    console.log(error);
-  }
-  return false;
-}
-
-/**
  * Stub for uploadMenu button
  * @return {Boolean}
  */
@@ -403,9 +379,6 @@ export default function RestaurantHomePage() {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button variant="contained" onClick={() => {
-            editDescription();
-          }}>Edit Description</Button>
           <Button variant="contained" onClick={() => {
             uploadMenu();
           }}>Upload Menu</Button>

@@ -117,6 +117,7 @@ function loadSubscriptions(allSubs, setCurrentSubs, index, count) {
  */
 async function getLatestEateries() {
   const getEateries = await axios.get('api/user/eatery/all');
+  console.log(getEateries);
   let eateries = getEateries.data.results;
   eateries = eateries.filter((eatery, index) => {
     // filter duplicate value based on their id on whether it matches

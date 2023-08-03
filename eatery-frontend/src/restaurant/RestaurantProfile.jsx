@@ -19,11 +19,16 @@ import jwtDecode from 'jwt-decode';
 
 import axios from 'axios';
 import tempImage from '../home/paella.jpg';
-import tempLayout from './tempLayout.png';
+// import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
+import Autocomplete from '@mui/material/Autocomplete';
 // import {axiosProxy} from '../axios-config/config';
 import {UserContext} from '../App.jsx';
 // import {useNavigate} from 'react-router-dom';
+
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 
 /**
  *  Loads reviews from backend
@@ -189,6 +194,8 @@ async function getEateryInfo(restaurantId, setEateryInfo) {
   try {
     const eateryId = restaurantId;
     const result = await axios.get(`api/user/eatery/${eateryId}`);
+    console.log('Eatery Info');
+    console.log(result.data.data);
     setEateryInfo(result.data.data);
   } catch (error) {
     console.log('getEateryInfo failed');
@@ -247,6 +254,26 @@ async function loadDescription(setDes, restId) {
 }
 
 /**
+ * @param {*} toSet
+ * @param {Int} restId
+*/
+async function loadVouchers(toSet, restId) {
+  const result = await axios.get(`api/user/eatery/vouchers/${restId}`);
+  console.log('Vouchers');
+  console.log(result.data.results);
+  toSet(result.data.results);
+}
+/**
+ * @param {*} restId
+ * @param {*} userId
+ * @param {*} voucherId
+ * @param {*} date Date for the booking
+ */
+function postBooking(restId, userId, voucherId, date) {
+  return;
+}
+
+/**
  * Stub for uploadMenu button
  * @return {Boolean}
  */
@@ -271,6 +298,9 @@ export default function RestaurantProfile() {
   const {state} = useLocation();
   const restaurantId = state.id;
 
+  const [voucherId, setVoucherId] = useState();
+  const [voucherList, setVoucherList] = useState({});
+
   const currentReviews = loadReviews(restaurantId);
   const [indexReviews, setIndexReviews] = useState(0);
   const countReviews = 3;
@@ -287,7 +317,10 @@ export default function RestaurantProfile() {
   const {userContext, setUserContext} = useContext(UserContext);
 
   const [descriptionSuccess, setDescriptionSuccess] = useState(null);
-  // const navigate = useNavigate();
+  const [loginId, setLoginId] = useState(0);
+
+  const [bookingDate, setBookingDate] = useState('');
+
   const noBorderTextField = {
     padding: 10,
     border: 'none',
@@ -302,6 +335,7 @@ export default function RestaurantProfile() {
     async function loading() {
       loadDescription(setDescription, restaurantId);
       loadPosts(setCurrentPosts, restaurantId);
+      loadVouchers(setVoucherList, restaurantId);
     }
     /**
      *
@@ -312,7 +346,7 @@ export default function RestaurantProfile() {
         const data = result.data;
         const decrypt = jwtDecode(data.token);
         if (data.success !== 0) {
-          const loginId = decrypt.result.id;
+          setLoginId(decrypt.result.id);
           // get EateryAccount, if no result then it will return an 404 error
           // else it will go to restaurant page
           console.log('should be a restaurant');
@@ -473,7 +507,8 @@ export default function RestaurantProfile() {
           {userContext === false && <CardActions>
             <Button variant="contained" onClick={() => {
               uploadMenu();
-            }}>Update Menu</Button>
+            }}>Update Menu
+            </Button>
           </CardActions>}
         </Grid>
         <Grid xs={6}>
@@ -519,21 +554,43 @@ export default function RestaurantProfile() {
           <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
             Booking
           </Typography>
-          <CardMedia
-            component="img"
-            sx={{height: 400}}
-            image={tempLayout} // TODO get actual image
-            title="Logo of this Restaurant"
-          />
+
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker label="Booking Date" value={bookingDate} onChange={(event) => {
+              setBookingDate(event);
+            }}/>
+          </LocalizationProvider>
+
+          {userContext === true &&
+            <Autocomplete
+              id="voucher-dropdown"
+              value={voucherId}
+              options={voucherList}
+              getOptionLabel={(option) => option.discount && option.startOffer ?
+                `Discount: ${option.discount}%, Valid Until: ${option.endOffer}, 
+              Remaining: ${option.count}`: ''}
+              onChange={(event, newValue) => {
+                setVoucherId(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Vouchers" />
+              )}
+            />
+          }
           {userContext === true &&
             <TextField label="Book Table (TEMP NOT SURE HOW WE WANT TO DO THIS)" />
           }
+
         </CardContent>
-        {userContext === false && <CardActions>
-          <Button variant="contained" onClick={() => {
-            uploadSeating();
-          }}>Update Seating</Button>
-        </CardActions>}
+        <CardActions>
+          {userContext === true &&
+            <Button variant="contained" onClick={postBooking(restaurantId,
+                loginId, voucherId, bookingDate)}>Create Booking</Button>}
+          {userContext === false &&
+            <Button variant="contained" onClick={() => {
+              uploadSeating();
+            }}>Update Seating</Button>}
+        </CardActions>
       </Card>
 
 
