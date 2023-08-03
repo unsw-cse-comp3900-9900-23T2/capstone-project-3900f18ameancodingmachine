@@ -5,7 +5,7 @@ services:
       context: ./eatery-frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000" 
+      - "3000:80" 
   backend:
     build:
       context: ./database
