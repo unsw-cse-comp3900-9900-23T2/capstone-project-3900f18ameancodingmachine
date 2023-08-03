@@ -300,19 +300,22 @@ export async function storeEateryLayoutImg (imgPath, restaurantId) {
     }
 }
 
-export async function getEateryLayoutImgPathController (req, res) {
-    try {
-        const result = await getEateryLayoutImgPath(req.params.id)
-        if (result.success === 0) {
-            return res.status(409).json(result)
-        }
-        return res.status(200).json(result)
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
+export async function getEateryLayoutImgPath (restaurantId) {
+    const query = 'select imagePath from restaurantLayout where restaurantId = ?'
+    const [result] = await poolPromise.execute(query, [restaurantId])
+
+    if (result.length === 0) {
+        return {
             success: 0,
-            message: 'Database connection error'
-        })
+            message: 'no image found'
+        }
+    }
+
+    const imgPath = result[0].imagePath
+    const relativePath = path.relative('public', imgPath)
+    return {
+        success: 1,
+        results: relativePath
     }
 }
 
