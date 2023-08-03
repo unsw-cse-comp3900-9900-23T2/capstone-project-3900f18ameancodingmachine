@@ -18,6 +18,12 @@ import jwtDecode from 'jwt-decode';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Grid from '@mui/material/Unstable_Grid2';
+
+import {RestaurantPostGridItem} from '../restaurant/RestaurantGridItem';
+
+import {useNavigate} from 'react-router-dom';
+// import {axiosProxy} from '../axios-config/config';
 
 const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -29,12 +35,14 @@ const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
  */
 async function getEateryId() {
   const result = await axios.get('api/user/');
+  console.log(result);
   const data = result.data;
   const decrypt = jwtDecode(data.token);
   const loginId = decrypt.result.id;
 
   // get the restaurantId
   const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
+  console.log(eateryRes);
   const eateryId = eateryRes.data.data.id;
   return eateryId;
 }
@@ -157,6 +165,34 @@ async function uploadHours() {
   return false;
 }
 
+
+/**
+ * upload restaurant profile image into the server
+ * @param {*} event
+ */
+async function uploadProfileImage(event) {
+  const file = event.target.files[0];
+  const formData = new FormData();
+
+  try {
+    // key is user-avatar, must be exact
+    const eateryId = await getEateryId();
+    formData.append('eatery-avatar', file);
+    // for request body
+    formData.append('restaurantId', eateryId);
+    // store into the database
+    await axios.post('/api/user/eatery/image/profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    alert('image upload success');
+  } catch (error) {
+    console.log('Error uploading file into the server');
+  }
+}
+
 /**
  * Stub code for creating new voucher
  * Note that logic for reoccuring has not been implemented yet
@@ -165,14 +201,43 @@ async function uploadHours() {
  * @param {*} startDate
  * @param {*} endDate
  * @param {*} reoccuring
+ * @param {*} setError set function for string for error message
  * @return {Boolean}
  */
-async function createVoucher(percentage, numVouchers, startDate, endDate, reoccuring) {
-  if (percentage === '' || numVouchers === '') { // field must be filled
-    alert('fill the voucher details');
-    return;
-  } else if (startDate > endDate) { // start date must be earlier than end date
-    alert('start date older than the end date');
+async function createVoucher(percentage, numVouchers, startDate, endDate,
+    reoccuring, setError) {
+  // Guard Statements
+  let isError = false;
+  setError('');
+  if (percentage === '') {
+    setError((prevState) => prevState + 'Enter Percentage. ');
+    isError = true;
+  }
+  if (isNaN(+percentage)) {
+    setError((prevState) => prevState + 'Percentage must be a number. ');
+    isError = true;
+  }
+  if (numVouchers === '') {
+    setError((prevState) => prevState + 'Enter Number of Vouchers. ');
+    isError = true;
+  }
+  if (isNaN(+numVouchers)) {
+    setError((prevState) => prevState + 'Number of Vouchers must be a number. ');
+    isError = true;
+  }
+  if (startDate === '') { // start date must be earlier than end date
+    setError((prevState) => prevState + 'Enter Start date. ');
+    isError = true;
+  }
+  if (endDate === '') { // start date must be earlier than end date
+    setError((prevState) => prevState + 'Enter End date. ');
+    isError = true;
+  }
+  if (startDate > endDate && endDate !== '') {
+    setError((prevState) => prevState + 'Start date older than the end date. ');
+    isError = true;
+  }
+  if (isError) {
     return;
   }
 
@@ -189,10 +254,7 @@ async function createVoucher(percentage, numVouchers, startDate, endDate, reoccu
       count: numVouchers,
       code: voucherCode,
     });
-
-    alert('voucher created');
   } catch (error) {
-    alert('something is wrong in the database');
     console.log(error);
   }
   return false;
@@ -207,7 +269,7 @@ async function viewVouchers(setVouchers) {
   try {
     const eateryId = await getEateryId();
     const {data} = await axios.get(`api/user/eatery/vouchers/${eateryId}`);
-    const results = data.results;
+    const results = data.results.reverse();
     // adding column titles
     results.unshift({
       id: 'Id',
@@ -238,15 +300,52 @@ async function viewVouchers(setVouchers) {
 }
 
 /**
+ * Loads all posts made by account
+ * @param {*} setPosts
+ */
+async function viewPosts(setPosts) {
+  console.log('Viewing vouchers');
+  try {
+    const eateryId = await getEateryId();
+    const {data} = await axios.get(`api/user/post/${eateryId}`);
+    console.log(data.data);
+    const results = data.data.reverse();
+    if (results.length === 0) {
+      results.push({
+        id: 'N/A',
+        postedBy: 'N/A',
+        title: 'N/A',
+        content: 'N/A',
+      });
+    }
+    setPosts(results);
+  } catch (error) {
+    alert('something is wrong in the database');
+    console.log(error);
+    setPosts([]);
+  }
+}
+
+/**
  * upload new post, character limit hasn't been implemented yet
  * @param {*} title
  * @param {*} body
+ * @param {*} setError set function for error output
  * @return {Boolean}
  */
-async function uploadPost(title, body) {
-  // alert(`uploadPost: Pressed uploadPost\nTitle: ${title}\nBody: ${body}`);
-  if (!title || !body) {
-    alert('please fill in the details');
+async function uploadPost(title, body, setError) {
+  // Guard Statements
+  let isError = false;
+  setError('');
+  if (title === '') {
+    setError((prevState) => prevState + 'Enter title. ');
+    isError = true;
+  }
+  if (body === '') {
+    setError((prevState) => prevState + 'Enter body. ');
+    isError = true;
+  }
+  if (isError) {
     return;
   }
 
@@ -259,8 +358,6 @@ async function uploadPost(title, body) {
       title: title,
       content: body,
     });
-
-    alert('new post created');
   } catch (error) {
     alert('something is wrong in the database');
     console.log(error);
@@ -268,6 +365,14 @@ async function uploadPost(title, body) {
   return false;
 }
 
+/**
+ * Genereates the URL from the restaurant id
+ * @param {String} toSet toSet function for the string to hold URL
+ */
+async function generateProfileLink() {
+  const eateryId = await getEateryId();
+  return eateryId;
+}
 /**
  * @return {JSX}
  */
@@ -279,7 +384,15 @@ export default function RestaurantHomePage() {
   const [reoccuring, setReoccuring] = React.useState(true);
   const [titlePost, setTitlePost] = React.useState('');
   const [bodyPost, setBodyPost] = React.useState('');
+  const [posts, setPosts] = React.useState([]);
   const [vouchers, setVouchers] = React.useState([]);
+  const navigate = useNavigate();
+  // const [profileURL, setProfileURL] = React.useState('');
+
+  // Set to '_', so 'Type' Created isn't displayed initially
+  const [voucherError, setVoucherError] = React.useState('_');
+  const [postError, setPostError] = React.useState('_');
+  // generateProfileLink(setProfileURL);
 
   return (
     <Container maxWidth="lg">
@@ -302,105 +415,189 @@ export default function RestaurantHomePage() {
           <Button variant="contained" onClick={() => {
             uploadHours();
           }}>Upload Hours</Button>
+          <Button variant="contained" component="label">
+            Upload Profile Image
+            <input hidden accept="image/*" type="file" onChange={uploadProfileImage}/>
+          </Button>
+          <Button variant="contained" onClick={async () => {
+            const eateryId = await generateProfileLink();
+            navigate('/RestaurantProfile', {state: {id: eateryId}});
+          }}>View Profile</Button>
         </CardActions>
       </Card>
 
-      <Card sx={{minWidth: 275}}>
-        <CardContent>
-          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-            Vouchers
-          </Typography>
-        </CardContent>
+      <Grid container spacing={0} xs={12}>
+        <Grid xs={6}>
+          <Card sx={{minWidth: 275, minHeight: 625}}>
+            <CardContent>
+              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+                Vouchers
+              </Typography>
+            </CardContent>
+            <Grid container spacing={2} xs={12}>
+              <Grid xs={12}>
+                <TextField sx={{minWidth: 258.4}}
+                  required id="voucher-percentage" label="Percentage"
+                  value={percentage} onChange={(event) => {
+                    setPercentage(event.target.value);
+                  }}
+                />
+                <TextField sx={{minWidth: 258.4}}
+                  required id="voucher-num" label="Number of Vouchers"
+                  value={numVouchers} onChange={(event) => {
+                    setNumVouchers(event.target.value);
+                  }}
+                />
+              </Grid>
+              <Grid xs={12}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker label="Start Date" value={startDate} onChange={(event) => {
+                    setStartDate(event);
+                  }}/>
+                  <DatePicker label="End Date" value={endDate} onChange={(event) => {
+                    setEndDate(event);
+                  }}/>
+                </LocalizationProvider>
+              </Grid>
+            </Grid>
+            <FormGroup>
+              <FormControlLabel control={<Checkbox defaultChecked />}
+                label="Reoccuring" value={reoccuring} onChange={(event) => {
+                  const {name, checked} = event.target; setReoccuring(checked);
+                  console.log(name);
+                }}/>
+            </FormGroup>
+            {voucherError !== '_' &&
+              <Typography sx={{fontSize: 14}} color="red" gutterBottom>
+                {voucherError}
+              </Typography>}
+            <CardActions >
+              <Button variant="contained" onClick={() => {
+                createVoucher(percentage, numVouchers, startDate,
+                    endDate, reoccuring, setVoucherError);
+                setPercentage('');
+                setNumVouchers('');
+                setStartDate('');
+                setEndDate('');
+              }}>Create Voucher</Button>
+              {voucherError == '' &&
+                <Typography sx={{fontSize: 20, marginLeft: 'auto'}}
+                  color="green" gutterBottom>
+                  Voucher Created
+                </Typography>}
+            </CardActions>
 
-        <TextField required id="voucher-percentage" label="Percentage"
-          value={percentage} onChange={(event) => {
-            setPercentage(event.target.value);
-          }}
-        />
-        <TextField required id="voucher-num" label="Number of Vouchers"
-          value={numVouchers} onChange={(event) => {
-            setNumVouchers(event.target.value);
-          }}
-        />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker label="Start Date" value={startDate} onChange={(event) => {
-            setStartDate(event);
-          }}/>
-          <DatePicker label="End Date" value={endDate} onChange={(event) => {
-            setEndDate(event);
-          }}/>
-        </LocalizationProvider>
-        <FormGroup>
-          <FormControlLabel control={<Checkbox defaultChecked />}
-            label="Reoccuring" value={reoccuring} onChange={(event) => {
-              const {name, checked} = event.target; setReoccuring(checked);
-              console.log(name);
-            }}/>
-        </FormGroup>
-        <CardActions >
-          <Button variant="contained" onClick={() => {
-            createVoucher(percentage, numVouchers, startDate, endDate, reoccuring);
-          }}>Create Voucher</Button>
-        </CardActions>
+            <CardActions>
+              { vouchers.length == 0 && <Button size="large" onClick={() => {
+                viewVouchers(setVouchers);
+                setVoucherError('_');
+              }}>View Created Vouchers</Button> }
+              { vouchers.length > 0 && <Button size="large" onClick={() => {
+                setVouchers([]);
+              }}>Hide Vouchers</Button> }
+            </CardActions>
 
-        <CardActions>
-          { vouchers.length == 0 && <Button size="large" onClick={() => {
-            viewVouchers(setVouchers);
-          }}>View Created Vouchers</Button> }
-          { vouchers.length > 0 && <Button size="large" onClick={() => {
-            setVouchers([]);
-          }}>Hide Vouchers</Button> }
-        </CardActions>
+            <CardContent>
+              <List sx={{height: 200, overflowX: 'auto', overflowY: 'auto'}}>
 
-        <CardContent>
-          <List>
+                {vouchers.map((voucher) => {
+                  return (
+                    <ListItem key={voucher.code}>
+                      <Grid container spacing={0} xs={12}>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.discount} />
+                        </Grid>
+                        <Grid xs={2}>
+                          <ListItemText primary={voucher.count} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.code} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.startOffer.slice(0, 10)} />
+                        </Grid>
+                        <Grid xs={2.5}>
+                          <ListItemText primary={voucher.endOffer.slice(0, 10)} />
+                        </Grid>
+                      </Grid>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </CardContent>
 
-            {vouchers.map((voucher) => {
-              return (
-                <ListItem key={voucher.code}>
-                  <ListItemText primary={voucher.discount} />
-                  <ListItemText primary={voucher.count} />
-                  <ListItemText primary={voucher.code} />
-                  <ListItemText primary={voucher.startOffer.slice(0, 10)} />
-                  <ListItemText primary={voucher.endOffer.slice(0, 10)} />
-                </ListItem>
-              );
-            })}
-          </List>
-        </CardContent>
+          </Card>
+        </Grid>
+        <Grid xs={6}>
+          <Card sx={{minWidth: 275}}>
+            <CardContent>
+              <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
+                Create Post
+              </Typography>
 
-      </Card>
+              <Typography sx={{fontSize: 14}} color="text.primary" gutterBottom>
+                Title
+              </Typography>
+              <TextField required id="title-post" placeholder="Title" value={titlePost}
+                onChange={(event) => {
+                  setTitlePost(event.target.value);
+                  setPostError('_');
+                }}
+              />
+              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                Body
+              </Typography>
+              <TextField sx={{minWidth: 500}} multiline rows={8} required id="body-post"
+                placeholder="Body" value={bodyPost} onChange={(event) => {
+                  setBodyPost(event.target.value);
+                  setPostError('_');
+                }}
+              />
+            </CardContent>
+            <CardActions>
+              <Button variant="contained" onClick={() => {
+                uploadPost(titlePost, bodyPost, setPostError);
+              }}>Post</Button>
+              {postError == '' &&
+                <Typography sx={{fontSize: 20, textAlign: 'right', marginLeft: 'auto'}}
+                  color="green" gutterBottom>
+                  Post Created
+                </Typography>}
+              {postError !== '_' &&
+              <Typography sx={{fontSize: 14, textAlign: 'right', marginLeft: 'auto'}}
+                color="red" gutterBottom>
+                {postError}
+              </Typography>}
+            </CardActions>
 
-      <Card sx={{minWidth: 275}}>
-        <CardContent>
-          <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
-            Create Post
-          </Typography>
+            <CardActions>
+              { posts.length == 0 && <Button size="large" onClick={() => {
+                viewPosts(setPosts);
+                setPostError('_');
+              }}>View Created Posts</Button> }
+              { posts.length > 0 && <Button size="large" onClick={() => {
+                setPosts([]);
+              }}>Hide Posts</Button> }
+            </CardActions>
 
-          <Typography sx={{fontSize: 14}} color="text.primary" gutterBottom>
-            Title
-          </Typography>
-          <TextField required id="title-post" placeholder="Title" value={titlePost}
-            onChange={(event) => {
-              setTitlePost(event.target.value);
-            }}
-          />
-          <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-            Body
-          </Typography>
-          <TextField sx={{minWidth: 500}} multiline rows={8} required id="body-post"
-            placeholder="Body" value={bodyPost} onChange={(event) => {
-              setBodyPost(event.target.value);
-            }}
-          />
-        </CardContent>
-        <CardActions>
-          <Button variant="contained" onClick={() => {
-            uploadPost(titlePost, bodyPost);
-          }}>Post</Button>
-        </CardActions>
-      </Card>
+            <CardContent>
+              <List sx={{height: 200, overflowX: 'auto', overflowY: 'auto'}}>
 
+                {posts.map((post) => {
+                  return (
+                    <ListItem key={post.code}>
+                      <Card>
+                        <RestaurantPostGridItem title={post.title}
+                          post={post.content} />
+                      </Card>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
     </Container>
   );
 }

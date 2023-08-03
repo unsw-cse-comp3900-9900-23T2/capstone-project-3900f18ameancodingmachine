@@ -55,7 +55,7 @@ async function getLatestEateries() {
   let eateries = getEateries.data.results;
   eateries = eateries.filter((eatery, index) => {
     // filter duplicate value based on their id on whether it matches
-    // the array index
+    // the first occurence array index
     return eateries.findIndex((e) => e.id === eatery.id) === index;
   });
   console.log(eateries);
@@ -74,31 +74,64 @@ async function getLatestEateries() {
 }
 
 /**
+ * @return {string} image path from axios request or default profile pic
+ */
+async function getProfileImage() {
+  try {
+    const response = await axios.get(`/api/user/image/profile/${userId}`);
+    const imageURL = response.data.results;
+    return imageURL;
+  } catch (error) {
+    return profilePic;
+  }
+}
+
+/**
  * @return {JSX}
  */
 export default function UserProfile() {
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
   const [userData, setUserData] = useState(null);
-  const [imageUrl, setImageUrl] = useState(profilePic);
+  const [imageUrl, setImageUrl] = useState(null);
   const [allSubs, setAllSubs] = useState([]);
   const [newRestaurants, setNewRestaurants] = useState([]);
   const [cuisineList, setCuisineList] = useState([]);
+  console.log(imageUrl);
   console.log(userContext, cuisineList);
 
   /**
    *
    * @param {*} event
    */
-  function handleFileUpload(event) {
+  async function handleFileUpload(event) {
     const file = event.target.files[0];
-    const reader = new FileReader();
+    const formData = new FormData();
 
-    reader.onloadend = () => {
-      setImageUrl(reader.result);
-    };
+    const imageURL = URL.createObjectURL(file);
+    setImageUrl(imageURL);
 
-    reader.readAsDataURL(file);
+    try {
+      // key is user-avatar, must be exact
+      formData.append('user-avatar', file);
+      // for request body
+      formData.append('userId', userId);
+      // store into the database
+      await axios.post('/api/user/image/profile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } catch (error) {
+      console.log('Error uploading file into the server');
+    }
+
+    // reader
+    // reader.onloadend = () => {
+    //   setImageUrl(reader.result);
+    // };
+
+    // reader.readAsDataURL(file);
   };
 
   useEffect(() => {
@@ -116,6 +149,7 @@ export default function UserProfile() {
           loginId = decrypt.result.id;
           const getUserId = await axios.get(`api/user/login/${loginId}`);
           userId = getUserId.data.data[0].id;
+          setImageUrl(await getProfileImage());
           // get the address
           const addressId = getUserId.data.data[0].address;
           const getUserAddress = (await axios.get(`api/user/address/${addressId}`)).data;

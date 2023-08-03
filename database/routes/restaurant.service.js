@@ -90,7 +90,7 @@ export async function getEateriesByCuisine (cuisine) {
 }
 
 export async function getDescriptionByEateryId (eateryId) {
-    let query = 'select description from EateryAccount where eateryId = ?'
+    let query = 'select description from EateryAccount where id = ?'
     let values = [eateryId]
     const [results] = await poolPromise.execute(query, values)
     if (results.length === 0) {
@@ -225,7 +225,7 @@ export async function storeEateryProfileImg (imgPath, restaurantId) {
 
     if (result.length !== 0) {
         // delete the existing image
-        fs.unlink(result[0].imagePath, (err) => {
+        fs.unlink("public/" + result[0].imagePath, (err) => {
             if (err) {
                 console.log('file does not exist')
             }
@@ -264,5 +264,29 @@ export async function getEateryProfileImgPath (restaurantId) {
     return {
         success: 1,
         results: relativePath
+    }
+}
+
+export async function voucherVerify (code, restaurantId) {
+    const query = `select * from userBookings where code = ? and restaurantId = ? and active = true`
+    const [result] = await poolPromise.execute(query, [code, restaurantId])
+
+    if (result.length === 0) {
+        return {
+            success: 0,
+            message: 'incorrect code or voucher has been reedeemed'
+        }
+    }
+
+    const voucherId = result[0].voucherId
+    const userId = result[0].userId
+
+    // if there is a result from the query, update active status
+    const updateQuery = `update Bookings set active = false where voucherId = ? and userId = ? and restaurantId = ?`
+    await poolPromise.execute(updateQuery, [voucherId, userId, restaurantId])
+
+    return {
+        success: 1,
+        message: "voucher verified"
     }
 }

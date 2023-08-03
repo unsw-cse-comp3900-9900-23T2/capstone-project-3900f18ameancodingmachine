@@ -37,7 +37,7 @@ export default function App() {
           <Route path="/RecoveryNewPass" element={<ForgotPassNewPass/>} />
           <Route path="/create-restaurant" element={<RestaurantRegistrationPage />} />
           <Route path="/browse" element={<Browse/>}/>
-          <Route path="/RestaurantProfile/:Restaurant_ID" element={<RestaurantProfile/>}/>
+          <Route path="/RestaurantProfile/*" element={<RestaurantProfile/>}/>
           <Route path="/user-profile" element={<UserProfile />} />
 
         </Routes>

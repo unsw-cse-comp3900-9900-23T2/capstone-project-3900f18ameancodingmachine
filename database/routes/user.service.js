@@ -185,9 +185,9 @@ export async function createNewPost (data) {
     }
 }
 
-export async function getPostByPostId (id) {
+export async function getPostByEateryId (id) {
     // gets post by id
-    const query = 'select id, postedBy, title, content from Posts where id = ?'
+    const query = 'select postId, name, title, content from restaurantPosts where restaurantId = ?'
     const value = [id]
     const [results] = await poolPromise.execute(query, value)
 
@@ -401,7 +401,7 @@ export async function storeUserProfileImg (imgPath, userId) {
 
     if (result.length !== 0) {
         // delete current profile image
-        fs.unlink(result[0].imagePath, (err) => {
+        fs.unlink("public/" + result[0].imagePath, (err) => {
             if (err) {
                 console.log('file does not exist')
             }
@@ -436,7 +436,7 @@ export async function getUserProfileImgPath (userId) {
     }
 
     const imgPath = result[0].imagePath
-    const relativePath = path.relative('public', imgPath)
+    const relativePath = path.relative('public', 'public/' + imgPath)
     return {
         success: 1,
         results: relativePath
@@ -467,6 +467,78 @@ export async function increaseLikes (postId) {
     return {
         success: 1,
         message: "liked the post"
+    }
+}
+
+
+/**
+ * check voucher availability and if so then book the voucher to the user
+ * @param {Int} userId 
+ * @param {Int} restaurantId 
+ * @param {Int} voucherId 
+ * @param {*} bookingTime date object where use book the voucher 
+ * @returns 
+ */
+export async function userBooking (userId, restaurantId, voucherId, bookingTime) {
+    // check whether there are voucher available
+    const searchQuery = `select * from Voucher where id = ?`
+    const [searchResult] = await poolPromise.execute(searchQuery, [voucherId])
+
+    if (searchResult.length === 0) {
+        return {
+            success: 0,
+            message: "no voucher found"
+        }
+    } else if (searchResult[0].count === 0) {
+        return {
+            success: 0,
+            message: "all voucher already booked"
+        }
+    }
+
+    let endOffer = searchResult[0].endOffer
+    let startOffer = searchResult[0].startOffer
+    endOffer = new Date(endOffer)
+    startOffer = new Date(startOffer)
+    bookingTime = new Date(bookingTime)
+
+    if (bookingTime > endOffer || bookingTime < startOffer) {
+        return {
+            success: 0,
+            message: "voucher not available / expired"
+        }
+    }
+
+    // if voucher available, then book the voucher
+    const insertQuery = `insert into Bookings(userId, restaurantId, voucherid) values (?, ?, ?)`
+    await poolPromise.execute(insertQuery, [userId, restaurantId, voucherId])
+    // then decrement available vouchers by 1 
+    const decrementQuery = `
+    update Voucher 
+    set count = count - 1 
+    where id = ? and count > 0`
+    await poolPromise.execute(decrementQuery, [voucherId])
+
+    return {
+        success: 1,
+        message: "booking success"
+    }
+}
+
+export async function getUserBookings (userId) {
+    const query = `select * from userBookings where userId = ?`
+    const [result] = await poolPromise.execute(query, [userId])
+
+    if (result.length === 0) {
+        return {
+            success: 0,
+            message: "no bookings found"
+        }
+    }
+
+    return {
+        success: 1,
+        data: result
     }
 }
 

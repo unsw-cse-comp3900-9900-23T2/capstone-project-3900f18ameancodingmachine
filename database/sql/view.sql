@@ -107,10 +107,14 @@ join    BusinessHour bh on (ea.id = bh.restaurantId)
 
 -- posts made by the restaurant
 create view restaurantPosts as
-select  ro.first, ro.last, ea.name, p.title, p.content
+select  
+    p.id as postId, 
+    ea.id as restaurantId, 
+    ea.name, 
+    p.title, 
+    p.content
 from    EateryAccount ea
 join    Posts p on (ea.id = p.postedBy)
-join    RestaurantOwners ro on (ro.ownerOf = ea.id)
 ;
 
 -- vouchers offered by restaurant
@@ -153,3 +157,21 @@ select
 from        UserAccount ua
 left join   PostComments pc on (pc.userId = ua.id)
 ; 
+
+-- views table related to bookings
+drop view if exists userBookings;
+
+create view userBookings as
+select
+    ua.first,
+    ua.last,
+    b.userId,
+    b.voucherId,
+    b.active,
+    v.offeredBy as restaurantId,
+    v.code,
+    v.discount
+from UserAccount ua
+join Bookings b on (ua.id = b.userId)
+join Voucher v on (v.id = b.voucherId)
+;
