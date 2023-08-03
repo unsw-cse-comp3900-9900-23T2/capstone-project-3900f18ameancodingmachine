@@ -339,6 +339,7 @@ left join   PostComments pc on (pc.userId = ua.id)
 ;
 
 -- views table related to bookings
+drop view if exists userBookings;
 
 create view userBookings as
 select

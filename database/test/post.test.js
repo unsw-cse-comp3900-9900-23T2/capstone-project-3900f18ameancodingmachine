@@ -89,26 +89,25 @@ describe('/posts', () => {
         expect(response.body.success).toBe(1);
     })
 
-    test('finding a post with valid postId will return statuscode 200 and success of 1', async () => {
+    test('finding a post with valid restaurantId will return statuscode 200 and success of 1', async () => {
         let response = await request(app).post('/api/user/posts').send(postData)
-        const postId = response.body.data.insertId
 
-        response = await request(app).get(`/api/user/post/${postId}`)
+        response = await request(app).get(`/api/user/post/${restaurantId}`)
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
     })
 
     test('finding a post but no post found will return statuscode 404 and success 0', async () => {
-        const response = await request(app).get(`/api/user/post/1`)
+        const noId = restaurantId - 1
+        const response = await request(app).get(`/api/user/post/${noId}`)
         expect(response.statusCode).toBe(404);
         expect(response.body.success).toBe(0);
     })
 
     test('finding 1 post', async () => {
         let response = await request(app).post('/api/user/posts').send(postData)
-        const postId = response.body.data.insertId
 
-        response = await request(app).get(`/api/user/post/${postId}`)
+        response = await request(app).get(`/api/user/post/${restaurantId}`)
         expect(response.body.data.length).toBe(1)
     })
 })
