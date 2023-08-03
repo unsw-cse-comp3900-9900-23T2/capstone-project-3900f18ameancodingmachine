@@ -201,6 +201,7 @@ async function getEateryInfo(restaurantId, setEateryInfo) {
  * Stub for editDescription button
  * @param {*} restaurantId
  * @param {String} description
+ * @param {*} setSuccess
  * @return {Boolean}
  */
 async function editDescription(restaurantId, description) {
@@ -214,11 +215,12 @@ async function editDescription(restaurantId, description) {
     });
 
     console.log('description updated');
+    return true;
   } catch (error) {
     console.log('something is wrong in the database');
     console.log(error);
+    return false;
   }
-  return false;
 }
 
 /**
@@ -231,9 +233,10 @@ async function loadDescription(setDes, restId) {
   try {
     // insert into the database
     const data = await axios.get(`api/user/eatery/description/${restId}`);
-    alert('here');
+    const description = data.data.results.description;
+    console.log('Loaded Description');
     console.log(data);
-    setDes();
+    setDes(description);
 
 
     console.log('description loaded');
@@ -282,6 +285,8 @@ export default function RestaurantProfile() {
   const [eateryInfo, setEateryInfo] = useState({});
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
+
+  const [descriptionSuccess, setDescriptionSuccess] = useState(null);
   // const navigate = useNavigate();
   const noBorderTextField = {
     padding: 10,
@@ -392,6 +397,7 @@ export default function RestaurantProfile() {
                 {userContext === false && <TextField multiline InputProps={{style:
                   noBorderTextField}} id="outlined-basic" value={description}
                 onChange={(event) => {
+                  setDescriptionSuccess(null);
                   setDescription(event.target.value);
                 }}/>}
               </Card>
@@ -399,9 +405,20 @@ export default function RestaurantProfile() {
             <CardActions>
               {userContext === false && <Button variant="contained"
                 onClick={() =>
-                  editDescription(restaurantId, description)}>
+                  setDescriptionSuccess(editDescription(
+                      restaurantId, description, setDescriptionSuccess))}>
                 Update Description
               </Button>}
+              {descriptionSuccess &&
+                <Typography sx={{fontSize: 20, marginLeft: 'auto'}}
+                  color="green" gutterBottom>
+                  Description Updated
+                </Typography>}
+              {descriptionSuccess === false &&
+              <Typography sx={{fontSize: 20, marginLeft: 'auto'}}
+                color="red" gutterBottom>
+                Description Not Updated
+              </Typography>}
             </CardActions>
           </Card>
         </Grid>
