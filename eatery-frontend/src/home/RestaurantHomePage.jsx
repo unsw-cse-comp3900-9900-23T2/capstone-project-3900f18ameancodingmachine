@@ -20,6 +20,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Grid from '@mui/material/Unstable_Grid2';
 
+import {RestaurantPostGridItem} from '../restaurant/RestaurantGridItem';
+
 import {useNavigate} from 'react-router-dom';
 // import {axiosProxy} from '../axios-config/config';
 
@@ -304,18 +306,11 @@ async function viewVouchers(setVouchers) {
 async function viewPosts(setPosts) {
   console.log('Viewing vouchers');
   try {
-    // const eateryId = await getEateryId();
-    const {data} = await axios.get(`api/user/post/5`);
-    console.log(data);
-    const results = data.results;
-    // adding column titles
-    results.unshift({
-      id: 'Id',
-      postedBy: 'postedBy',
-      title: 'title',
-      content: 'content',
-    });
-    if (results.length === 1) {
+    const eateryId = await getEateryId();
+    const {data} = await axios.get(`api/user/post/${eateryId}`);
+    console.log(data.data);
+    const results = data.data.reverse();
+    if (results.length === 0) {
       results.push({
         id: 'N/A',
         postedBy: 'N/A',
@@ -591,20 +586,10 @@ export default function RestaurantHomePage() {
                 {posts.map((post) => {
                   return (
                     <ListItem key={post.code}>
-                      <Grid container spacing={0} xs={12}>
-                        <Grid xs={2.5}>
-                          <ListItemText primary={post.id} />
-                        </Grid>
-                        <Grid xs={2}>
-                          <ListItemText primary={post.postedBy} />
-                        </Grid>
-                        <Grid xs={2.5}>
-                          <ListItemText primary={post.title} />
-                        </Grid>
-                        <Grid xs={2.5}>
-                          <ListItemText primary={post.content} />
-                        </Grid>
-                      </Grid>
+                      <Card>
+                        <RestaurantPostGridItem title={post.title}
+                          post={post.content} />
+                      </Card>
                     </ListItem>
                   );
                 })}

@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 import {useState, useEffect} from 'react';
-import {NavLink} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -26,6 +26,7 @@ export default function RestaurantPost(props) {
   const restaurantPost = props.rpost;
   const restaurantId = restaurantPost.id;
   const userId = props.user;
+  const navigate = useNavigate();
 
   const [isSubscribed, setIsSubscribed] = useState(() => {
     // Compare ID to determin if items is subscribed or not
@@ -90,8 +91,9 @@ export default function RestaurantPost(props) {
         <CardMedia
           sx={{height: 140}}
           // component="img"
-          component={NavLink}
-          to={`/RestaurantProfile/${restaurantId}`}
+          onClick={async () => {
+            navigate('/RestaurantProfile', {state: {id: restaurantId}});
+          }}
           image={restaurantPost.image || paella}
           title="Paella"
         />
@@ -105,8 +107,9 @@ export default function RestaurantPost(props) {
         </CardContent>
         <CardActions>
           <Button size="small">Share</Button>
-          <Button size="small" component={NavLink}
-            to={`/RestaurantProfile/${restaurantId}`}>Learn More</Button>
+          <Button size="small" onClick={async () => {
+            navigate('/RestaurantProfile', {state: {id: restaurantId}});
+          }}>Learn More</Button>
           {userId && (isSubscribed ?
             <Button size="small" onClick={userUnSubscribe}>
               Unsub

@@ -102,11 +102,12 @@ function loadDisplay(list, index, count) {
 }
 
 /**
- *
- * @param {*} restaurantId
+ * @param {*} toSet set function for array which stores posts
+ * @param {Int} restaurantId
  * @return {*}
  */
-function loadPosts(restaurantId) {
+async function loadPosts(toSet, restaurantId) {
+  /*
   const tempData = [
     {
       'title': 'Sensational Fusion',
@@ -159,22 +160,24 @@ function loadPosts(restaurantId) {
       'to luscious desserts, it was a heavenly treat.',
     },
   ];
-  return tempData;
-}
-
-// helper function to get the eatery id
-/**
- * @return {Int}
- */
-async function getEateryId() {
-  const result = await axios.get('api/user/');
-  const data = result.data;
-  const decrypt = jwtDecode(data.token);
-  const loginId = decrypt.result.id;
-  // get the restaurantId
-  const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
-  const eateryId = eateryRes.data.data.id;
-  return eateryId;
+  */
+  const {data} = await axios.get(`api/user/post/${restaurantId}`);
+  const results = data.data.reverse();
+  if (results.length === 0) {
+    results.push({
+      id: 'N/A',
+      postedBy: 'N/A',
+      title: 'N/A',
+      content: 'N/A',
+    });
+  }
+  toSet(results);
+  try {
+  } catch (error) {
+    alert('something is wrong in the database');
+    console.log(error);
+    toSet([]);
+  }
 }
 
 /**
@@ -196,12 +199,13 @@ async function getEateryInfo(restaurantId, setEateryInfo) {
 
 /**
  * Stub for editDescription button
+ * @param {*} restaurantId
+ * @param {String} description
  * @return {Boolean}
  */
-async function editDescription() {
-  const description = prompt('Enter your description:');
+async function editDescription(restaurantId, description) {
   try {
-    const eateryId = await getEateryId();
+    const eateryId = restaurantId;
 
     // insert into the database
     await axios.put('api/user/eatery/description', {
@@ -220,30 +224,19 @@ async function editDescription() {
 /**
  * Stub for editDescription button
  * @param {string} setDes set function for description
+ * @param {Int} restId
  * @return {Boolean}
  */
-async function loadDescription(setDes) {
+async function loadDescription(setDes, restId) {
   try {
-    /*
-    const eateryId = await getEateryId();
-
     // insert into the database
-    setDes(await axios.get('api/user/eatery/description'));
+    const data = await axios.get(`api/user/eatery/description/${restId}`);
+    alert('here');
+    console.log(data);
+    setDes();
 
 
-    */
-    setDes('Discover a culinary oasis at Savory Bites & Co., '+
-    'where passion meets perfection, and every morsel tells '+
-    'a tale of delightful flavors. Situated in the heart of '+
-    'a bustling city, this enchanting restaurant is a celebration '+
-    'of gastronomy, offering an unforgettable dining experience that '+
-    'lingers in your memory long after the last bite. As you step '+
-    'inside, the ambiance embraces you like a warm hug, a harmonious '+
-    'blend of contemporary elegance and rustic charm. The soothing '+
-    'color palette, soft lighting, and tasteful decor create an '+
-    'inviting setting that beckons you to indulge in the culinary '+
-    'wonders that await.');
-    console.log('description set');
+    console.log('description loaded');
   } catch (error) {
     console.log('something is wrong in the database');
     console.log(error);
@@ -280,7 +273,7 @@ export default function RestaurantProfile() {
   const countReviews = 3;
   const [displayReviews, setDisplayReviews] = useState([]);
 
-  const currentPosts = loadPosts(restaurantId);
+  const [currentPosts, setCurrentPosts] = useState([]);
   const [indexPosts, setIndexPosts] = useState(0);
   const countPosts = 3;
   const [displayPosts, setDisplayPosts] = useState([]);
@@ -298,11 +291,12 @@ export default function RestaurantProfile() {
 
   // setDisplayReviews(loadDisplayReviews(currentReviews, 0, 3))
   useEffect(() => {
-    /**
-     *
-     */
+    /** check whether user has a token
+    *   if user has a token, user is logged in
+    */
     async function loading() {
-      loadDescription(setDescription);
+      loadDescription(setDescription, restaurantId);
+      loadPosts(setCurrentPosts, restaurantId);
     }
     /**
      *
@@ -324,6 +318,7 @@ export default function RestaurantProfile() {
       } catch (err) {
         if (err.response) { // not an eatery
           console.log(err.response.data.message);
+          console.log('is a user');
           console.log(err.response.data);
           console.log('set to true');
           setUserContext(true);
@@ -357,7 +352,10 @@ export default function RestaurantProfile() {
     setDisplayPosts(loadDisplay(
         currentPosts, indexPosts, countPosts,
     ));
-  }, [indexPosts]);
+    console.log('Compare these two');
+    console.log(currentPosts);
+    console.log(displayPosts);
+  }, [currentPosts, indexPosts]);
 
   // Menu DONE
   // Reviews DONE
@@ -401,7 +399,7 @@ export default function RestaurantProfile() {
             <CardActions>
               {userContext === false && <Button variant="contained"
                 onClick={() =>
-                  editDescription(description)}>
+                  editDescription(restaurantId, description)}>
                 Update Description
               </Button>}
             </CardActions>
@@ -470,8 +468,8 @@ export default function RestaurantProfile() {
 
               {displayPosts.map((currentPost) => {
                 return (
-                  <RestaurantPostGridItem key={currentPost.title}
-                    title={currentPost.title} post={currentPost.post}
+                  <RestaurantPostGridItem key={currentPost.postId}
+                    title={currentPost.title} post={currentPost.content}
                   />
                 );
               })}
