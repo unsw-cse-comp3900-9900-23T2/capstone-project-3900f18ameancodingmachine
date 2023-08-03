@@ -122,9 +122,20 @@ export async function getLoginByUsername (username) {
 
 // returns multiple row if more than one cuisine
 export async function getEateryByRestaurantId (id) {
-    const query = `select name, address, phone, email, login, url 
+    const query = `
+    select 
+        ea.name, 
+        ea.address, 
+        ea.phone, 
+        ea.email, 
+        ea.login, 
+        ea.url,
+        rl.imagePath as layoutPath,
+        rpi.imagePath as profilePath  
     from EateryAccount ea
-    where id = ?`
+    join restaurantProfileImages rpi on (ea.id = rpi.restaurantId)
+    join restaurantLayout rl on (ea.id = rl.restaurantId)
+    where ea.id = ?`
     const values = [id]
     const [results] = await poolPromise.execute(query, values)
     if (results.length === 0) {
@@ -133,6 +144,8 @@ export async function getEateryByRestaurantId (id) {
             message: 'Eatery not found'
         }
     } else {
+        results[0].layoutPath = path.relative('public', results[0].layoutPath)
+        results[0].profilePath = path.relative('public', results[0].profilePath)
         return {
             success: 1,
             data: results[0]
