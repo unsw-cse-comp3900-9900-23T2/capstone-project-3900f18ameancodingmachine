@@ -133,8 +133,8 @@ export async function getEateryByRestaurantId (id) {
         rl.imagePath as layoutPath,
         rpi.imagePath as profilePath  
     from EateryAccount ea
-    join restaurantProfileImages rpi on (ea.id = rpi.restaurantId)
-    join restaurantLayout rl on (ea.id = rl.restaurantId)
+    left join restaurantProfileImages rpi on (ea.id = rpi.restaurantId)
+    left join restaurantLayout rl on (ea.id = rl.restaurantId)
     where ea.id = ?`
     const values = [id]
     const [results] = await poolPromise.execute(query, values)
@@ -144,8 +144,11 @@ export async function getEateryByRestaurantId (id) {
             message: 'Eatery not found'
         }
     } else {
-        results[0].layoutPath = path.relative('public', results[0].layoutPath)
-        results[0].profilePath = path.relative('public', results[0].profilePath)
+        if (results[0].layoutPath && results[0].profilePath) {
+            results[0].layoutPath = path.relative('public', results[0].layoutPath)
+            results[0].profilePath = path.relative('public', results[0].profilePath)
+        }
+    
         return {
             success: 1,
             data: results[0]
