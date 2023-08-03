@@ -90,7 +90,7 @@ export async function getEateriesByCuisine (cuisine) {
 }
 
 export async function getDescriptionByEateryId (eateryId) {
-    let query = 'select description from EateryAccount where eateryId = ?'
+    let query = 'select description from EateryAccount where id = ?'
     let values = [eateryId]
     const [results] = await poolPromise.execute(query, values)
     if (results.length === 0) {
@@ -300,21 +300,43 @@ export async function storeEateryLayoutImg (imgPath, restaurantId) {
     }
 }
 
-export async function getEateryLayoutImgPath (restaurantId) {
-    const query = 'select imagePath from restaurantLayout where restaurantId = ?'
-    const [result] = await poolPromise.execute(query, [restaurantId])
+export async function getEateryLayoutImgPathController (req, res) {
+    try {
+        const result = await getEateryLayoutImgPath(req.params.id)
+        if (result.success === 0) {
+            return res.status(409).json(result)
+        }
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: 'Database connection error'
+        })
+    }
+}
+
+export async function voucherVerify (code, restaurantId) {
+    const query = `select * from userBookings where code = ? and restaurantId = ? and active = true`
+    const [result] = await poolPromise.execute(query, [code, restaurantId])
 
     if (result.length === 0) {
         return {
             success: 0,
-            message: 'no image found'
+            message: 'incorrect code or voucher has been reedeemed'
         }
     }
 
-    const imgPath = result[0].imagePath
-    const relativePath = path.relative('public', imgPath)
+    const voucherId = result[0].voucherId
+    const userId = result[0].userId
+
+    // if there is a result from the query, update active status
+    const updateQuery = `update Bookings set active = false where voucherId = ? and userId = ? and restaurantId = ?`
+    await poolPromise.execute(updateQuery, [voucherId, userId, restaurantId])
+
     return {
         success: 1,
-        results: relativePath
+        message: "voucher verified"
     }
 }
+

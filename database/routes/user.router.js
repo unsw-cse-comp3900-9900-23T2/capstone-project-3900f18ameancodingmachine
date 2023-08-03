@@ -30,7 +30,9 @@ import {
     postNewCommentController,
     increaseLikesController,
     getCommentsFromPostIdController,
-    getAddress
+    getAddress,
+    userBookingController,
+    getUserBookingsController
 } from './user.controller.js'
 
 import {
@@ -46,7 +48,8 @@ import {
     getEateryProfileImgPathController,
     getDescriptionById,
     storeEateryLayoutImgController,
-    getEateryLayoutImgPathController
+    getEateryLayoutImgPathController,
+    voucherVerifyController
 } from './restaurant.controller.js'
 
 import upload from '../img-config/config.js'
@@ -92,6 +95,11 @@ router.post('/eatery/image/layout', upload.single('restaurant-layout'), storeEat
 router.get('/eatery/image/profile/:id', getEateryProfileImgPathController)
 router.get('/image/profile/:id', getUserProfileImgPathController)
 router.get('/eatery/image/layout/:id', getEateryLayoutImgPathController)
+
+// booking related router
+router.post('/user/booking', userBookingController)
+router.get('/user/bookings/:id', getUserBookingsController)
+router.put('/eatery/booking/verify', voucherVerifyController)
 
 router.get('/post/:id', getPostById)
 router.get('/review/:id', getReviewById)
