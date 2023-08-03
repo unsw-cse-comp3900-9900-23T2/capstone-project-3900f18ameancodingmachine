@@ -278,9 +278,12 @@ export async function voucherVerify (code, restaurantId) {
         }
     }
 
+    const voucherId = result[0].voucherId
+    const userId = result[0].userId
+
     // if there is a result from the query, update active status
-    const updateQuery = `update Bookings set active = false`
-    await poolPromise.execute(updateQuery, [code, restaurantId])
+    const updateQuery = `update Bookings set active = false where voucherId = ? and userId = ? and restaurantId = ?`
+    await poolPromise.execute(updateQuery, [voucherId, userId, restaurantId])
 
     return {
         success: 1,
