@@ -120,7 +120,6 @@ export async function getLoginByUsername (username) {
     }
 }
 
-// returns multiple row if more than one cuisine
 export async function getEateryByRestaurantId (id) {
     const query = `
     select 
@@ -144,11 +143,16 @@ export async function getEateryByRestaurantId (id) {
             message: 'Eatery not found'
         }
     } else {
-        if (results[0].layoutPath && results[0].profilePath) {
+        // if layout image is available give relative path from public to uploads/imagename
+        if (results[0].layoutPath) {
             results[0].layoutPath = path.relative('public', results[0].layoutPath)
+        }
+
+        // if profile image is available give relative path from public to uploads/imagename
+        if (results[0].profilePath) {
             results[0].profilePath = path.relative('public', results[0].profilePath)
         }
-    
+
         return {
             success: 1,
             data: results[0]
