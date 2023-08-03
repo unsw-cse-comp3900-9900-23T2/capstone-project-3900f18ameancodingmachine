@@ -30,7 +30,8 @@ import {
     postNewCommentController,
     increaseLikesController,
     getCommentsFromPostIdController,
-    getAddress
+    getAddress,
+    userBookingController
 } from './user.controller.js'
 
 import {
@@ -88,6 +89,11 @@ router.post('/image/profile', upload.single('user-avatar'), storeUserProfileImgC
 router.post('/eatery/image/profile', upload.single('eatery-avatar'), storeEateryProfileImgController)
 router.get('/eatery/image/profile/:id', getEateryProfileImgPathController)
 router.get('/image/profile/:id', getUserProfileImgPathController)
+
+// booking related router
+router.post('/user/booking', userBookingController)
+router.get('/user/bookings/:id')
+router.put('/eatery/booking/verify')
 
 router.get('/post/:id', getPostById)
 router.get('/review/:id', getReviewById)

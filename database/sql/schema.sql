@@ -168,11 +168,11 @@ create table Bookings (
     id              integer auto_increment,
     userId          integer,
     restaurantId    integer,
-    VoucherId       integer,
-    active          boolean,
+    voucherId       integer,
+    active          boolean default 1,
     primary key (id),
-    FOREIGN KEY (userId) REFERENCES UserAccount(id),
-    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id),
+    FOREIGN KEY (userId) REFERENCES UserAccount(id) on delete cascade,
+    FOREIGN KEY (restaurantId) REFERENCES EateryAccount(id) on delete cascade,
     FOREIGN KEY (VoucherId) REFERENCES Voucher(id) on delete set null 
 );
 
