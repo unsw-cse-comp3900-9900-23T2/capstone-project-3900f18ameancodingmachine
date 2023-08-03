@@ -298,7 +298,6 @@ export default function RestaurantProfile() {
   const [displayPosts, setDisplayPosts] = useState([]);
 
   const [description, setDescription] = useState('No Description Given');
-  const [restaurantName, setRestaurantName] = useState('');
   const [restaurantLayout, setRestaurantLayout] = useState(null);
   const [eateryInfo, setEateryInfo] = useState({});
   // Null: not logged in, true: user, false: restaurant
@@ -354,7 +353,6 @@ export default function RestaurantProfile() {
     }
     checkCookies();
     loading();
-    getEateryName(restaurantId, setRestaurantName);
     loadRestaurantLayouts(restaurantId, setRestaurantLayout);
     getEateryInfo(restaurantId, setEateryInfo);
   }, [setUserContext]);
