@@ -90,7 +90,7 @@ export async function getEateriesByCuisine (cuisine) {
 }
 
 export async function getDescriptionByEateryId (eateryId) {
-    let query = 'select description from EateryAccount where eateryId = ?'
+    let query = 'select description from EateryAccount where id = ?'
     let values = [eateryId]
     const [results] = await poolPromise.execute(query, values)
     if (results.length === 0) {

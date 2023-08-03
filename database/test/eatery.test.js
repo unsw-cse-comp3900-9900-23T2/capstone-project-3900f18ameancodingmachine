@@ -224,17 +224,17 @@ describe("/eatery/description", () => {
 
     test("get description would return statuscode 200 and success 1", async () => {
 
-        response = await request(app).get(`/api/user/eatery/description/${eateryLoginId}`)
+        const response = await request(app).get(`/api/user/eatery/description/${restaurantId}`)
 
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
     })
 
-    test("get description with invalid id would return statuscode 500 and success 0", async () => {
+    test("get description with invalid id would return statuscode 404 and success 0", async () => {
+        const noId = restaurantId + 1
+        const response = await request(app).get(`/api/user/eatery/description/${noId}`)
 
-        response = await request(app).get(`/api/user/eatery/description/12345`)
-
-        expect(response.statusCode).toBe(500)
+        expect(response.statusCode).toBe(404)
         expect(response.body.success).toBe(0)
     })
 })

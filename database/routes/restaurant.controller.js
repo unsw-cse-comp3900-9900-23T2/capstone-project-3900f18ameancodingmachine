@@ -69,8 +69,14 @@ export async function getDescriptionById (req, res) {
     try {
         const id = req.params.id
         const result = await getDescriptionByEateryId(id)
+
+        if (result.success === 0) {
+            return res.status(404).json(result)
+        }
+
         return res.status(200).json(result)
     } catch (err) {
+        console.log(err)
         return res.status(500).json({
             success: 0,
             message: 'Database connection error'
