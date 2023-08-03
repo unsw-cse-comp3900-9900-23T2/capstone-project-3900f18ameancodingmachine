@@ -130,8 +130,6 @@ describe('/user/booking', () => {
         let threeDaysFromNow = new Date(userDate);
         threeDaysFromNow.setDate(userDate.getDate() + 3);
 
-        console.log(threeDaysFromNow < currentEnd)
-
         const bookingData = {
             userId: userId,
             restaurantId: restaurantId,
@@ -180,5 +178,55 @@ describe('/user/booking', () => {
         expect(response.body.success).toBe(0);
     })
 
+    test('successful booking will decrease the amount of voucher by 1', async () => {
 
+        let [searchQuery] = await poolPromise.execute('select count from Voucher where id = ?', [voucherId]);
+        expect(searchQuery[0].count).toBe(1)
+
+        // Calculate the date 3 days from now
+        const userDate = new Date();
+        // console.log(userDate);
+
+        let threeDaysFromNow = new Date(userDate);
+        threeDaysFromNow.setDate(userDate.getDate() + 3);
+
+        const bookingData = {
+            userId: userId,
+            restaurantId: restaurantId,
+            voucherId: voucherId,
+            bookingTime: threeDaysFromNow
+        }
+
+        let response = await request(app).post('/api/user/user/booking').send(bookingData);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+
+        [searchQuery] = await poolPromise.execute('select count from Voucher where id = ?', [voucherId]);
+        expect(searchQuery[0].count).toBe(0)
+    })
+
+    test('booking when the voucher are all booked will return statuscode 409 and sucess 0', async () => {
+
+        // Calculate the date 3 days from now
+        const userDate = new Date();
+        // console.log(userDate);
+
+        let threeDaysFromNow = new Date(userDate);
+        threeDaysFromNow.setDate(userDate.getDate() + 3);
+
+        const bookingData = {
+            userId: userId,
+            restaurantId: restaurantId,
+            voucherId: voucherId,
+            bookingTime: threeDaysFromNow
+        }
+
+        let response = await request(app).post('/api/user/user/booking').send(bookingData);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+
+        response = await request(app).post('/api/user/user/booking').send(bookingData);
+        expect(response.statusCode).toBe(409);
+        expect(response.body.success).toBe(0);
+    })
 })
