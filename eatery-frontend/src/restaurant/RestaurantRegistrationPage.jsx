@@ -26,9 +26,10 @@ import {createAddress, createAccount} from '../user/RegistrationPage';
  * @param {*} email
  * @param {*} loginId
  * @param {*} url
+ * @param {*} cuisine
  * @return {Int}
  */
-async function createEatery(name, addressId, phone, email, loginId, url) {
+async function createEatery(name, addressId, phone, email, loginId, url, cuisine) {
   try {
     const {data} = await axios.post('api/user/eatery', {
       name: name,
@@ -38,9 +39,16 @@ async function createEatery(name, addressId, phone, email, loginId, url) {
       loginId: loginId,
       url: url,
     });
+    console.log(data);
     if (data.success) {
+      const eateryId = data.results.insertId;
+      console.log(data);
+      await axios.post('api/user/cuisine', {
+        cuisineName: cuisine,
+        restaurantId: eateryId,
+      });
       console.log('Eatery successfully created');
-      return data.data.insertId;
+      return eateryId;
     }
   } catch (error) {
     console.log(error);
@@ -122,7 +130,7 @@ export default function RestaurantRegistrationPage() {
     const addressId = await createAddress(street, suburb, region, postCode);
     console.log(addressId);
     const eateryId = await createEatery(
-        name, addressId, phoneNumber, email, loginId, website,
+        name, addressId, phoneNumber, email, loginId, website, cuisine,
     );
     console.log(eateryId);
     navigate('/login');
