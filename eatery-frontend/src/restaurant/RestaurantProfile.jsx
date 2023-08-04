@@ -29,6 +29,7 @@ import {UserContext} from '../App.jsx';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
+import TempMenu from './tempMenu.jsx';
 
 /**
  *  Loads reviews from backend
@@ -654,6 +655,7 @@ export default function RestaurantProfile() {
             <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
               Menu
             </Typography>
+            <TempMenu/>
             <CardMedia
               sx={{minHeight: 140}}
               component="img"
