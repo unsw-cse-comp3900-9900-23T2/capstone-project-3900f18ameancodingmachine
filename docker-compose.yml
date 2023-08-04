@@ -1,0 +1,24 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./eatery-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80" 
+  backend:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+  nginx:
+    restart: always
+    depends_on:
+      - backend
+      - frontend
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - "80:80"
