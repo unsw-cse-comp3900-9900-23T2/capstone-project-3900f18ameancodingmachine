@@ -287,6 +287,58 @@ export async function getEateryProfileImgPath (restaurantId) {
     }
 }
 
+export async function storeEateryLayoutImg (imgPath, restaurantId) {
+    // find existing image path
+    let query = 'select imagePath from restaurantLayout where restaurantId = ?'
+    const [result] = await poolPromise.execute(query, [restaurantId])
+
+    // remove public from path -> path stored becomes upload/(image name)
+    const relativePath = path.relative('public', imgPath)
+
+    if (result.length !== 0) {
+        // delete the existing image
+        fs.unlink("public/" + result[0].imagePath, (err) => {
+            if (err) {
+                console.log('file does not exist')
+            }
+        })
+
+        // update image path
+        query = 'update restaurantLayout set imagePath = ? where restaurantId = ?'
+        await poolPromise.execute(query, [relativePath, restaurantId])
+        return {
+            success: 1,
+            message: 'Image updated successfully'
+        }
+    }
+
+    query = 'insert into restaurantLayout(restaurantId, imagePath) values (?, ?)'
+    await poolPromise.execute(query, [restaurantId, relativePath])
+    return {
+        success: 1,
+        message: 'Image uploaded successfully'
+    }
+}
+
+export async function getEateryLayoutImgPath (restaurantId) {
+    const query = 'select imagePath from restaurantLayout where restaurantId = ?'
+    const [result] = await poolPromise.execute(query, [restaurantId])
+
+    if (result.length === 0) {
+        return {
+            success: 0,
+            message: 'no image found'
+        }
+    }
+
+    const imgPath = result[0].imagePath
+    const relativePath = path.relative('public', imgPath)
+    return {
+        success: 1,
+        results: relativePath
+    }
+}
+
 /**
  * checks if voucher is valid
  * @param {string} code - a voucher code
@@ -316,3 +368,4 @@ export async function voucherVerify (code, restaurantId) {
         message: "voucher verified"
     }
 }
+
