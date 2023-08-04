@@ -407,25 +407,33 @@ export async function checkReoccuringVoucher (today) {
                 const updateQuery = `update Voucher set startOffer = ?, endOffer = ? where id = ?`
                 await poolPromise.execute(updateQuery, [startDate2, endDate2, voucher.id])
             }
-/**
- * checks if voucher is valid
- * @param {string} code - a voucher code
- * @param {int} restaurantId - eatery id
- * @returns {object} - object contain success of 1 and success message, otherwise 0 and a fail message
- */
-export async function voucherVerify (code, restaurantId) {
-    const query = `select * from userBookings where code = ? and restaurantId = ? and active = true`
-    const [result] = await poolPromise.execute(query, [code, restaurantId])
-
-    if (result.length === 0) {
-        return {
-            success: 0,
-            message: 'incorrect code or voucher has been reedeemed'
         }
     }
 
     return {
         success: 1,
-        message: "voucher updated"
+        message: "voucher successfully updated"
     }
 }
+// /**
+//  * checks if voucher is valid
+//  * @param {string} code - a voucher code
+//  * @param {int} restaurantId - eatery id
+//  * @returns {object} - object contain success of 1 and success message, otherwise 0 and a fail message
+//  */
+// export async function voucherVerify (code, restaurantId) {
+//     const query = `select * from userBookings where code = ? and restaurantId = ? and active = true`
+//     const [result] = await poolPromise.execute(query, [code, restaurantId])
+
+//     if (result.length === 0) {
+//         return {
+//             success: 0,
+//             message: 'incorrect code or voucher has been reedeemed'
+//         }
+//     }
+
+//     return {
+//         success: 1,
+//         message: "voucher updated"
+//     }
+// }
