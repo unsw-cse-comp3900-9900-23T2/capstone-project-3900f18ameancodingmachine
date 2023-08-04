@@ -11,11 +11,20 @@ import path from 'path'
  * @param {date} data.endOffer      coupon ending offer
  * @param {int} data.count          number of coupon generated
  * @param {string} data.code        code of coupon generated
- * @returns {object}    if successful object with success 1, otherwise 0
+ * @returns {object}    if successful object with success 1
  */
 export async function createNewVoucher (data) {
-    const query = 'insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)'
-    const values = [data.offeredBy, data.discount, data.startOffer, data.endOffer, data.count, data.code]
+    let query = 'insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)'
+    let values = [data.offeredBy, data.discount, data.startOffer, data.endOffer, data.count, data.code]
+
+    // check on whether the option is reoccuring which can be find the code 
+    // ending with RE
+    // if it does then reoccuring will add the inital count to the reoccuring table
+    if (data.code.slice(-2) === "RE") {
+        query = 'insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code, reoccuring) values (?,?,?,?,?,?,?)'
+        values.push(data.count)
+    }
+
     const result = await poolPromise.execute(query, values)
 
     return {
@@ -23,13 +32,12 @@ export async function createNewVoucher (data) {
         results: result
     }
 }
-
 /**
  * update the description associated with an eatery account
  * @param {object} data
  * @param {string} data.description   new description
  * @param {string} data.restaurantId  restaurantId
- * @returns {object}    if successful object with success 1, otherwise 0
+ * @returns {object}    if successful object with success 1
  */
 export async function updateExistingDescription (data) {
     console.log(data)
@@ -44,6 +52,12 @@ export async function updateExistingDescription (data) {
 }
 
 /// ///////for search//////////////
+
+/**
+ * find eateries by inputting relevant search string
+ * @param {string} string  a search string
+ * @returns {object}    if successful object with success 1
+ */
 export async function getEateriesBySearchString (string) {
     let query = 'select * from restaurantInfo where name regexp ?'
     let values = [string]
@@ -59,6 +73,11 @@ export async function getEateriesBySearchString (string) {
     }
 }
 
+/**
+ * find eateries by inputting the user's preferred diet
+ * @param {object} diet  a diet preferred by a user
+ * @returns {object}    if successful object with success 1
+ */
 export async function getEateriesByDiet (diet) {
     let query = 'select * from restaurantInfo where diet = ?'
     let values = [diet]
@@ -74,6 +93,11 @@ export async function getEateriesByDiet (diet) {
     }
 }
 
+/**
+ * find eateries by inputting the user's preferred cuisine
+ * @param {object} cuisine  a cuisine preferred by a user
+ * @returns {object}    if successful object with success 1
+ */
 export async function getEateriesByCuisine (cuisine) {
     let query = 'select * from restaurantInfo where cuisine = ?'
     let values = [cuisine]
@@ -89,6 +113,11 @@ export async function getEateriesByCuisine (cuisine) {
     }
 }
 
+/**
+ * get description of an eatery by ID 
+ * @param {object} cuisine  a cuisine preferred by a user
+ * @returns {object}    if successful object with success 1
+ */
 export async function getDescriptionByEateryId (eateryId) {
     let query = 'select description from EateryAccount where id = ?'
     let values = [eateryId]
@@ -110,7 +139,7 @@ export async function getDescriptionByEateryId (eateryId) {
 /**
  * get all vouchers associated with an eatery
  * @param {string} id   eatery id
- * @returns {object}    if successful object with success 1, otherwise 0
+ * @returns {object}    if successful object with success 1
  */
 export async function getAllEateryVouchers (Id) {
     const query = 'select * from Voucher where offeredBy = ?'
@@ -124,7 +153,7 @@ export async function getAllEateryVouchers (Id) {
 
 /**
  * gets information about each existing cuisine type
- * @returns {object}    if successful object with success 1, otherwise 0
+ * @returns {object}    if successful object with success 1
  */
 export async function getAllCuisines () {
     const query = 'select * from Cuisines'
@@ -137,7 +166,7 @@ export async function getAllCuisines () {
 
 /**
  * gets infromation about each existing eatery
- * @returns {object}    if successful object with success 1, otherwise 0
+ * @returns {object}    if successful object with success 1
  */
 export async function getAllEateries () {
     const query = 'select * from restaurantInfo'
@@ -220,7 +249,6 @@ export async function storeEateryProfileImg (imgPath, restaurantId) {
     let query = 'select imagePath from restaurantProfileImages where restaurantId = ?'
     const [result] = await poolPromise.execute(query, [restaurantId])
 
-    // remove public from path -> path stored becomes upload/(image name)
     const relativePath = path.relative('public', imgPath)
 
     if (result.length !== 0) {
@@ -264,6 +292,30 @@ export async function getEateryProfileImgPath (restaurantId) {
     return {
         success: 1,
         results: relativePath
+    }
+}
+
+export async function voucherVerify (code, restaurantId) {
+    const query = `select * from userBookings where code = ? and restaurantId = ? and active = true`
+    const [result] = await poolPromise.execute(query, [code, restaurantId])
+
+    if (result.length === 0) {
+        return {
+            success: 0,
+            message: 'incorrect code or voucher has been reedeemed'
+        }
+    }
+
+    const voucherId = result[0].voucherId
+    const userId = result[0].userId
+
+    // if there is a result from the query, update active status
+    const updateQuery = `update Bookings set active = false where voucherId = ? and userId = ? and restaurantId = ?`
+    await poolPromise.execute(updateQuery, [voucherId, userId, restaurantId])
+
+    return {
+        success: 1,
+        message: "voucher verified"
     }
 }
 
@@ -319,27 +371,69 @@ export async function getEateryLayoutImgPath (restaurantId) {
     }
 }
 
-export async function voucherVerify (code, restaurantId) {
-    const query = `select * from userBookings where code = ? and restaurantId = ? and active = true`
-    const [result] = await poolPromise.execute(query, [code, restaurantId])
+export async function checkReoccuringVoucher (today) {
+    // get all vouchers from the database and increment count by reoccuring
+    let todayDate = new Date(today)
+    console.log(todayDate.getMonth())
+    const getQuery = `select * from Voucher`
+    const [vouchers] = await poolPromise.execute(getQuery)
 
-    if (result.length === 0) {
-        return {
-            success: 0,
-            message: 'incorrect code or voucher has been reedeemed'
+    for (let i = 0; i < vouchers.length; i++) {
+        let voucher = vouchers[i]
+        console.log(voucher)
+        const code = voucher.code
+        console.log(voucher.code)
+
+        // check that the code is for reoccuring voucher
+        if (code.slice(-2) === "RE") {
+            const startDate = new Date(voucher.startOffer)
+            const endDate = new Date(voucher.endOffer)
+
+            // if exactly one year passes
+            if (todayDate.getFullYear() === startDate.getFullYear() + 1 &&
+                todayDate.getMonth() === startDate.getMonth() &&
+                todayDate.getDate() === startDate.getDate()) {
+                // increment count query
+                const incrermentQuery = `update Voucher set count = ? where id = ?`
+                await poolPromise.execute(incrermentQuery, [voucher.reoccuring, voucher.id])
+
+                // increase date by a year
+                startDate.setFullYear(startDate.getFullYear() + 1)
+                endDate.setFullYear(endDate.getFullYear() + 1)
+
+                // convert to mysql datetime format
+                const startDate2 = startDate.toISOString().slice(0, 19).replace('T', ' ')
+                const endDate2 = endDate.toISOString().slice(0, 19).replace('T', ' ')
+                const updateQuery = `update Voucher set startOffer = ?, endOffer = ? where id = ?`
+                await poolPromise.execute(updateQuery, [startDate2, endDate2, voucher.id])
+            }
         }
     }
 
-    const voucherId = result[0].voucherId
-    const userId = result[0].userId
-
-    // if there is a result from the query, update active status
-    const updateQuery = `update Bookings set active = false where voucherId = ? and userId = ? and restaurantId = ?`
-    await poolPromise.execute(updateQuery, [voucherId, userId, restaurantId])
-
     return {
         success: 1,
-        message: "voucher verified"
+        message: "voucher successfully updated"
     }
 }
+// /**
+//  * checks if voucher is valid
+//  * @param {string} code - a voucher code
+//  * @param {int} restaurantId - eatery id
+//  * @returns {object} - object contain success of 1 and success message, otherwise 0 and a fail message
+//  */
+// export async function voucherVerify (code, restaurantId) {
+//     const query = `select * from userBookings where code = ? and restaurantId = ? and active = true`
+//     const [result] = await poolPromise.execute(query, [code, restaurantId])
 
+//     if (result.length === 0) {
+//         return {
+//             success: 0,
+//             message: 'incorrect code or voucher has been reedeemed'
+//         }
+//     }
+
+//     return {
+//         success: 1,
+//         message: "voucher updated"
+//     }
+// }

@@ -302,15 +302,6 @@ export default function UserProfile() {
               </Grid>
               <Grid xs={3}></Grid>
             </Grid>
-            <Grid xs={12}>
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Button variant="outlined" onClick={() => {}}>Edit</Button>
-              </Box>
-            </Grid>
             <Grid xs={12}></Grid>
             <Grid container spacing={2} xs={12}>
               <Grid xs={12}></Grid>

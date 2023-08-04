@@ -102,7 +102,8 @@ create table Voucher (
     startOffer      datetime, -- 2022-04-22 10:34:23:55
     endOffer        datetime, 
     count           integer,
-    code            text, 
+    code            text,
+    reoccuring      integer default 0, -- 0 if not reoccuring, else it does 
     primary key (id),
     foreign key (offeredBy) references EateryAccount(id) on delete cascade 
 );
