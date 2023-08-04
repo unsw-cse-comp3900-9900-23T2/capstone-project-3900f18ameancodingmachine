@@ -19,7 +19,7 @@ import jwtDecode from 'jwt-decode';
 
 import axios from 'axios';
 import tempImage from '../home/paella.jpg';
-// import tempLayout from './tempLayout.png';
+import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
 import Autocomplete from '@mui/material/Autocomplete';
 // import {axiosProxy} from '../axios-config/config';
@@ -94,6 +94,7 @@ async function loadReviews(toSet, restaurantId) {
     const data = await axios.get(`api/user/review/${restaurantId}`);
     const reviewInfo = data.data.data;
     console.log('LoadReviews');
+    console.log(data);
     console.log(reviewInfo);
     const name = getUserName(reviewInfo.userId);
     console.log(name);
@@ -350,7 +351,7 @@ async function getUserName(id) {
   try {
     const result = await axios.get(`api/user/${id}`);
     const data = result.data.data;
-    userName = data.first + data.last;
+    userName = data.first + ' ' + data.last;
   } catch (error) {
     userName = 'Real Person';
   }
@@ -472,7 +473,7 @@ export default function RestaurantProfile() {
     setDisplayReviews(loadDisplay(
         currentReviews, indexReviews, countReviews,
     ));
-  }, [indexReviews]);
+  }, [indexReviews, currentReviews]);
 
   useEffect(() => {
     /*
@@ -647,7 +648,6 @@ export default function RestaurantProfile() {
           {userContext === false && <CardActions>
             <Button variant="contained" onClick={() => {
               uploadMenu();
-              uploadReview();
             }}>Update Menu
             </Button>
           </CardActions>}

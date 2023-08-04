@@ -47,7 +47,7 @@ const LocationAutocomplete = ({apiKey, onPlaceChanged}) => {
 };
 
 // get all of the restaurant and the cuisines from the database
-const n = 4; // change the number depending on the requirements
+const n = 6; // change the number depending on the requirements
 
 let loginId;
 let userId;
@@ -125,7 +125,8 @@ async function getLatestEateries() {
     return eateries.findIndex((e) => e.id === eatery.id) === index;
   });
   console.log(eateries);
-  let newEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n);
+  let newEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n).reverse();
+  console.log(newEateries);
 
   newEateries = newEateries.map((eatery) => ({
     key: eatery.id,
@@ -136,6 +137,7 @@ async function getLatestEateries() {
     location: eatery.suburb,
     image: eatery.image,
   }));
+  console.log(newEateries);
   return newEateries;
 }
 
