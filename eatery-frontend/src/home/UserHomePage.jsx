@@ -260,19 +260,19 @@ export default function UserHomePage() {
   /**
    * Handle function for random button
    */
-  /*
-  function handleOnClickRandom() {
-    navigate('/browse', {
-      state: {
-        search: search,
-        location: location,
-        cuisine: cuisine,
-        dietary: dietary,
-        distance: maxDistance,
-      },
-    });
+  async function handleOnClickRandom() {
+    try {
+      const dataEateries = await axios.get('api/user/eatery/all');
+      const allEateries = dataEateries.data.results;
+      // Extracting IDs from allEateries array
+      const validEateryIds = allEateries.map((eatery) => eatery.id);
+      const randomIndex = Math.floor(Math.random() * validEateryIds.length);
+      navigate('/RestaurantProfile', {state: {
+        id: validEateryIds[randomIndex]}});
+    } catch (error) {
+      console.log('handleOnClickRandom Error');
+    }
   }
-*/
 
   // TODO: have to hide the google api code
   return (
@@ -300,7 +300,8 @@ export default function UserHomePage() {
                 <Button variant="contained" onClick={handleOnClickBrowse}>Browse</Button>
               </Grid>
               <Grid xs={2}>
-                <Button variant="contained" onClick={() => {}}>Random</Button>
+                <Button variant="contained" onClick={() => handleOnClickRandom()}>
+                  Random</Button>
               </Grid>
             </Grid>
             <Grid container xs={12} spacing={2}>
