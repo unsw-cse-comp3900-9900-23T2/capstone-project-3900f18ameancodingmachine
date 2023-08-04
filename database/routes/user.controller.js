@@ -43,7 +43,14 @@ export const tokenBlackList = []
 
 // Controller functions
 
-// create account in LoginInfo table
+/**
+ * create account in LoginInfo table
+ * @param {Request} req
+ * @param {Response} res
+ * @returns result called from service function with statuscode 200
+ * @returns result called from service function with statuscode 400 if success is 0
+ * @returns object with success: 0 and database connection error with statuscode 500
+ */
 export async function createAccountInfo (req, res) {
     try {
         const body = req.body
@@ -64,7 +71,13 @@ export async function createAccountInfo (req, res) {
     }
 }
 
-// create address in Address table
+/**
+ * create address in Address table
+ * @param {Request} req
+ * @param {Response} res
+ * @returns result called from service function with statuscode 200
+ * @returns object with success: 0 and database connection error with statuscode 500
+ */
 export async function createAddressInfo (req, res) {
     try {
         const body = req.body
@@ -78,7 +91,13 @@ export async function createAddressInfo (req, res) {
     }
 }
 
-// create User in UserAccount table
+/**
+ * create User in UserAccount table
+ * @param {Request} req
+ * @param {Response} res
+ * @returns result called from service function with statuscode 200
+ * @returns object with success: 0 and database connection error with statuscode 500
+ */
 export async function createUser (req, res) {
     try {
         const body = req.body

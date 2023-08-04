@@ -11,7 +11,7 @@ import path from 'path'
  * @param {date} data.endOffer      coupon ending offer
  * @param {int} data.count          number of coupon generated
  * @param {string} data.code        code of coupon generated
- * @returns {object}    if successful object with success 1, otherwise 0
+ * @returns {object}    if successful object with success 1
  */
 export async function createNewVoucher (data) {
     const query = 'insert into Voucher(offeredBy, discount, startOffer, endOffer, count, code) values (?,?,?,?,?,?)'
@@ -29,7 +29,7 @@ export async function createNewVoucher (data) {
  * @param {object} data
  * @param {string} data.description   new description
  * @param {string} data.restaurantId  restaurantId
- * @returns {object}    if successful object with success 1, otherwise 0
+ * @returns {object}    if successful object with success 1
  */
 export async function updateExistingDescription (data) {
     console.log(data)
@@ -44,6 +44,12 @@ export async function updateExistingDescription (data) {
 }
 
 /// ///////for search//////////////
+
+/**
+ * find eateries by inputting relevant search string
+ * @param {string} string  a search string
+ * @returns {object}    if successful object with success 1
+ */
 export async function getEateriesBySearchString (string) {
     let query = 'select * from restaurantInfo where name regexp ?'
     let values = [string]
@@ -59,6 +65,11 @@ export async function getEateriesBySearchString (string) {
     }
 }
 
+/**
+ * find eateries by inputting the user's preferred diet
+ * @param {object} diet  a diet preferred by a user
+ * @returns {object}    if successful object with success 1
+ */
 export async function getEateriesByDiet (diet) {
     let query = 'select * from restaurantInfo where diet = ?'
     let values = [diet]
@@ -74,6 +85,11 @@ export async function getEateriesByDiet (diet) {
     }
 }
 
+/**
+ * find eateries by inputting the user's preferred cuisine
+ * @param {object} cuisine  a cuisine preferred by a user
+ * @returns {object}    if successful object with success 1
+ */
 export async function getEateriesByCuisine (cuisine) {
     let query = 'select * from restaurantInfo where cuisine = ?'
     let values = [cuisine]
@@ -89,6 +105,11 @@ export async function getEateriesByCuisine (cuisine) {
     }
 }
 
+/**
+ * get description of an eatery by ID 
+ * @param {object} cuisine  a cuisine preferred by a user
+ * @returns {object}    if successful object with success 1
+ */
 export async function getDescriptionByEateryId (eateryId) {
     let query = 'select description from EateryAccount where id = ?'
     let values = [eateryId]
@@ -110,7 +131,7 @@ export async function getDescriptionByEateryId (eateryId) {
 /**
  * get all vouchers associated with an eatery
  * @param {string} id   eatery id
- * @returns {object}    if successful object with success 1, otherwise 0
+ * @returns {object}    if successful object with success 1
  */
 export async function getAllEateryVouchers (Id) {
     const query = 'select * from Voucher where offeredBy = ?'
@@ -124,7 +145,7 @@ export async function getAllEateryVouchers (Id) {
 
 /**
  * gets information about each existing cuisine type
- * @returns {object}    if successful object with success 1, otherwise 0
+ * @returns {object}    if successful object with success 1
  */
 export async function getAllCuisines () {
     const query = 'select * from Cuisines'
@@ -137,7 +158,7 @@ export async function getAllCuisines () {
 
 /**
  * gets infromation about each existing eatery
- * @returns {object}    if successful object with success 1, otherwise 0
+ * @returns {object}    if successful object with success 1
  */
 export async function getAllEateries () {
     const query = 'select * from restaurantInfo'
@@ -220,7 +241,6 @@ export async function storeEateryProfileImg (imgPath, restaurantId) {
     let query = 'select imagePath from restaurantProfileImages where restaurantId = ?'
     const [result] = await poolPromise.execute(query, [restaurantId])
 
-    // remove public from path -> path stored becomes upload/(image name)
     const relativePath = path.relative('public', imgPath)
 
     if (result.length !== 0) {
@@ -319,6 +339,12 @@ export async function getEateryLayoutImgPath (restaurantId) {
     }
 }
 
+/**
+ * checks if voucher is valid
+ * @param {string} code - a voucher code
+ * @param {int} restaurantId - eatery id
+ * @returns {object} - object contain success of 1 and success message, otherwise 0 and a fail message
+ */
 export async function voucherVerify (code, restaurantId) {
     const query = `select * from userBookings where code = ? and restaurantId = ? and active = true`
     const [result] = await poolPromise.execute(query, [code, restaurantId])

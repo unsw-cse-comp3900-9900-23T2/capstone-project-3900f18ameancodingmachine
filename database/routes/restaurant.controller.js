@@ -190,7 +190,13 @@ async function getDistanceBetweenAddresses (address1, address2) {
     }
 }
 
-// search functionality
+/**
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @returns object with success: 1 and result of filtered cuisine match
+ * @returns object with success: 0, a message of error and database connection error with statuscode 500
+ */
 export async function getSearchResults (req, res) {
     try {
         const string = req.query.string
