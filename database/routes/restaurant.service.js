@@ -32,7 +32,6 @@ export async function createNewVoucher (data) {
         results: result
     }
 }
-
 /**
  * update the description associated with an eatery account
  * @param {object} data
@@ -297,5 +296,94 @@ export async function voucherVerify (code, restaurantId) {
     return {
         success: 1,
         message: "voucher verified"
+    }
+}
+
+export async function storeEateryLayoutImg (imgPath, restaurantId) {
+    // find existing image path
+    let query = 'select imagePath from restaurantLayout where restaurantId = ?'
+    const [result] = await poolPromise.execute(query, [restaurantId])
+
+    // remove public from path -> path stored becomes upload/(image name)
+    const relativePath = path.relative('public', imgPath)
+
+    if (result.length !== 0) {
+        // delete the existing image
+        fs.unlink("public/" + result[0].imagePath, (err) => {
+            if (err) {
+                console.log('file does not exist')
+            }
+        })
+
+        // update image path
+        query = 'update restaurantLayout set imagePath = ? where restaurantId = ?'
+        await poolPromise.execute(query, [relativePath, restaurantId])
+        return {
+            success: 1,
+            message: 'Image updated successfully'
+        }
+    }
+
+    query = 'insert into restaurantLayout(restaurantId, imagePath) values (?, ?)'
+    await poolPromise.execute(query, [restaurantId, relativePath])
+    return {
+        success: 1,
+        message: 'Image uploaded successfully'
+    }
+}
+
+export async function getEateryLayoutImgPath (restaurantId) {
+    const query = 'select imagePath from restaurantLayout where restaurantId = ?'
+    const [result] = await poolPromise.execute(query, [restaurantId])
+
+    if (result.length === 0) {
+        return {
+            success: 0,
+            message: 'no image found'
+        }
+    }
+
+    const imgPath = result[0].imagePath
+    const relativePath = path.relative('public', imgPath)
+    return {
+        success: 1,
+        results: relativePath
+    }
+}
+
+export async function checkReoccuringVoucher () {
+    // get all vouchers from the database and increment count by reoccuring
+    const today = new Date()
+    const getQuery = `select * from Voucher`
+    const [vouchers] = await poolPromise.execute(getQuery)
+
+    for (const voucher in vouchers) {
+        const code = voucher.code
+
+        // check that the code is for reoccuring voucher
+        if (code.slice(-2) === "RE") {
+            let startDate = new Date(voucher.startOffer)
+            let endDate = new Date(voucher.endOffer)
+            if (today.getFullYear() === startDate.getFullYear() + 1) {
+                // increment count query
+                const incrermentQuery = `update Voucher set count = ? where id = ?`
+                await poolPromise.execute(incrermentQuery, [voucher.reoccuring, voucher.id])
+
+                // increase date by a year
+                startDate = startDate.setFullYear(startDate.getFullYear() + 1)
+                endDate = endDate.setFullYear(startDate.getFullYear() + 1)
+
+                // convert to mysql datetime format
+                startDate = startDate.toISOString().slice(0, 19).replace('T', ' ')
+                endDate = endDate.toISOString().slice(0, 19).replace('T', ' ')
+                const updateQuery = `update Voucher set startOffer = ?, endOffer = ? where id = ?`
+                await poolPromise.execute(updateQuery, [startDate, endDate, voucher.id])
+            }
+        }
+    }
+
+    return {
+        success: 1,
+        message: "voucher updated"
     }
 }
