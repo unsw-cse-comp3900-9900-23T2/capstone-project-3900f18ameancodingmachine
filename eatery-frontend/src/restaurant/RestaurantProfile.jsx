@@ -29,7 +29,6 @@ import {UserContext} from '../App.jsx';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
-import { getUserById } from '../../../database/routes/user.controller';
 
 /**
  *  Loads reviews from backend
@@ -304,9 +303,6 @@ function generateAvailableVoucherList(toSet, allVouchers, bookingDate) {
  */
 async function postBooking(restId, userId, voucherId, date) {
   console.log('postBooking');
-  console.log(restId);
-  console.log(userId);
-  console.log(voucherId);
   await axios.post('api/user/user/booking', {
     userId: userId,
     restaurantId: restId,
@@ -373,6 +369,25 @@ function uploadSeating() {
   return false;
 }
 
+// helper function to get the eatery id
+/**
+ * @return {Int}
+ */
+async function getUserId() {
+  const result = await axios.get('api/user/');
+  console.log(result);
+  const data = result.data;
+  const decrypt = jwtDecode(data.token);
+  const loginId = decrypt.result.id;
+
+  // get the restaurantId
+  const user = await axios.get(`api/user/login/${loginId}`);
+  console.log(user);
+  const userId = user.data.data[0].id;
+  console.log(userId);
+  return userId;
+}
+
 /**
  * @return {JSX}
  */
@@ -400,8 +415,6 @@ export default function RestaurantProfile() {
   const {userContext, setUserContext} = useContext(UserContext);
 
   const [descriptionSuccess, setDescriptionSuccess] = useState(null);
-  const [loginId, setLoginId] = useState(0);
-  const [userId, setUserId] = useState(-1);
 
   const [bookingDate, setBookingDate] = useState('');
 
@@ -421,21 +434,6 @@ export default function RestaurantProfile() {
       loadPosts(setCurrentPosts, restaurantId);
       loadVouchers(setVoucherList, restaurantId);
     }
-    /**
-     * TODO: axios request returns an empty array
-     */
-    async function getUserId() {
-      alert(loginId);
-      try {
-        const result = await axios.get(`api/user/login/${loginId}`);
-        console.log('getUserId');
-        console.log(result);
-        setUserId();
-      } catch (error) {
-        console.log('Could not get userId');
-        setUserId(-1);
-      }
-    }
 
     /**
      *
@@ -447,9 +445,7 @@ export default function RestaurantProfile() {
         const decrypt = jwtDecode(data.token);
         console.log(decrypt);
         if (data.success !== 0) {
-          const decryptLoginId = decrypt.result.id;
-          console.log(decrypt.result.id);
-          setLoginId(decryptLoginId);
+          const loginId = decrypt.result.id;
           // get EateryAccount, if no result then it will return an 404 error
           // else it will go to restaurant page
           console.log('should be a restaurant');
@@ -463,7 +459,6 @@ export default function RestaurantProfile() {
           console.log('is a user');
           console.log(err.response.data);
           console.log('set to true');
-          getUserId();
           setUserContext(true);
         } else { // not loggedIn
           setUserContext(null);
@@ -615,6 +610,7 @@ export default function RestaurantProfile() {
           {userContext === false && <CardActions>
             <Button variant="contained" onClick={() => {
               uploadMenu();
+              uploadReview();
             }}>Update Menu
             </Button>
           </CardActions>}
@@ -690,7 +686,7 @@ export default function RestaurantProfile() {
         <CardActions>
           {userContext === true &&
             <Button variant="contained" onClick={() => postBooking(parseInt(restaurantId),
-                parseInt(userId), parseInt(voucherId.id), bookingDate)}>
+                parseInt(getUserId()), parseInt(voucherId.id), bookingDate)}>
               Create Booking</Button>}
           {userContext === false &&
             <Button variant="contained" onClick={() => {
