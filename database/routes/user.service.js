@@ -2,8 +2,14 @@ import { pool, poolPromise } from '../db-config/db_connection.js'
 import fs from 'fs'
 import path from 'path'
 
+/**
+ * insert login details into they system
+ * @param {object} data
+ * @param {string} data.login       login info
+ * @param {string} data.password    password of the account
+ * @returns {object}                if successful object with success 1, otherwise 0
+ */
 export async function createLogin (data) {
-    // insert login details
     const [existing] = await poolPromise.execute('select * from LoginInfo where login = ?', [data.login])
     if (existing.length !== 0) {
         return {
@@ -20,6 +26,15 @@ export async function createLogin (data) {
     }
 }
 
+/**
+ * creates user's address
+ * @param {object} data
+ * @param {string} data.street     street info
+ * @param {string} data.suburb     suburb of the user
+ * @param {string} data.region     region where the user lives
+ * @param {int} data.postcode      postcode of the user
+ * @returns {object}               if successful object with success 1
+ */
 export async function createAddress (data) {
     // insert address details
     const query = 'insert into Address (street, suburb, region, postcode) values (?, ?, ?, ?)'
@@ -36,6 +51,15 @@ export async function createAddress (data) {
     }
 }
 
+/**
+ * create new and unique eatery account
+ * @param {object} data
+ * @param {string} data.first        user's first name
+ * @param {string} data.last         user's last name
+ * @param {int} data.loginId         user's login ID
+ * @param {int} data.addressId       user's address ID
+ * @returns {object}                if successful object with success 1, otherwise 0
+ */
 export async function createUse (data) {
     // using both the insertIds of login and address, creates the User
     const query = 'insert into UserAccount (first, last, login, address) values (?, ?, ?, ?)'
