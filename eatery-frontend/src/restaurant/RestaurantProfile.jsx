@@ -91,16 +91,24 @@ async function loadReviews(toSet, restaurantId) {
       'was a work of art.',
     },
   ];
-  try {
-    const data = await axios.get(`api/user/review/${restaurantId}`);
-    const reviewInfo = data.data.data;
-
-    const name = getUserName(reviewInfo.userId);
-    console.log(name);
-  } catch (error) {
-    toSet(tempData);
+  console.log(tempData);
+  // try {
+  const reviewArrayProcessed = [];
+  const data = await axios.get(`api/user/review/${restaurantId}`);
+  const reviewInfoArray = data.data.data;
+  // Loop through each reviewInfo in reviewInfoArray
+  for (const reviewInfo of reviewInfoArray) {
+    const name = await getUserName(reviewInfo.userId);
+    // Push name and review as an object into the reviewArrayProcessed
+    reviewArrayProcessed.push({
+      author: name,
+      review: reviewInfo.comment,
+    });
   }
-  toSet(tempData);
+  toSet(reviewArrayProcessed.reverse());
+  // } catch (error) {
+  //  toSet(tempData);
+  // }
 }
 
 /**
@@ -604,6 +612,7 @@ export default function RestaurantProfile() {
                 <CardActions>
                   <Button variant="contained" onClick={() => {
                     uploadReview(reviewBody, restaurantId, setUploadReviewError);
+                    loadReviews(setCurrentReviews, restaurantId);
                   }}>Post</Button>
                   {uploadReviewError == '' &&
                   <Typography sx={{fontSize: 20, textAlign: 'right', marginLeft: 'auto'}}
