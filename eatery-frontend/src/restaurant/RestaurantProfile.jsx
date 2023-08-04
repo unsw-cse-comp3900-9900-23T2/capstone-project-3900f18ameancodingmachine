@@ -295,12 +295,19 @@ function generateAvailableVoucherList(toSet, allVouchers, bookingDate) {
 }
 
 /**
- * @param {*} restId
- * @param {*} userId
- * @param {*} voucherId
- * @param {*} date Date for the booking
+ * TODO - Not Working
+ * @param {Int} restId
+ * @param {Int} userId
+ * @param {String} voucherId
+ * @param {Date} date Date for the booking
  */
-function postBooking(restId, userId, voucherId, date) {
+async function postBooking(restId, userId, voucherId, date) {
+  await axios.post('api/user/user/booking', {
+    userId: userId,
+    restaurantId: restId,
+    voucherId: voucherId,
+    bookingTime: date,
+  });
   return;
 }
 
@@ -617,8 +624,9 @@ export default function RestaurantProfile() {
         </CardContent>
         <CardActions>
           {userContext === true &&
-            <Button variant="contained" onClick={postBooking(restaurantId,
-                loginId, voucherId, bookingDate)}>Create Booking</Button>}
+            <Button variant="contained" onClick={() => postBooking(parseInt(restaurantId),
+                parseInt(loginId), voucherId.code, bookingDate)}>
+              Create Booking</Button>}
           {userContext === false &&
             <Button variant="contained" onClick={() => {
               uploadSeating();
