@@ -30,3 +30,15 @@ Week 8
   Implemented view/hide vouchers functionality. Continued work on improving the styling of pages.
   Redesigned routing pages to what was decided by team. Fixed navigation elements.
 
+Week 9
+  Set up linting on the front-end with ESLint. Reformatted and styled all the front-end code to match
+  linting requirements when the automatic linting failed. Implemented the User Profile page with
+  upload image functionality and added icon button to banner. Set up restaurant posts to display on
+  the user profile from eateries the user is subscribed to.
+
+Week 10
+  Restructured and styled the restaurant profile page. Modified the restaurant profile so that it can be
+  used for users too, hiding components that only eatery managers should have access to. Fixed a few
+  bugs with routing and links. Wrote some functionalities in the report. Set up the references section,
+  wrote the 3rd party functionalities and implementation challengs for the front-end parts and the APIs.
+  Edited and formatted the report. 
