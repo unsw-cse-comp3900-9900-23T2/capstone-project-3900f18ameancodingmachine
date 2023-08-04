@@ -270,14 +270,20 @@ async function loadVouchers(toSet, restId) {
 }
 
 /**
- *
+ * Limit to given voucher list to the ones avaliable during booking date
  * @param {*} toSet
  * @param {*} allVouchers The list of all available vouchers
  * @param {*} bookingDate Date for the booking
  */
 function generateAvailableVoucherList(toSet, allVouchers, bookingDate) {
   console.log('generateAvailableVoucherList');
+  console.log(bookingDate);
   console.log(allVouchers);
+  // If no booking date provided, show all vouchers
+  if (bookingDate == '') {
+    toSet(allVouchers);
+    return;
+  }
   const filteredObjects = allVouchers.filter((obj) =>
     new Date(obj.startOffer) <= bookingDate && new Date(obj.endOffer) >= bookingDate);
   console.log(filteredObjects);
@@ -424,7 +430,7 @@ export default function RestaurantProfile() {
 
   useEffect(() => {
     generateAvailableVoucherList(setAvailableVoucherList, voucherList, bookingDate);
-  }, [bookingDate]);
+  }, [bookingDate, voucherList]);
 
   // Menu DONE
   // Reviews DONE
