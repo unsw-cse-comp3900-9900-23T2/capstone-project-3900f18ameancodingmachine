@@ -33,10 +33,11 @@ import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 /**
  *  Loads reviews from backend
  * (TODO: currently unknown how many we want to load / display at once)
+ * @param {*} toSet
  * @param {*} restaurantId
  * @return {*}
  */
-function loadReviews(restaurantId) {
+async function loadReviews(toSet, restaurantId) {
   const tempData = [
     {
       'author': 'John Smith',
@@ -89,8 +90,17 @@ function loadReviews(restaurantId) {
       'was a work of art.',
     },
   ];
-
-  return tempData;
+  try {
+    const data = await axios.get(`api/user/review/${restaurantId}`);
+    const reviewInfo = data.data.data;
+    console.log('LoadReviews');
+    console.log(reviewInfo);
+    const name = getUserName(reviewInfo.userId);
+    console.log(name);
+  } catch (error) {
+    toSet(tempData);
+  }
+  toSet(tempData);
 }
 
 /**
@@ -112,60 +122,6 @@ function loadDisplay(list, index, count) {
  * @return {*}
  */
 async function loadPosts(toSet, restaurantId) {
-  /*
-  const tempData = [
-    {
-      'title': 'Sensational Fusion',
-      'post': 'An exceptional fusion of flavors that took my taste ' +
-      'buds on a thrilling adventure. A must-visit culinary destination.',
-    },
-    {
-      'title': 'Rustic Charm',
-      'post': 'A charming eatery with rustic decor, and the dishes were ' +
-      'heartwarming. A delightful experience reminiscent of home.',
-    },
-    {
-      'title': 'Oceans Bounty',
-      'post': 'Savoring the freshest seafood delights by the ocean. ' +
-      'The delectable dishes had a delightful taste of the sea.',
-    },
-    {
-      'title': 'Culinary Elegance',
-      'post': 'Elegance on a plate! From presentation to taste, each dish ' +
-      'exuded sophistication, making it a truly refined experience.',
-    },
-    {
-      'title': 'Aromatic Indulgence',
-      'post': 'A sensory journey of tantalizing aromas and bold flavors. ' +
-      'An indulgence that left a lasting impression on my palate.',
-    },
-    {
-      'title': 'Wholesome Delights',
-      'post': 'Wholesome ingredients transformed into delightful dishes that ' +
-      'left me feeling nourished and satisfied. Health and taste combined!',
-    },
-    {
-      'title': 'Flavors of the Orient',
-      'post': 'Embarked on a culinary trip to the Orient. Authentic dishes with ' +
-      'bold spices made for an unforgettable gastronomic experience.',
-    },
-    {
-      'title': 'Cozy Culinary Haven',
-      'post': 'Found a cozy haven for food enthusiasts. The warm ambiance paired ' +
-      'with delectable dishes made for a perfect dining escape.',
-    },
-    {
-      'title': 'Gourmet Artistry',
-      'post': 'Every plate was an exquisite work of culinary art, elevating the ' +
-      'dining experience into a true gourmet indulgence.',
-    },
-    {
-      'title': 'A Symphony of Sweets',
-      'post': 'Indulged in a symphony of sweet delights. From delicate pastries ' +
-      'to luscious desserts, it was a heavenly treat.',
-    },
-  ];
-  */
   let results = [];
   try {
     const {data} = await axios.get(`api/user/post/${restaurantId}`);
@@ -366,7 +322,7 @@ function uploadSeating() {
   return false;
 }
 
-// helper function to get the eatery id
+// helper function to get the user id
 /**
  * @return {Int}
  */
@@ -377,12 +333,29 @@ async function getUserId() {
   const decrypt = jwtDecode(data.token);
   const loginId = decrypt.result.id;
 
-  // get the restaurantId
   const user = await axios.get(`api/user/login/${loginId}`);
   console.log(user);
   const userId = user.data.data[0].id;
   console.log(userId);
   return userId;
+}
+
+// helper function to get the user name
+/**
+ * @param {Int} id The user Id you want info on
+ * @return {Int}
+ */
+async function getUserName(id) {
+  let userName = 'temp';
+  try {
+    const result = await axios.get(`api/user/${id}`);
+    const data = result.data.data;
+    userName = data.first + data.last;
+  } catch (error) {
+    userName = 'Real Person';
+  }
+
+  return userName;
 }
 
 /**
@@ -396,7 +369,7 @@ export default function RestaurantProfile() {
   const [voucherList, setVoucherList] = useState([]);
   const [availableVoucherList, setAvailableVoucherList] = useState([]);
 
-  const currentReviews = loadReviews(restaurantId);
+  const [currentReviews, setCurrentReviews] = useState([]);
   const [indexReviews, setIndexReviews] = useState(0);
   const countReviews = 3;
   const [displayReviews, setDisplayReviews] = useState([]);
@@ -431,6 +404,7 @@ export default function RestaurantProfile() {
     */
     async function loading() {
       loadDescription(setDescription, restaurantId);
+      loadReviews(setCurrentReviews, restaurantId);
       loadPosts(setCurrentPosts, restaurantId);
       loadVouchers(setVoucherList, restaurantId);
     }
