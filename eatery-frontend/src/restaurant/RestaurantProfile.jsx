@@ -263,6 +263,26 @@ async function loadVouchers(toSet, restId) {
   console.log(result.data.results);
   toSet(result.data.results);
 }
+
+/**
+ *
+ * @param {*} toSet
+ * @param {*} allVouchers The list of all available vouchers
+ * @param {*} bookingDate Date for the booking
+ */
+function generateAvailableVoucherList(toSet, allVouchers, bookingDate) {
+  console.log('generateAvailableVoucherList');
+  console.log(allVouchers);
+  const filteredObjects = allVouchers.filter((obj) =>
+    new Date(obj.startOffer) <= bookingDate && new Date(obj.endOffer) >= bookingDate);
+  console.log(filteredObjects);
+  try {
+    toSet(filteredObjects);
+  } catch (error) {
+    toSet([]);
+  }
+}
+
 /**
  * @param {*} restId
  * @param {*} userId
@@ -299,7 +319,8 @@ export default function RestaurantProfile() {
   const restaurantId = state.id;
 
   const [voucherId, setVoucherId] = useState();
-  const [voucherList, setVoucherList] = useState({});
+  const [voucherList, setVoucherList] = useState([]);
+  const [availableVoucherList, setAvailableVoucherList] = useState([]);
 
   const currentReviews = loadReviews(restaurantId);
   const [indexReviews, setIndexReviews] = useState(0);
@@ -395,6 +416,10 @@ export default function RestaurantProfile() {
     console.log(currentPosts);
     console.log(displayPosts);
   }, [currentPosts, indexPosts]);
+
+  useEffect(() => {
+    generateAvailableVoucherList(setAvailableVoucherList, voucherList, bookingDate);
+  }, [bookingDate]);
 
   // Menu DONE
   // Reviews DONE
@@ -565,7 +590,7 @@ export default function RestaurantProfile() {
             <Autocomplete
               id="voucher-dropdown"
               value={voucherId}
-              options={voucherList}
+              options={availableVoucherList}
               getOptionLabel={(option) => option.discount && option.startOffer ?
                 `Discount: ${option.discount}%, Valid Until: ${option.endOffer}, 
               Remaining: ${option.count}`: ''}
@@ -576,9 +601,6 @@ export default function RestaurantProfile() {
                 <TextField {...params} label="Vouchers" />
               )}
             />
-          }
-          {userContext === true &&
-            <TextField label="Book Table (TEMP NOT SURE HOW WE WANT TO DO THIS)" />
           }
 
         </CardContent>
