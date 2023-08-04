@@ -257,6 +257,22 @@ export default function UserHomePage() {
     });
   };
 
+  /**
+   * Handle function for random button
+   */
+  /*
+  function handleOnClickRandom() {
+    navigate('/browse', {
+      state: {
+        search: search,
+        location: location,
+        cuisine: cuisine,
+        dietary: dietary,
+        distance: maxDistance,
+      },
+    });
+  }
+*/
 
   // TODO: have to hide the google api code
   return (
