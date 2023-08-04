@@ -499,6 +499,16 @@ export default function RestaurantProfile() {
     generateAvailableVoucherList(setAvailableVoucherList, voucherList, bookingDate);
   }, [bookingDate, voucherList]);
 
+  /**
+   *
+   */
+  function handleBookingButtonClick() {
+    // Call both functions in sequence using try-catch block to handle any errors.
+    postBooking(parseInt(restaurantId), parseInt(getUserId()),
+        parseInt(voucherId.id), bookingDate);
+    loadVouchers(setVoucherList, restaurantId);
+  };
+
   // Menu DONE
   // Reviews DONE
   // Booking DONE
@@ -685,8 +695,7 @@ export default function RestaurantProfile() {
         </CardContent>
         <CardActions>
           {userContext === true &&
-            <Button variant="contained" onClick={() => postBooking(parseInt(restaurantId),
-                parseInt(getUserId()), parseInt(voucherId.id), bookingDate)}>
+            <Button variant="contained" onClick={() => handleBookingButtonClick()}>
               Create Booking</Button>}
           {userContext === false &&
             <Button variant="contained" onClick={() => {
