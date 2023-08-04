@@ -77,7 +77,7 @@ describe('/voucher', () => {
         restaurantId = response.body.results.insertId
     })
 
-    test('insert correct voucher data return statuscode 200 and success 1', async () => {
+    test('insert correct voucher non-reoccuring data return statuscode 200 and success 1', async () => {
 
         const start = new Date().toISOString().slice(0, 19).replace('T', ' ');
         const end = new Date().toISOString().slice(0, 19).replace('T', ' ');
@@ -96,5 +96,33 @@ describe('/voucher', () => {
         const response = await request(app).post('/api/user/voucher').send(voucherData);
         expect(response.statusCode).toBe(200);
         expect(response.body.success).toBe(1);
+    })
+
+    test('insert correct voucher occuring data return statuscode 200 and success 1', async () => {
+
+        const start = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        const end = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        // input for voucher
+        // leave code null
+        const voucherData = {
+            offeredBy: restaurantId,
+            discount: 50,
+            startOffer: start,
+            endOffer: end,
+            count: 9,
+            code: 'ABCD$RE'
+        }
+
+        const response = await request(app).post('/api/user/voucher').send(voucherData);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+
+        // check on whether reoccuring field is equal to the initial count at count field
+        const voucherId = response.body.results[0].insertId
+        const [searchResponse] = await poolPromise.execute(`select * from Voucher where id = ?`, [voucherId])
+        const reoccuringCount = searchResponse[0].reoccuring
+        console.log(reoccuringCount)
+        expect(reoccuringCount).toBe(9)
     })
 })
