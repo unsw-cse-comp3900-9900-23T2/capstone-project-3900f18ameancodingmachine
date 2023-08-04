@@ -19,19 +19,25 @@ import jwtDecode from 'jwt-decode';
 
 import axios from 'axios';
 import tempImage from '../home/paella.jpg';
-import tempLayout from './tempLayout.png';
+// import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
+import Autocomplete from '@mui/material/Autocomplete';
 // import {axiosProxy} from '../axios-config/config';
 import {UserContext} from '../App.jsx';
 // import {useNavigate} from 'react-router-dom';
 
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
+
 /**
  *  Loads reviews from backend
  * (TODO: currently unknown how many we want to load / display at once)
+ * @param {*} toSet
  * @param {*} restaurantId
  * @return {*}
  */
-function loadReviews(restaurantId) {
+async function loadReviews(toSet, restaurantId) {
   const tempData = [
     {
       'author': 'John Smith',
@@ -84,8 +90,17 @@ function loadReviews(restaurantId) {
       'was a work of art.',
     },
   ];
-
-  return tempData;
+  try {
+    const data = await axios.get(`api/user/review/${restaurantId}`);
+    const reviewInfo = data.data.data;
+    console.log('LoadReviews');
+    console.log(reviewInfo);
+    const name = getUserName(reviewInfo.userId);
+    console.log(name);
+  } catch (error) {
+    toSet(tempData);
+  }
+  toSet(tempData);
 }
 
 /**
@@ -107,62 +122,13 @@ function loadDisplay(list, index, count) {
  * @return {*}
  */
 async function loadPosts(toSet, restaurantId) {
-  /*
-  const tempData = [
-    {
-      'title': 'Sensational Fusion',
-      'post': 'An exceptional fusion of flavors that took my taste ' +
-      'buds on a thrilling adventure. A must-visit culinary destination.',
-    },
-    {
-      'title': 'Rustic Charm',
-      'post': 'A charming eatery with rustic decor, and the dishes were ' +
-      'heartwarming. A delightful experience reminiscent of home.',
-    },
-    {
-      'title': 'Oceans Bounty',
-      'post': 'Savoring the freshest seafood delights by the ocean. ' +
-      'The delectable dishes had a delightful taste of the sea.',
-    },
-    {
-      'title': 'Culinary Elegance',
-      'post': 'Elegance on a plate! From presentation to taste, each dish ' +
-      'exuded sophistication, making it a truly refined experience.',
-    },
-    {
-      'title': 'Aromatic Indulgence',
-      'post': 'A sensory journey of tantalizing aromas and bold flavors. ' +
-      'An indulgence that left a lasting impression on my palate.',
-    },
-    {
-      'title': 'Wholesome Delights',
-      'post': 'Wholesome ingredients transformed into delightful dishes that ' +
-      'left me feeling nourished and satisfied. Health and taste combined!',
-    },
-    {
-      'title': 'Flavors of the Orient',
-      'post': 'Embarked on a culinary trip to the Orient. Authentic dishes with ' +
-      'bold spices made for an unforgettable gastronomic experience.',
-    },
-    {
-      'title': 'Cozy Culinary Haven',
-      'post': 'Found a cozy haven for food enthusiasts. The warm ambiance paired ' +
-      'with delectable dishes made for a perfect dining escape.',
-    },
-    {
-      'title': 'Gourmet Artistry',
-      'post': 'Every plate was an exquisite work of culinary art, elevating the ' +
-      'dining experience into a true gourmet indulgence.',
-    },
-    {
-      'title': 'A Symphony of Sweets',
-      'post': 'Indulged in a symphony of sweet delights. From delicate pastries ' +
-      'to luscious desserts, it was a heavenly treat.',
-    },
-  ];
-  */
-  const {data} = await axios.get(`api/user/post/${restaurantId}`);
-  const results = data.data.reverse();
+  let results = [];
+  try {
+    const {data} = await axios.get(`api/user/post/${restaurantId}`);
+    results = data.data.reverse();
+  } catch (error) {
+    results = [];
+  }
   if (results.length === 0) {
     results.push({
       id: 'N/A',
@@ -189,6 +155,8 @@ async function getEateryInfo(restaurantId, setEateryInfo) {
   try {
     const eateryId = restaurantId;
     const result = await axios.get(`api/user/eatery/${eateryId}`);
+    console.log('Eatery Info');
+    console.log(result.data.data);
     setEateryInfo(result.data.data);
   } catch (error) {
     console.log('getEateryInfo failed');
@@ -247,6 +215,96 @@ async function loadDescription(setDes, restId) {
 }
 
 /**
+ * @param {*} toSet
+ * @param {Int} restId
+*/
+async function loadVouchers(toSet, restId) {
+  const result = await axios.get(`api/user/eatery/vouchers/${restId}`);
+  console.log('Vouchers');
+  console.log(result.data.results);
+  toSet(result.data.results);
+}
+
+/**
+ * Limit to given voucher list to the ones avaliable during booking date
+ * @param {*} toSet
+ * @param {*} allVouchers The list of all available vouchers
+ * @param {*} bookingDate Date for the booking
+ */
+function generateAvailableVoucherList(toSet, allVouchers, bookingDate) {
+  console.log('generateAvailableVoucherList');
+  console.log(bookingDate);
+  console.log(allVouchers);
+  // If no booking date provided, show all vouchers
+  if (bookingDate == '') {
+    toSet(allVouchers);
+    return;
+  }
+  const filteredObjects = allVouchers.filter((obj) =>
+    new Date(obj.startOffer) <= bookingDate && new Date(obj.endOffer) >= bookingDate);
+  console.log(filteredObjects);
+  try {
+    toSet(filteredObjects);
+  } catch (error) {
+    toSet([]);
+  }
+}
+
+/**
+ * TODO - Not Working
+ * @param {Int} restId
+ * @param {Int} userId
+ * @param {Int} voucherId
+ * @param {Date} date Date for the booking
+ */
+async function postBooking(restId, userId, voucherId, date) {
+  console.log('postBooking');
+  await axios.post('api/user/user/booking', {
+    userId: userId,
+    restaurantId: restId,
+    voucherId: voucherId,
+    bookingTime: date,
+  });
+  return;
+}
+
+/**
+ * upload new comment, character limit hasn't been implemented yet
+ * @param {*} body
+ * @param {*} restId
+ * @param {*} setError set function for error output
+ * @return {Boolean}
+ */
+async function uploadReview(body, restId, setError) {
+  // Guard Statements
+  let isError = false;
+  setError('');
+  if (body === '') {
+    setError((prevState) => prevState + 'Enter a comment. ');
+    isError = true;
+  }
+  if (isError) {
+    return;
+  }
+
+  const userId = await getUserId();
+
+  await axios.post('api/user/reviews', {
+    userId: userId,
+    restaurantId: restId,
+    comment: body,
+    rating: '0',
+  });
+  try {
+  } catch (error) {
+    alert('something is wrong in the database');
+    console.log(error);
+  }
+  return false;
+}
+
+
+/**
  * Stub for uploadMenu button
  * @return {Boolean}
  */
@@ -262,6 +320,42 @@ function uploadMenu() {
 function uploadSeating() {
   alert('uploadSeating: Pressed uploadSeating');
   return false;
+}
+
+// helper function to get the user id
+/**
+ * @return {Int}
+ */
+async function getUserId() {
+  const result = await axios.get('api/user/');
+  console.log(result);
+  const data = result.data;
+  const decrypt = jwtDecode(data.token);
+  const loginId = decrypt.result.id;
+
+  const user = await axios.get(`api/user/login/${loginId}`);
+  console.log(user);
+  const userId = user.data.data[0].id;
+  console.log(userId);
+  return userId;
+}
+
+// helper function to get the user name
+/**
+ * @param {Int} id The user Id you want info on
+ * @return {Int}
+ */
+async function getUserName(id) {
+  let userName = 'temp';
+  try {
+    const result = await axios.get(`api/user/${id}`);
+    const data = result.data.data;
+    userName = data.first + data.last;
+  } catch (error) {
+    userName = 'Real Person';
+  }
+
+  return userName;
 }
 
 /**
@@ -287,7 +381,11 @@ export default function RestaurantProfile() {
   const {state} = useLocation();
   const restaurantId = state.id;
 
-  const currentReviews = loadReviews(restaurantId);
+  const [voucherId, setVoucherId] = useState();
+  const [voucherList, setVoucherList] = useState([]);
+  const [availableVoucherList, setAvailableVoucherList] = useState([]);
+
+  const [currentReviews, setCurrentReviews] = useState([]);
   const [indexReviews, setIndexReviews] = useState(0);
   const countReviews = 3;
   const [displayReviews, setDisplayReviews] = useState([]);
@@ -304,7 +402,12 @@ export default function RestaurantProfile() {
   const {userContext, setUserContext} = useContext(UserContext);
 
   const [descriptionSuccess, setDescriptionSuccess] = useState(null);
-  // const navigate = useNavigate();
+
+  const [bookingDate, setBookingDate] = useState('');
+  const [showPostReview, setShowPostReview] = useState(false);
+  const [uploadReviewError, setUploadReviewError] = useState('_');
+  const [reviewBody, setReviewBody] = useState('');
+
   const noBorderTextField = {
     padding: 10,
     border: 'none',
@@ -318,8 +421,11 @@ export default function RestaurantProfile() {
     */
     async function loading() {
       loadDescription(setDescription, restaurantId);
+      loadReviews(setCurrentReviews, restaurantId);
       loadPosts(setCurrentPosts, restaurantId);
+      loadVouchers(setVoucherList, restaurantId);
     }
+
     /**
      *
      */
@@ -328,6 +434,7 @@ export default function RestaurantProfile() {
         const result = await axios.get('/api/user/');
         const data = result.data;
         const decrypt = jwtDecode(data.token);
+        console.log(decrypt);
         if (data.success !== 0) {
           const loginId = decrypt.result.id;
           // get EateryAccount, if no result then it will return an 404 error
@@ -379,6 +486,20 @@ export default function RestaurantProfile() {
     console.log(currentPosts);
     console.log(displayPosts);
   }, [currentPosts, indexPosts]);
+
+  useEffect(() => {
+    generateAvailableVoucherList(setAvailableVoucherList, voucherList, bookingDate);
+  }, [bookingDate, voucherList]);
+
+  /**
+   *
+   */
+  function handleBookingButtonClick() {
+    // Call both functions in sequence using try-catch block to handle any errors.
+    postBooking(parseInt(restaurantId), parseInt(getUserId()),
+        parseInt(voucherId.id), bookingDate);
+    loadVouchers(setVoucherList, restaurantId);
+  };
 
   // Menu DONE
   // Reviews DONE
@@ -443,6 +564,41 @@ export default function RestaurantProfile() {
         <Grid xs={6}>
           <Card sx={{minHeight: 680, display: 'flex', flexDirection: 'column'}}>
             <CardContent style={{flexGrow: 1}}>
+              <Button variant="contained"
+                disabled={displayPosts.length !== 3}
+                onClick={() =>
+                  setShowPostReview((prevIndex) => !prevIndex)}>
+                    Toggle Review Post
+              </Button>
+              {showPostReview && <Card>
+                <CardContent>
+                  <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                    Review
+                  </Typography>
+                  <TextField sx={{minWidth: 500}} multiline rows={8}
+                    required id="body-review"
+                    placeholder="Review" value={reviewBody} onChange={(event) => {
+                      setReviewBody(event.target.value);
+                      setUploadReviewError('_');
+                    }}
+                  />
+                </CardContent>
+                <CardActions>
+                  <Button variant="contained" onClick={() => {
+                    uploadReview(reviewBody, restaurantId, setUploadReviewError);
+                  }}>Post</Button>
+                  {uploadReviewError == '' &&
+                  <Typography sx={{fontSize: 20, textAlign: 'right', marginLeft: 'auto'}}
+                    color="green" gutterBottom>
+                    Post Created
+                  </Typography>}
+                  {uploadReviewError !== '_' &&
+                  <Typography sx={{fontSize: 14, textAlign: 'right', marginLeft: 'auto'}}
+                    color="red" gutterBottom>
+                    {uploadReviewError}
+                  </Typography>}
+                </CardActions>
+              </Card>}
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
                 Reviews
               </Typography>
@@ -491,7 +647,9 @@ export default function RestaurantProfile() {
           {userContext === false && <CardActions>
             <Button variant="contained" onClick={() => {
               uploadMenu();
-            }}>Update Menu</Button>
+              uploadReview();
+            }}>Update Menu
+            </Button>
           </CardActions>}
         </Grid>
         <Grid xs={6}>
@@ -537,21 +695,47 @@ export default function RestaurantProfile() {
           <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
             Booking
           </Typography>
+
           <CardMedia
             component="img"
             sx={{height: 400}}
             image={restaurantLayout} // TODO get actual image
             title="Logo of this Restaurant"
           />
+
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker label="Booking Date" value={bookingDate} onChange={(event) => {
+              setBookingDate(event);
+            }}/>
+          </LocalizationProvider>
+
           {userContext === true &&
-            <TextField label="Book Table (TEMP NOT SURE HOW WE WANT TO DO THIS)" />
+            <Autocomplete
+              id="voucher-dropdown"
+              value={voucherId}
+              options={availableVoucherList}
+              getOptionLabel={(option) => option.discount && option.startOffer ?
+                `Discount: ${option.discount}%, Valid Until: ${option.endOffer}, 
+              Remaining: ${option.count}`: ''}
+              onChange={(event, newValue) => {
+                setVoucherId(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Vouchers" />
+              )}
+            />
           }
+
         </CardContent>
-        {userContext === false && <CardActions>
-          <Button variant="contained" onClick={() => {
-            uploadSeating();
-          }}>Update Seating</Button>
-        </CardActions>}
+        <CardActions>
+          {userContext === true &&
+            <Button variant="contained" onClick={() => handleBookingButtonClick()}>
+              Create Booking</Button>}
+          {userContext === false &&
+            <Button variant="contained" onClick={() => {
+              uploadSeating();
+            }}>Update Seating</Button>}
+        </CardActions>
       </Card>
 
 
