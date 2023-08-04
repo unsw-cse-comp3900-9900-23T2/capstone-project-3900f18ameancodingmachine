@@ -23,4 +23,17 @@ Week 7
   - created registration checks for both eateries and usersn ensuring that correct details are provided
   - implemented the 'forgotten' password functionality which allows both eateries and users to reset their password using their email
 Week 8
-  -TODO
+  - implemented voucher view on resteraunt profile
+  - created search functionality where user inputs a series of values to obtain eateries matching details
+Week 9
+  - setup basic docker filee
+  - created outline of the user and eatery views of eatery profiles
+  - documnetation
+  - started on the report
+  - help fix code errors
+Week 10
+  - virtual machine/docker/nginx
+  - helped finish document
+  - presented
+  - helped fix multiple errors
+  - minor implementations
