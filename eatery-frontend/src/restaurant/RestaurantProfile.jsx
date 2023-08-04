@@ -29,6 +29,7 @@ import {UserContext} from '../App.jsx';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
+import { getUserById } from '../../../database/routes/user.controller';
 
 /**
  *  Loads reviews from backend
@@ -314,6 +315,45 @@ async function postBooking(restId, userId, voucherId, date) {
   });
   return;
 }
+
+/**
+ * upload new post, character limit hasn't been implemented yet
+ * @param {*} title
+ * @param {*} body
+ * @param {*} setError set function for error output
+ * @return {Boolean}
+ */
+async function uploadReview(title, body, setError) {
+  // Guard Statements
+  let isError = false;
+  setError('');
+  if (title === '') {
+    setError((prevState) => prevState + 'Enter title. ');
+    isError = true;
+  }
+  if (body === '') {
+    setError((prevState) => prevState + 'Enter body. ');
+    isError = true;
+  }
+  if (isError) {
+    return;
+  }
+
+  try {
+    const userId = await getUserById();
+
+    // insert into the database
+    await axios.post('api/user/reviews', {
+      postedBy: userId,
+      content: body,
+    });
+  } catch (error) {
+    alert('something is wrong in the database');
+    console.log(error);
+  }
+  return false;
+}
+
 
 /**
  * Stub for uploadMenu button
