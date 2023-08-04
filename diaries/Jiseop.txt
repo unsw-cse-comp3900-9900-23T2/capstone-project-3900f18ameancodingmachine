@@ -1,0 +1,16 @@
+Week 1: Had a first meeting with my group, then we chose the topic to be an eatery management system.
+
+Week 2: Created user stories and objectives. My role is backend development.
+
+Week 3: Submitted project proposal.
+
+Week 4: Worked on project demo A
+
+Week 7: Implemented some functions and added routes for restaurant pages.
+
+Week 8: This week I couldn't really do much because I was very sick from influenza. It took me a much longer time to recover then I expected.
+
+Week 9: Started writing report. Currently there's not much information filled in, just a template.
+
+Week 10: Filled in report, especially functionality / objectives part. At first it was sort of a repetition of what I wrote in the proposal
+in week 1, but then I started focusing on explaining frontend, and I think it helped to improve the report.

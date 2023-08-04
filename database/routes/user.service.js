@@ -276,7 +276,7 @@ export async function getReviewByReviewId (id) {
     }
     return {
         success: 1,
-        data: results[0]
+        data: results
     }
 }
 

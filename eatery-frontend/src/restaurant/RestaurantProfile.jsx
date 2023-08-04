@@ -91,16 +91,24 @@ async function loadReviews(toSet, restaurantId) {
       'was a work of art.',
     },
   ];
+  console.log(tempData);
   try {
+    const reviewArrayProcessed = [];
     const data = await axios.get(`api/user/review/${restaurantId}`);
-    const reviewInfo = data.data.data;
-
-    const name = getUserName(reviewInfo.userId);
-    console.log(name);
+    const reviewInfoArray = data.data.data;
+    // Loop through each reviewInfo in reviewInfoArray
+    for (const reviewInfo of reviewInfoArray) {
+      const name = await getUserName(reviewInfo.userId);
+      // Push name and review as an object into the reviewArrayProcessed
+      reviewArrayProcessed.push({
+        author: name,
+        review: reviewInfo.comment,
+      });
+    }
+    toSet(reviewArrayProcessed.reverse());
   } catch (error) {
     toSet(tempData);
   }
-  toSet(tempData);
 }
 
 /**
@@ -582,12 +590,12 @@ export default function RestaurantProfile() {
         <Grid xs={6}>
           <Card sx={{minHeight: 680, display: 'flex', flexDirection: 'column'}}>
             <CardContent style={{flexGrow: 1}}>
-              <Button variant="contained"
+              {userContext === true && <Button variant="contained"
                 disabled={displayPosts.length !== 3}
                 onClick={() =>
                   setShowPostReview((prevIndex) => !prevIndex)}>
                     Toggle Review Post
-              </Button>
+              </Button>}
               {showPostReview && <Card>
                 <CardContent>
                   <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
@@ -604,6 +612,7 @@ export default function RestaurantProfile() {
                 <CardActions>
                   <Button variant="contained" onClick={() => {
                     uploadReview(reviewBody, restaurantId, setUploadReviewError);
+                    loadReviews(setCurrentReviews, restaurantId);
                   }}>Post</Button>
                   {uploadReviewError == '' &&
                   <Typography sx={{fontSize: 20, textAlign: 'right', marginLeft: 'auto'}}
