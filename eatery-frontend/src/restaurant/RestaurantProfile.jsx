@@ -590,12 +590,12 @@ export default function RestaurantProfile() {
         <Grid xs={6}>
           <Card sx={{minHeight: 680, display: 'flex', flexDirection: 'column'}}>
             <CardContent style={{flexGrow: 1}}>
-              <Button variant="contained"
+              {userContext === true && <Button variant="contained"
                 disabled={displayPosts.length !== 3}
                 onClick={() =>
                   setShowPostReview((prevIndex) => !prevIndex)}>
                     Toggle Review Post
-              </Button>
+              </Button>}
               {showPostReview && <Card>
                 <CardContent>
                   <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
