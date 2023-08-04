@@ -241,7 +241,7 @@ export async function createReviews (data) {
 
 export async function getReviewByReviewId (id) {
     // gets post by id
-    const query = 'select id, userId, restaurantId, rating, comment from Reviews where id = ?'
+    const query = 'select id, userId, restaurantId, rating, comment from Reviews where restaurantId = ?'
     const value = [id]
     const [results] = await poolPromise.execute(query, value)
     if (results.length === 0) {
