@@ -313,36 +313,33 @@ async function postBooking(restId, userId, voucherId, date) {
 }
 
 /**
- * upload new post, character limit hasn't been implemented yet
- * @param {*} title
+ * upload new comment, character limit hasn't been implemented yet
  * @param {*} body
+ * @param {*} restId
  * @param {*} setError set function for error output
  * @return {Boolean}
  */
-async function uploadReview(title, body, setError) {
+async function uploadReview(body, restId, setError) {
   // Guard Statements
   let isError = false;
   setError('');
-  if (title === '') {
-    setError((prevState) => prevState + 'Enter title. ');
-    isError = true;
-  }
   if (body === '') {
-    setError((prevState) => prevState + 'Enter body. ');
+    setError((prevState) => prevState + 'Enter a comment. ');
     isError = true;
   }
   if (isError) {
     return;
   }
 
-  try {
-    const userId = await getUserById();
+  const userId = await getUserId();
 
-    // insert into the database
-    await axios.post('api/user/reviews', {
-      postedBy: userId,
-      content: body,
-    });
+  await axios.post('api/user/reviews', {
+    userId: userId,
+    restaurantId: restId,
+    comment: body,
+    rating: '0',
+  });
+  try {
   } catch (error) {
     alert('something is wrong in the database');
     console.log(error);
@@ -417,6 +414,9 @@ export default function RestaurantProfile() {
   const [descriptionSuccess, setDescriptionSuccess] = useState(null);
 
   const [bookingDate, setBookingDate] = useState('');
+  const [showPostReview, setShowPostReview] = useState(false);
+  const [uploadReviewError, setUploadReviewError] = useState('_');
+  const [reviewBody, setReviewBody] = useState('');
 
   const noBorderTextField = {
     padding: 10,
@@ -572,6 +572,41 @@ export default function RestaurantProfile() {
         <Grid xs={6}>
           <Card sx={{minHeight: 680, display: 'flex', flexDirection: 'column'}}>
             <CardContent style={{flexGrow: 1}}>
+              <Button variant="contained"
+                disabled={displayPosts.length !== 3}
+                onClick={() =>
+                  setShowPostReview((prevIndex) => !prevIndex)}>
+                    Toggle Review Post
+              </Button>
+              {showPostReview && <Card>
+                <CardContent>
+                  <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                    Review
+                  </Typography>
+                  <TextField sx={{minWidth: 500}} multiline rows={8}
+                    required id="body-review"
+                    placeholder="Review" value={reviewBody} onChange={(event) => {
+                      setReviewBody(event.target.value);
+                      setUploadReviewError('_');
+                    }}
+                  />
+                </CardContent>
+                <CardActions>
+                  <Button variant="contained" onClick={() => {
+                    uploadReview(reviewBody, restaurantId, setUploadReviewError);
+                  }}>Post</Button>
+                  {uploadReviewError == '' &&
+                  <Typography sx={{fontSize: 20, textAlign: 'right', marginLeft: 'auto'}}
+                    color="green" gutterBottom>
+                    Post Created
+                  </Typography>}
+                  {uploadReviewError !== '_' &&
+                  <Typography sx={{fontSize: 14, textAlign: 'right', marginLeft: 'auto'}}
+                    color="red" gutterBottom>
+                    {uploadReviewError}
+                  </Typography>}
+                </CardActions>
+              </Card>}
               <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
                 Reviews
               </Typography>
