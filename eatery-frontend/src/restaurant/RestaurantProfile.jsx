@@ -92,23 +92,23 @@ async function loadReviews(toSet, restaurantId) {
     },
   ];
   console.log(tempData);
-  // try {
-  const reviewArrayProcessed = [];
-  const data = await axios.get(`api/user/review/${restaurantId}`);
-  const reviewInfoArray = data.data.data;
-  // Loop through each reviewInfo in reviewInfoArray
-  for (const reviewInfo of reviewInfoArray) {
-    const name = await getUserName(reviewInfo.userId);
-    // Push name and review as an object into the reviewArrayProcessed
-    reviewArrayProcessed.push({
-      author: name,
-      review: reviewInfo.comment,
-    });
+  try {
+    const reviewArrayProcessed = [];
+    const data = await axios.get(`api/user/review/${restaurantId}`);
+    const reviewInfoArray = data.data.data;
+    // Loop through each reviewInfo in reviewInfoArray
+    for (const reviewInfo of reviewInfoArray) {
+      const name = await getUserName(reviewInfo.userId);
+      // Push name and review as an object into the reviewArrayProcessed
+      reviewArrayProcessed.push({
+        author: name,
+        review: reviewInfo.comment,
+      });
+    }
+    toSet(reviewArrayProcessed.reverse());
+  } catch (error) {
+    toSet(tempData);
   }
-  toSet(reviewArrayProcessed.reverse());
-  // } catch (error) {
-  //  toSet(tempData);
-  // }
 }
 
 /**
