@@ -338,7 +338,7 @@ export async function voucherVerifyController (req, res) {
 export async function checkReoccuringVoucherController (req, res) {
     try {
         const body = req.body
-        const result = await checkReoccuringVoucher()
+        const result = await checkReoccuringVoucher(body.date)
         if (result.success === 0) {
             return res.status(404).json(result)
         }

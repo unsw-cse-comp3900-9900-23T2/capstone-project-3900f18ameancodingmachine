@@ -351,37 +351,41 @@ export async function getEateryLayoutImgPath (restaurantId) {
     }
 }
 
-export async function checkReoccuringVoucher () {
+export async function checkReoccuringVoucher (today) {
     // get all vouchers from the database and increment count by reoccuring
-    const today = new Date()
+    let todayDate = new Date(today)
+    console.log(todayDate.getMonth())
     const getQuery = `select * from Voucher`
     const [vouchers] = await poolPromise.execute(getQuery)
 
-    for (const voucher in vouchers) {
+    for (let i = 0; i < vouchers.length; i++) {
+        let voucher = vouchers[i]
+        console.log(voucher)
         const code = voucher.code
+        console.log(voucher.code)
 
         // check that the code is for reoccuring voucher
         if (code.slice(-2) === "RE") {
-            let startDate = new Date(voucher.startOffer)
-            let endDate = new Date(voucher.endOffer)
+            const startDate = new Date(voucher.startOffer)
+            const endDate = new Date(voucher.endOffer)
 
             // if exactly one year passes
-            if (today.getFullYear() === startDate.getFullYear() + 1 &&
-                today.getFullMonth() === startDate.getFullMonth() &&
-                today.getDate() === startDate.getDate()) {
+            if (todayDate.getFullYear() === startDate.getFullYear() + 1 &&
+                todayDate.getMonth() === startDate.getMonth() &&
+                todayDate.getDate() === startDate.getDate()) {
                 // increment count query
                 const incrermentQuery = `update Voucher set count = ? where id = ?`
                 await poolPromise.execute(incrermentQuery, [voucher.reoccuring, voucher.id])
 
                 // increase date by a year
-                startDate = startDate.setFullYear(startDate.getFullYear() + 1)
-                endDate = endDate.setFullYear(startDate.getFullYear() + 1)
+                startDate.setFullYear(startDate.getFullYear() + 1)
+                endDate.setFullYear(endDate.getFullYear() + 1)
 
                 // convert to mysql datetime format
-                startDate = startDate.toISOString().slice(0, 19).replace('T', ' ')
-                endDate = endDate.toISOString().slice(0, 19).replace('T', ' ')
+                const startDate2 = startDate.toISOString().slice(0, 19).replace('T', ' ')
+                const endDate2 = endDate.toISOString().slice(0, 19).replace('T', ' ')
                 const updateQuery = `update Voucher set startOffer = ?, endOffer = ? where id = ?`
-                await poolPromise.execute(updateQuery, [startDate, endDate, voucher.id])
+                await poolPromise.execute(updateQuery, [startDate2, endDate2, voucher.id])
             }
         }
     }
