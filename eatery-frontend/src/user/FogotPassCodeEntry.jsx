@@ -38,7 +38,7 @@ async function checkCode(login, code) {
  * @return {JSX}
  */
 export default function ForgotPassCodeEntry() {
-  let codeRef = React.useRef('');
+  const codeRef = React.useRef('');
   const navigate = useNavigate();
   const {state} = useLocation();
   const [resetFail, setResetFail] = React.useState(false);
