@@ -49,7 +49,8 @@ import {
     getDescriptionById,
     storeEateryLayoutImgController,
     getEateryLayoutImgPathController,
-    voucherVerifyController
+    voucherVerifyController,
+    checkReoccuringVoucherController
 } from './restaurant.controller.js'
 
 import upload from '../img-config/config.js'
@@ -114,6 +115,7 @@ router.put('/user/likes', increaseLikesController)
 router.get('/address/:id', getAddress)
 
 router.post('/voucher', createVoucher)
+router.put('/voucher/reoccurs', checkReoccuringVoucherController)
 router.put('/eatery/description', updateDescription)
 router.get('/eatery/description/:id', getDescriptionById)
 

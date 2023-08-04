@@ -364,7 +364,11 @@ export async function checkReoccuringVoucher () {
         if (code.slice(-2) === "RE") {
             let startDate = new Date(voucher.startOffer)
             let endDate = new Date(voucher.endOffer)
-            if (today.getFullYear() === startDate.getFullYear() + 1) {
+
+            // if exactly one year passes
+            if (today.getFullYear() === startDate.getFullYear() + 1 &&
+                today.getFullMonth() === startDate.getFullMonth() &&
+                today.getDate() === startDate.getDate()) {
                 // increment count query
                 const incrermentQuery = `update Voucher set count = ? where id = ?`
                 await poolPromise.execute(incrermentQuery, [voucher.reoccuring, voucher.id])
