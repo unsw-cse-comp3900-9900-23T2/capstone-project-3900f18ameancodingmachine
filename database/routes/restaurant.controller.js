@@ -14,7 +14,8 @@ import {
     getDescriptionByEateryId,
     getEateryLayoutImgPath,
     storeEateryLayoutImg,
-    voucherVerify
+    voucherVerify,
+    checkReoccuringVoucher
 } from './restaurant.service.js'
 import axios from 'axios'
 import 'dotenv/config'
@@ -327,6 +328,23 @@ export async function voucherVerifyController (req, res) {
     try {
         const body = req.body
         const result = await voucherVerify(body.code, body.restaurantId)
+        if (result.success === 0) {
+            return res.status(404).json(result)
+        }
+        return res.status(200).json(result)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: 0,
+            message: "Database connection error"
+        })
+    }
+}
+
+export async function checkReoccuringVoucherController (req, res) {
+    try {
+        const body = req.body
+        const result = await checkReoccuringVoucher(body.date)
         if (result.success === 0) {
             return res.status(404).json(result)
         }
