@@ -166,8 +166,13 @@ async function loadPosts(toSet, restaurantId) {
     },
   ];
   */
-  const {data} = await axios.get(`api/user/post/${restaurantId}`);
-  const results = data.data.reverse();
+  let results = [];
+  try {
+    const {data} = await axios.get(`api/user/post/${restaurantId}`);
+    results = data.data.reverse();
+  } catch (error) {
+    results = [];
+  }
   if (results.length === 0) {
     results.push({
       id: 'N/A',
