@@ -37,6 +37,7 @@ create table EateryAccount (
     login           integer,
     url             text,
     description     text,
+    layoutPath      text,
     primary key (id),
     foreign key (address) references Address(id) on delete cascade ,
     foreign key (login) references LoginInfo(id) on delete cascade 
@@ -162,6 +163,14 @@ create table PostComments (
     primary key (id),
     FOREIGN KEY (userId) REFERENCES UserAccount(id) on delete cascade ,
     FOREIGN KEY (postId) REFERENCES Posts(id) on delete cascade  
+);
+
+create table restaurantLayout (
+    id  integer auto_increment,
+    restaurantId    integer,
+    imagePath       text,
+    primary key (id),
+    foreign key (restaurantId) references EateryAccount(id) on delete cascade
 );
 
 create table Bookings (

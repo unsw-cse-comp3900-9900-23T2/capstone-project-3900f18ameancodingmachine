@@ -100,14 +100,14 @@ describe("/reviews", () => {
 
         // find the review
         const reviewId = response.body.data.insertId
-        response = await request(app).get(`/api/user/review/${reviewId}`)
+        response = await request(app).get(`/api/user/review/${eateryAccountId}`)
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
     })
 
     test("not finding the review will return statuscode 404", async () => {
-        const reviewId = 1 //any number because of empty database
-        const response = await request(app).get(`/api/user/review/${reviewId}`)
+        const restaurantId = -1 //any number because of empty database
+        const response = await request(app).get(`/api/user/review/${restaurantId}`)
         expect(response.statusCode).toBe(404)
         expect(response.body.success).toBe(0)
     })

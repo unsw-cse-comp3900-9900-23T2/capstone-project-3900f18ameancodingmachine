@@ -46,34 +46,29 @@ const eateryLoginData = {
     password: restaurantPassword
 }
 
+const eateryLoginData2 = {
+    login: userLogin,
+    password: userPassword
+}
+
 //////////////////////////////////////////////////////////////////////////////////////
 
 describe("/cuisine", () => {
 
-    const cuisineData = {
-        name: "new cuisine" //fake
-    }
-
-    test("adding new cuisine should return statuscode 200 and success of 1", async () => {
-        const response = await request(app).post('/api/user/cuisine').send(cuisineData)
-        expect(response.statusCode).toBe(200)
-        expect(response.body.success).toBe(1)
-    })
-})
-
-describe("/cuisine-offer", () => {
-    const cuisineData = {
-        name: "new cuisine" //fake
-    }
-
     let eateryLoginId;
+    let eateryLoginId1;
     let addressId;
     let restaurantId;
     let eateryAccount;
+    let anotherEateryAccount;
+    let restaurantId1;
 
     beforeEach(async () => {
         let response = await request(app).post("/api/user/account").send(eateryLoginData)
         eateryLoginId = response.body.data.insertId
+
+        response = await request(app).post("/api/user/account").send(eateryLoginData2)
+        eateryLoginId1 = response.body.data.insertId
        
         // create address   
         response = await request(app).post('/api/user/address').send(data)
@@ -91,22 +86,73 @@ describe("/cuisine-offer", () => {
 
         response = await request(app).post("/api/user/eatery").send(eateryAccount);
         restaurantId = response.body.results.insertId
-    })
 
-    test("restaurant linking to a cuisine would have statuscode 200 and success of 1", async () => {
-
-        let response = await request(app).post('/api/user/cuisine').send(cuisineData)
-        const cuisineId = response.body.data.insertId
-
-        const offerData = {
-            restaurantId: restaurantId,
-            cuisineId: cuisineId
+        anotherEateryAccount = {
+            name: "another restaurant 1",
+            addressId: addressId, //fake
+            phone: "0493186824",
+            email: "anotherrestaurant1@gmail.com",
+            loginId: eateryLoginId1, 
+            url: "www.anotherrestaurant1.com",
         }
 
-        // make cuisine offer from restaurant
-        response = await request(app).post('/api/user/cuisine-offer').send(offerData)
+        response = await request(app).post("/api/user/eatery").send(anotherEateryAccount);
+        restaurantId1 = response.body.results.insertId
+    })
+
+    test("restaurant with a new cuisine would have statuscode 200 and success of 1", async () => {
+
+        const cuisineData = {
+            cuisineName: "japanese",
+            restaurantId: restaurantId
+        }
+
+        let response = await request(app).post('/api/user/cuisine').send(cuisineData)
         expect(response.statusCode).toBe(200)
         expect(response.body.success).toBe(1)
+
+        // restaurant offer a cuisine
+        let query = `select * from CuisineOffer`
+        let [result] = await poolPromise.execute(query)
+        expect(result.length).toBe(1)
+
+        // new cuisine created
+        query = `select * from Cuisines`
+        let [result1] = await poolPromise.execute(query)
+        expect(result1.length).toBe(1)
+        expect(result1[0].name).toBe("japanese")
+    })
+
+    test("two restaurant with a new cuisine would have 1 cuisine on Cuisine table", async () => {
+
+        const cuisineData = {
+            cuisineName: "japanese",
+            restaurantId: restaurantId
+        }
+
+        let response = await request(app).post('/api/user/cuisine').send(cuisineData)
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+
+        const cuisineData1 = {
+            cuisineName: "japanese",
+            restaurantId: restaurantId1
+        }
+
+        response = await request(app).post('/api/user/cuisine').send(cuisineData1)
+        expect(response.statusCode).toBe(200)
+        expect(response.body.success).toBe(1)
+
+        // restaurant offer a cuisine
+        let query = `select * from CuisineOffer`
+        let [result] = await poolPromise.execute(query)
+        expect(result.length).toBe(2)
+
+        // new cuisine created
+        query = `select * from Cuisines`
+        let [result1] = await poolPromise.execute(query)
+        expect(result1.length).toBe(1)
+        expect(result1[0].name).toBe("japanese")
     })
 
 })
