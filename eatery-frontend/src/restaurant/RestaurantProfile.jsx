@@ -19,7 +19,7 @@ import jwtDecode from 'jwt-decode';
 
 import axios from 'axios';
 import tempImage from '../home/paella.jpg';
-// import tempLayout from './tempLayout.png';
+import tempLayout from './tempLayout.png';
 import {RestaurantReviewGridItem, RestaurantPostGridItem} from './RestaurantGridItem';
 import Autocomplete from '@mui/material/Autocomplete';
 // import {axiosProxy} from '../axios-config/config';
@@ -29,6 +29,7 @@ import {UserContext} from '../App.jsx';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
+import TempMenu from './tempMenu.jsx';
 
 /**
  *  Loads reviews from backend
@@ -93,8 +94,7 @@ async function loadReviews(toSet, restaurantId) {
   try {
     const data = await axios.get(`api/user/review/${restaurantId}`);
     const reviewInfo = data.data.data;
-    console.log('LoadReviews');
-    console.log(reviewInfo);
+
     const name = getUserName(reviewInfo.userId);
     console.log(name);
   } catch (error) {
@@ -155,8 +155,6 @@ async function getEateryInfo(restaurantId, setEateryInfo) {
   try {
     const eateryId = restaurantId;
     const result = await axios.get(`api/user/eatery/${eateryId}`);
-    console.log('Eatery Info');
-    console.log(result.data.data);
     setEateryInfo(result.data.data);
   } catch (error) {
     console.log('getEateryInfo failed');
@@ -165,6 +163,22 @@ async function getEateryInfo(restaurantId, setEateryInfo) {
   return;
 }
 
+/**
+ *
+ * @param {*} restaurantId
+ * @param {*} setEateryProfileImage
+ */
+/*
+async function getEateryProfileImage(restaurantId, setEateryProfileImage) {
+  try {
+    const response = await axios.get(`api/user/eatery/image/profile/${restaurantId}`);
+    const imageURL = response.data.results;
+    return imageURL;
+  } catch (error) {
+    return tempImage;
+  }
+}
+*/
 /**
  * Stub for editDescription button
  * @param {*} restaurantId
@@ -182,11 +196,8 @@ async function editDescription(restaurantId, description) {
       description: description,
     });
 
-    console.log('description updated');
     return true;
   } catch (error) {
-    console.log('something is wrong in the database');
-    console.log(error);
     return false;
   }
 }
@@ -202,12 +213,7 @@ async function loadDescription(setDes, restId) {
     // insert into the database
     const data = await axios.get(`api/user/eatery/description/${restId}`);
     const description = data.data.results.description;
-    console.log('Loaded Description');
-    console.log(data);
     setDes(description);
-
-
-    console.log('description loaded');
   } catch (error) {
     console.log('something is wrong in the database');
     console.log(error);
@@ -220,8 +226,6 @@ async function loadDescription(setDes, restId) {
 */
 async function loadVouchers(toSet, restId) {
   const result = await axios.get(`api/user/eatery/vouchers/${restId}`);
-  console.log('Vouchers');
-  console.log(result.data.results);
   toSet(result.data.results);
 }
 
@@ -232,9 +236,6 @@ async function loadVouchers(toSet, restId) {
  * @param {*} bookingDate Date for the booking
  */
 function generateAvailableVoucherList(toSet, allVouchers, bookingDate) {
-  console.log('generateAvailableVoucherList');
-  console.log(bookingDate);
-  console.log(allVouchers);
   // If no booking date provided, show all vouchers
   if (bookingDate == '') {
     toSet(allVouchers);
@@ -242,7 +243,6 @@ function generateAvailableVoucherList(toSet, allVouchers, bookingDate) {
   }
   const filteredObjects = allVouchers.filter((obj) =>
     new Date(obj.startOffer) <= bookingDate && new Date(obj.endOffer) >= bookingDate);
-  console.log(filteredObjects);
   try {
     toSet(filteredObjects);
   } catch (error) {
@@ -258,7 +258,6 @@ function generateAvailableVoucherList(toSet, allVouchers, bookingDate) {
  * @param {Date} date Date for the booking
  */
 async function postBooking(restId, userId, voucherId, date) {
-  console.log('postBooking');
   await axios.post('api/user/user/booking', {
     userId: userId,
     restaurantId: restId,
@@ -327,17 +326,18 @@ function uploadSeating() {
  * @return {Int}
  */
 async function getUserId() {
-  const result = await axios.get('api/user/');
-  console.log(result);
-  const data = result.data;
-  const decrypt = jwtDecode(data.token);
-  const loginId = decrypt.result.id;
+  try {
+    const result = await axios.get('api/user/');
+    const data = result.data;
+    const decrypt = jwtDecode(data.token);
+    const loginId = decrypt.result.id;
 
-  const user = await axios.get(`api/user/login/${loginId}`);
-  console.log(user);
-  const userId = user.data.data[0].id;
-  console.log(userId);
-  return userId;
+    const user = await axios.get(`api/user/login/${loginId}`);
+    const userId = user.data.data[0].id;
+    return userId;
+  } catch (error) {
+    return 0;
+  }
 }
 
 // helper function to get the user name
@@ -350,7 +350,7 @@ async function getUserName(id) {
   try {
     const result = await axios.get(`api/user/${id}`);
     const data = result.data.data;
-    userName = data.first + data.last;
+    userName = data.first + ' ' + data.last;
   } catch (error) {
     userName = 'Real Person';
   }
@@ -407,6 +407,7 @@ export default function RestaurantProfile() {
   const [showPostReview, setShowPostReview] = useState(false);
   const [uploadReviewError, setUploadReviewError] = useState('_');
   const [reviewBody, setReviewBody] = useState('');
+  // const [imageUrl, setImageUrl] = useState('');
 
   const noBorderTextField = {
     padding: 10,
@@ -414,6 +415,41 @@ export default function RestaurantProfile() {
     outline: 'none',
   };
 
+  /**
+   *
+   * @param {*} event
+   */
+  /*
+  async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    const formData = new FormData();
+
+    const imageURL = URL.createObjectURL(file);
+    setImageUrl(imageURL);
+
+    try {
+      // key is user-avatar, must be exact
+      formData.append('eatery-avatar', file);
+      // for request body
+      formData.append('restaurantId', restaurantId);
+      // store into the database
+      await axios.post('/api/user/eatery/image/profile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } catch (error) {
+      console.log('Error uploading file into the server');
+    }
+
+    // reader
+    // reader.onloadend = () => {
+    //   setImageUrl(reader.result);
+    // };
+
+    // reader.readAsDataURL(file);
+  };
+  */
   // setDisplayReviews(loadDisplayReviews(currentReviews, 0, 3))
   useEffect(() => {
     /** check whether user has a token
@@ -424,6 +460,7 @@ export default function RestaurantProfile() {
       loadReviews(setCurrentReviews, restaurantId);
       loadPosts(setCurrentPosts, restaurantId);
       loadVouchers(setVoucherList, restaurantId);
+      // setImageUrl(getEateryProfileImage(restaurantId));
     }
 
     /**
@@ -434,27 +471,19 @@ export default function RestaurantProfile() {
         const result = await axios.get('/api/user/');
         const data = result.data;
         const decrypt = jwtDecode(data.token);
-        console.log(decrypt);
         if (data.success !== 0) {
           const loginId = decrypt.result.id;
           // get EateryAccount, if no result then it will return an 404 error
           // else it will go to restaurant page
-          console.log('should be a restaurant');
           await axios.get(`/api/user/eatery/login/${loginId}`);
-          console.log('is a restaurant');
           setUserContext(false);
         }
       } catch (err) {
         if (err.response) { // not an eatery
-          console.log(err.response.data.message);
-          console.log('is a user');
-          console.log(err.response.data);
-          console.log('set to true');
           setUserContext(true);
         } else { // not loggedIn
           setUserContext(null);
-          // navigate('/');
-          console.log('Not logged in');
+          navigate('/');
         }
       }
     }
@@ -472,7 +501,7 @@ export default function RestaurantProfile() {
     setDisplayReviews(loadDisplay(
         currentReviews, indexReviews, countReviews,
     ));
-  }, [indexReviews]);
+  }, [indexReviews, currentReviews]);
 
   useEffect(() => {
     /*
@@ -482,9 +511,6 @@ export default function RestaurantProfile() {
     setDisplayPosts(loadDisplay(
         currentPosts, indexPosts, countPosts,
     ));
-    console.log('Compare these two');
-    console.log(currentPosts);
-    console.log(displayPosts);
   }, [currentPosts, indexPosts]);
 
   useEffect(() => {
@@ -500,14 +526,6 @@ export default function RestaurantProfile() {
         parseInt(voucherId.id), bookingDate);
     loadVouchers(setVoucherList, restaurantId);
   };
-
-  // Menu DONE
-  // Reviews DONE
-  // Booking DONE
-  // Previous Post
-
-  console.log('userContext');
-  console.log(userContext);
 
   return (
     <Container maxWidth="lg">
@@ -637,6 +655,7 @@ export default function RestaurantProfile() {
             <Typography sx={{fontSize: 30}} color="text.primary" gutterBottom>
               Menu
             </Typography>
+            <TempMenu/>
             <CardMedia
               sx={{minHeight: 140}}
               component="img"
@@ -647,7 +666,6 @@ export default function RestaurantProfile() {
           {userContext === false && <CardActions>
             <Button variant="contained" onClick={() => {
               uploadMenu();
-              uploadReview();
             }}>Update Menu
             </Button>
           </CardActions>}

@@ -6,7 +6,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-import RestaurantPost from './RestaurantPost';
+import BrowsePost from './BrowsePost';
 
 import axios from 'axios';
 
@@ -109,7 +109,7 @@ export default function Browse() {
               No Results
             </Typography>}
           {results.map((result) => (
-            <RestaurantPost
+            <BrowsePost
               key={result.id}
               user={userId}
               id={result.id}
