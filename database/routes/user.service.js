@@ -351,23 +351,27 @@ export async function insertCuisineFromRestaurant (data) {
 
 // create new cuisine
 export async function insertNewCuisineName (data) {
-    const name = data.name
+    const name = data.cuisineName
+    const restaurantId = data.restaurantId
+    let cuisineId
+    
     const searchQuery = 'select * from Cuisines where name = ?'
     const [result1] = await poolPromise.execute(searchQuery, [name])
 
     // cuisine exist
     if (result1.length !== 0) {
-        return {
-            success: 0,
-            message: 'Cuisine name already exist'
-        }
+        cuisineId = result1[0].id
+    } else {
+        const insertQuery = 'insert into Cuisines(name) values (?)'
+        const [result] = await poolPromise.execute(insertQuery, [name])
+        cuisineId = result.insertId
     }
 
-    const insertQuery = 'insert into Cuisines(name) values (?)'
-    const [result] = await poolPromise.execute(insertQuery, [name])
+    const query = 'insert into CuisineOffer(restaurantId, cuisineId) values (?, ?)'
+    const [results] = await poolPromise.execute(query, [restaurantId, cuisineId])
     return {
         success: 1,
-        data: result
+        data: results,
     }
 }
 
