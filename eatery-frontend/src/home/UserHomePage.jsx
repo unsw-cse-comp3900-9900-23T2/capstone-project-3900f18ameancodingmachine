@@ -47,7 +47,7 @@ const LocationAutocomplete = ({apiKey, onPlaceChanged}) => {
 };
 
 // get all of the restaurant and the cuisines from the database
-const n = 4; // change the number depending on the requirements
+const n = 6; // change the number depending on the requirements
 
 let loginId;
 let userId;
@@ -125,7 +125,8 @@ async function getLatestEateries() {
     return eateries.findIndex((e) => e.id === eatery.id) === index;
   });
   console.log(eateries);
-  let newEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n);
+  let newEateries = eateries.sort((a, b) => b.id - a.id).slice(0, n).reverse();
+  console.log(newEateries);
 
   newEateries = newEateries.map((eatery) => ({
     key: eatery.id,
@@ -136,6 +137,7 @@ async function getLatestEateries() {
     location: eatery.suburb,
     image: eatery.image,
   }));
+  console.log(newEateries);
   return newEateries;
 }
 
@@ -255,6 +257,22 @@ export default function UserHomePage() {
     });
   };
 
+  /**
+   * Handle function for random button
+   */
+  async function handleOnClickRandom() {
+    try {
+      const dataEateries = await axios.get('api/user/eatery/all');
+      const allEateries = dataEateries.data.results;
+      // Extracting IDs from allEateries array
+      const validEateryIds = allEateries.map((eatery) => eatery.id);
+      const randomIndex = Math.floor(Math.random() * validEateryIds.length);
+      navigate('/RestaurantProfile', {state: {
+        id: validEateryIds[randomIndex]}});
+    } catch (error) {
+      console.log('handleOnClickRandom Error');
+    }
+  }
 
   // TODO: have to hide the google api code
   return (
@@ -282,7 +300,8 @@ export default function UserHomePage() {
                 <Button variant="contained" onClick={handleOnClickBrowse}>Browse</Button>
               </Grid>
               <Grid xs={2}>
-                <Button variant="contained" onClick={() => {}}>Random</Button>
+                <Button variant="contained" onClick={() => handleOnClickRandom()}>
+                  Random</Button>
               </Grid>
             </Grid>
             <Grid container xs={12} spacing={2}>

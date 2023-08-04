@@ -67,5 +67,7 @@ Saturday 29-07
 - Implemented the ability for a restaurant to edit their profile if logged in
 
 Week 10
-Monday 1-08
+Tuesday 1-08
 - Improved rest registration page
+Friday 4-08
+- Finished up with restraurant profile page, fixed up browse and did our best to iron out the last issues

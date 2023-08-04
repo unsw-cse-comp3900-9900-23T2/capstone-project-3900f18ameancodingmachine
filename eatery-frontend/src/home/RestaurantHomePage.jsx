@@ -34,17 +34,18 @@ const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
  * @return {Int}
  */
 async function getEateryId() {
-  const result = await axios.get('api/user/');
-  console.log(result);
-  const data = result.data;
-  const decrypt = jwtDecode(data.token);
-  const loginId = decrypt.result.id;
-
-  // get the restaurantId
-  const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
-  console.log(eateryRes);
-  const eateryId = eateryRes.data.data.id;
-  return eateryId;
+  try {
+    const result = await axios.get('api/user/');
+    const data = result.data;
+    const decrypt = jwtDecode(data.token);
+    const loginId = decrypt.result.id;
+    // get the restaurantId
+    const eateryRes = await axios.get(`api/user/eatery/login/${loginId}`);
+    const eateryId = eateryRes.data.data.id;
+    return eateryId;
+  } catch (error) {
+    return 0;
+  }
 }
 
 // TODO: fix small chance of clashes
@@ -149,9 +150,7 @@ async function uploadHours() {
       close: close,
       restaurantId: eateryId,
     });
-
-    console.log(res.data);
-    alert('upload success');
+    console.log(res);
   } catch (error) {
     alert('something is wrong in the database');
     console.log(error);
@@ -181,8 +180,6 @@ async function uploadProfileImage(event) {
         'Content-Type': 'multipart/form-data',
       },
     });
-
-    alert('image upload success');
   } catch (error) {
     console.log('Error uploading file into the server');
   }
@@ -260,7 +257,6 @@ async function createVoucher(percentage, numVouchers, startDate, endDate,
  * @param {*} setVouchers
  */
 async function viewVouchers(setVouchers) {
-  console.log('Viewing vouchers');
   try {
     const eateryId = await getEateryId();
     const {data} = await axios.get(`api/user/eatery/vouchers/${eateryId}`);
@@ -299,11 +295,9 @@ async function viewVouchers(setVouchers) {
  * @param {*} setPosts
  */
 async function viewPosts(setPosts) {
-  console.log('Viewing vouchers');
   try {
     const eateryId = await getEateryId();
     const {data} = await axios.get(`api/user/post/${eateryId}`);
-    console.log(data.data);
     const results = data.data.reverse();
     if (results.length === 0) {
       results.push({

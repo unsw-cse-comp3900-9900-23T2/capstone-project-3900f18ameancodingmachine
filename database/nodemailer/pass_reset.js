@@ -1,6 +1,6 @@
 import { poolPromise } from "../db-config/db_connection.js";
 
-const resetCodes = [];
+let resetCodes = [];
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 export async function generateResetcode(data) {
