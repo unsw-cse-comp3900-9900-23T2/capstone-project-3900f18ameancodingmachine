@@ -126,3 +126,64 @@ describe('/voucher', () => {
         expect(reoccuringCount).toBe(9)
     })
 })
+
+describe('/voucher/reoccuring', () => {
+    let eateryLoginId;
+    let addressId;
+    let restaurantId;
+    let eateryAccount;
+
+    beforeEach(async () => {
+        let response = await request(app).post("/api/user/account").send(eateryLoginData)
+        eateryLoginId = response.body.data.insertId
+       
+        // create address   
+        response = await request(app).post('/api/user/address').send(data)
+        addressId = response.body.data.insertId
+
+        // create eatery account
+        eateryAccount = {
+            name: "another restaurant",
+            addressId: addressId, //fake
+            phone: "0493186858",
+            email: "anotherrestaurant@gmail.com",
+            loginId: eateryLoginId, 
+            url: "www.anotherrestaurant.com",
+        }
+
+        response = await request(app).post("/api/user/eatery").send(eateryAccount);
+        restaurantId = response.body.results.insertId
+    })
+
+    test('reoccuring voucher exactly one year after ', async () => {
+
+        const start = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        const end = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        // input for voucher
+        // leave code null
+        const voucherData = {
+            offeredBy: restaurantId,
+            discount: 50,
+            startOffer: start,
+            endOffer: end,
+            count: 9,
+            code: 'ABCD$RE'
+        }
+
+        const response = await request(app).post('/api/user/voucher').send(voucherData);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(1);
+
+        // check on whether reoccuring field is equal to the initial count at count field
+        const voucherId = response.body.results[0].insertId
+
+        // 
+        const updateResponse = await poolPromise.execute(`update Voucher set count = 0 where id = ?`, [voucherId])
+
+        const [searchResponse] = await poolPromise.execute(`select * from Voucher where id = ?`, [voucherId])
+        const reoccuringCount = searchResponse[0].reoccuring
+        console.log(reoccuringCount)
+        expect(reoccuringCount).toBe(9)
+    })
+})
