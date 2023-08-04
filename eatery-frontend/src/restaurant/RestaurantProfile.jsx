@@ -265,6 +265,22 @@ function uploadSeating() {
 }
 
 /**
+ * get restaurant table layout from the database
+ * @param {Int} restaurantId
+ * @param {*} setLayout set the restaurant layout image
+ */
+async function loadRestaurantLayouts(restaurantId, setLayout) {
+  try {
+    const response = await axios.get(`api/user/eatery/image/layout/${restaurantId}`);
+    const imageUrl = response.data.results;
+    setLayout(imageUrl);
+  } catch (error) {
+    const image = tempLayout;
+    setLayout(image);
+  }
+}
+
+/**
  * @return {JSX}
  */
 export default function RestaurantProfile() {
@@ -282,6 +298,7 @@ export default function RestaurantProfile() {
   const [displayPosts, setDisplayPosts] = useState([]);
 
   const [description, setDescription] = useState('No Description Given');
+  const [restaurantLayout, setRestaurantLayout] = useState(null);
   const [eateryInfo, setEateryInfo] = useState({});
   // Null: not logged in, true: user, false: restaurant
   const {userContext, setUserContext} = useContext(UserContext);
@@ -336,6 +353,7 @@ export default function RestaurantProfile() {
     }
     checkCookies();
     loading();
+    loadRestaurantLayouts(restaurantId, setRestaurantLayout);
     getEateryInfo(restaurantId, setEateryInfo);
   }, [setUserContext]);
 
@@ -522,7 +540,7 @@ export default function RestaurantProfile() {
           <CardMedia
             component="img"
             sx={{height: 400}}
-            image={tempLayout} // TODO get actual image
+            image={restaurantLayout} // TODO get actual image
             title="Logo of this Restaurant"
           />
           {userContext === true &&

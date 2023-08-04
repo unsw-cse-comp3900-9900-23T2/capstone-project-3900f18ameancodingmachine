@@ -32,4 +32,10 @@ week 7
 
 week 8
 - making subscriber implementation
-- implement backend for viewing user subscribed eateries 
+- implement backend for viewing user subscribed eateries
+
+week 9
+- implement upload profile for both user and eateries
+
+week 10
+- made bookings router implementation and add more unit test

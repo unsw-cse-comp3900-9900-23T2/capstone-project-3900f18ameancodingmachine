@@ -120,11 +120,21 @@ export async function getLoginByUsername (username) {
     }
 }
 
-// returns multiple row if more than one cuisine
 export async function getEateryByRestaurantId (id) {
-    const query = `select name, address, phone, email, login, url 
+    const query = `
+    select 
+        ea.name, 
+        ea.address, 
+        ea.phone, 
+        ea.email, 
+        ea.login, 
+        ea.url,
+        rl.imagePath as layoutPath,
+        rpi.imagePath as profilePath  
     from EateryAccount ea
-    where id = ?`
+    left join restaurantProfileImages rpi on (ea.id = rpi.restaurantId)
+    left join restaurantLayout rl on (ea.id = rl.restaurantId)
+    where ea.id = ?`
     const values = [id]
     const [results] = await poolPromise.execute(query, values)
     if (results.length === 0) {
@@ -133,6 +143,16 @@ export async function getEateryByRestaurantId (id) {
             message: 'Eatery not found'
         }
     } else {
+        // if layout image is available give relative path from public to uploads/imagename
+        if (results[0].layoutPath) {
+            results[0].layoutPath = path.relative('public', results[0].layoutPath)
+        }
+
+        // if profile image is available give relative path from public to uploads/imagename
+        if (results[0].profilePath) {
+            results[0].profilePath = path.relative('public', results[0].profilePath)
+        }
+
         return {
             success: 1,
             data: results[0]
@@ -221,7 +241,7 @@ export async function createReviews (data) {
 
 export async function getReviewByReviewId (id) {
     // gets post by id
-    const query = 'select id, userId, restaurantId, rating, comment from Reviews where id = ?'
+    const query = 'select id, userId, restaurantId, rating, comment from Reviews where restaurantId = ?'
     const value = [id]
     const [results] = await poolPromise.execute(query, value)
     if (results.length === 0) {
@@ -331,23 +351,27 @@ export async function insertCuisineFromRestaurant (data) {
 
 // create new cuisine
 export async function insertNewCuisineName (data) {
-    const name = data.name
+    const name = data.cuisineName
+    const restaurantId = data.restaurantId
+    let cuisineId
+    
     const searchQuery = 'select * from Cuisines where name = ?'
     const [result1] = await poolPromise.execute(searchQuery, [name])
 
     // cuisine exist
     if (result1.length !== 0) {
-        return {
-            success: 0,
-            message: 'Cuisine name already exist'
-        }
+        cuisineId = result1[0].id
+    } else {
+        const insertQuery = 'insert into Cuisines(name) values (?)'
+        const [result] = await poolPromise.execute(insertQuery, [name])
+        cuisineId = result.insertId
     }
 
-    const insertQuery = 'insert into Cuisines(name) values (?)'
-    const [result] = await poolPromise.execute(insertQuery, [name])
+    const query = 'insert into CuisineOffer(restaurantId, cuisineId) values (?, ?)'
+    const [results] = await poolPromise.execute(query, [restaurantId, cuisineId])
     return {
         success: 1,
-        data: result
+        data: results,
     }
 }
 
