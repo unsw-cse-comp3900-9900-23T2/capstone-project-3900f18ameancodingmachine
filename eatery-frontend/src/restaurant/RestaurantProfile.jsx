@@ -298,10 +298,12 @@ function generateAvailableVoucherList(toSet, allVouchers, bookingDate) {
  * TODO - Not Working
  * @param {Int} restId
  * @param {Int} userId
- * @param {String} voucherId
+ * @param {Int} voucherId
  * @param {Date} date Date for the booking
  */
 async function postBooking(restId, userId, voucherId, date) {
+  console.log('postBooking');
+  console.log((date));
   await axios.post('api/user/user/booking', {
     userId: userId,
     restaurantId: restId,
@@ -625,7 +627,7 @@ export default function RestaurantProfile() {
         <CardActions>
           {userContext === true &&
             <Button variant="contained" onClick={() => postBooking(parseInt(restaurantId),
-                parseInt(loginId), voucherId.code, bookingDate)}>
+                parseInt(loginId), parseInt(voucherId.id), bookingDate)}>
               Create Booking</Button>}
           {userContext === false &&
             <Button variant="contained" onClick={() => {
