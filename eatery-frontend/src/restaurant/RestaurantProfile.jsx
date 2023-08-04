@@ -303,7 +303,9 @@ function generateAvailableVoucherList(toSet, allVouchers, bookingDate) {
  */
 async function postBooking(restId, userId, voucherId, date) {
   console.log('postBooking');
-  console.log((date));
+  console.log(restId);
+  console.log(userId);
+  console.log(voucherId);
   await axios.post('api/user/user/booking', {
     userId: userId,
     restaurantId: restId,
@@ -359,6 +361,7 @@ export default function RestaurantProfile() {
 
   const [descriptionSuccess, setDescriptionSuccess] = useState(null);
   const [loginId, setLoginId] = useState(0);
+  const [userId, setUserId] = useState(-1);
 
   const [bookingDate, setBookingDate] = useState('');
 
@@ -379,6 +382,22 @@ export default function RestaurantProfile() {
       loadVouchers(setVoucherList, restaurantId);
     }
     /**
+     * TODO: axios request returns an empty array
+     */
+    async function getUserId() {
+      alert(loginId);
+      try {
+        const result = await axios.get(`api/user/login/${loginId}`);
+        console.log('getUserId');
+        console.log(result);
+        setUserId();
+      } catch (error) {
+        console.log('Could not get userId');
+        setUserId(-1);
+      }
+    }
+
+    /**
      *
      */
     async function checkCookies() {
@@ -386,8 +405,11 @@ export default function RestaurantProfile() {
         const result = await axios.get('/api/user/');
         const data = result.data;
         const decrypt = jwtDecode(data.token);
+        console.log(decrypt);
         if (data.success !== 0) {
-          setLoginId(decrypt.result.id);
+          const decryptLoginId = decrypt.result.id;
+          console.log(decrypt.result.id);
+          setLoginId(decryptLoginId);
           // get EateryAccount, if no result then it will return an 404 error
           // else it will go to restaurant page
           console.log('should be a restaurant');
@@ -401,6 +423,7 @@ export default function RestaurantProfile() {
           console.log('is a user');
           console.log(err.response.data);
           console.log('set to true');
+          getUserId();
           setUserContext(true);
         } else { // not loggedIn
           setUserContext(null);
@@ -627,7 +650,7 @@ export default function RestaurantProfile() {
         <CardActions>
           {userContext === true &&
             <Button variant="contained" onClick={() => postBooking(parseInt(restaurantId),
-                parseInt(loginId), parseInt(voucherId.id), bookingDate)}>
+                parseInt(userId), parseInt(voucherId.id), bookingDate)}>
               Create Booking</Button>}
           {userContext === false &&
             <Button variant="contained" onClick={() => {
